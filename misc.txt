@@ -1,0 +1,122 @@
+### Tout Ceci se trouve dans mon infos.go ###
+
+package database
+
+type Info struct {
+	ID       int
+	Agent    string
+	Material string
+	Priority int
+	Target   time.Time
+	Rte      string
+	Detail   string
+	Estimate string
+	Brips    string
+	Oups     string
+	Ameps    string
+	Ais      string
+	SourceID int
+	Created  time.Time
+	Updated  time.Time
+	Status   string
+	Event    string
+	ZeroTime time.Time
+	DB       *pgxpool.Pool
+}
+
+func (i *Info) InfoInsert(id int) (int, error) {
+	ctx := context.Background()
+	query := `
+INSERT INTO infos
+    (agent, material, priority, target, rte, detail, estimate, brips, oups, 
+    ameps, ais, source_id, created, updated, status, event)
+        VALUES
+            ($3, $2, $4, $5, $6, $7, $8, $9, $10, $11, $12, $1, $13, $14, $15, $16)
+	        RETURNING id;
+`
+	// i := &Info{}
+	err := i.DB.QueryRow(ctx, query, id,
+		i.Agent, i.Material, i.Priority, i.Target, i.Rte, i.Detail,
+		i.Estimate, i.Brips, i.Oups, i.Ameps, i.Ais, time.Now().UTC(),
+		i.Updated, i.Status, i.Event).Scan(&i.ID)
+	if err != nil {
+		return 0, err
+	}
+
+	return i.ID, nil
+}
+
+#############
+
+### Dans main.go ###
+
+package main
+
+type application struct {
+	infos	*database.Info
+}
+
+func main() {
+	// ...
+
+	app := &application{
+		// ...
+		infos:	&database.Info{DB, db},
+	}
+}
+
+#############
+
+### Handlers.go ###
+
+package main
+
+func (app *application) infoCreatePost(w http.ResponseWriter, r *http.Request) {
+	// Fetch input
+	err := r.ParseForm()
+	if err != nil {
+		app.clientError(w, http.StatusBadRequest)
+	}
+
+	app.infos.Agent = r.PostForm.Get("agent")
+	app.infos.Material = r.PostForm.Get("material")
+	app.infos.Detail = r.PostForm.Get("detail")
+	app.infos.Event = r.PostForm.Get("event")
+
+	prio := r.PostForm.Get("priority")
+	app.infos.Priority, err = strconv.Atoi(prio)
+	if err != nil {
+		app.notFound(w)
+		return
+	}
+
+	// Fetch SourceID
+	key := chi.URLParam(r, "id")
+
+	sID, err := strconv.Atoi(key)
+	if err != nil || sID < 1 {
+		app.notFound(w)
+		return
+	}
+
+	id, err := app.infos.Insert(sID)
+	if err != nil {
+		app.serverError(w, err)
+		return
+	}
+
+	http.Redirect(w, r, fmt.Sprintf("/source/%d/view/%d", sID, id), http.StatusSeeOther)
+}
+
+#############
+
+### routes.go ###
+
+package main
+
+func routes() {
+	// ...
+
+	r.Get("/source/{id}/info/create", app.infoCreate)
+	r.Post("/source/{id}/info/create", app.infoCreatePost)
+}
