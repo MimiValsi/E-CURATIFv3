@@ -18,6 +18,7 @@ type application struct {
 	infos         *database.Info
 	templateCache map[string]*template.Template
 	errorLog      *log.Logger
+	infoLog       *log.Logger
 }
 
 const (
@@ -27,7 +28,8 @@ const (
 
 func main() {
 	infoLog := log.New(os.Stderr, "INFO\t", log.Ldate|log.Ltime)
-	errorLog := log.New(os.Stderr, "ERROR\t", log.Ldate|log.Ltime|log.Lshortfile)
+	errorLog := log.New(os.Stderr, "ERROR\t",
+		log.Ldate|log.Ltime|log.Lshortfile)
 
 	db, err := openDB(dataURL)
 	if err != nil {

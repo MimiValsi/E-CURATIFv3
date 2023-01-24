@@ -2,7 +2,8 @@
     box-sizing:   border-box;
     margin:       0;
     padding:      0;
-    font-family:  "Ubuntu Mono", monospace;
+    /* font-family:  "Ubuntu Mono", monospace; */
+    font-family: "Lucida Grande", "monospace";
 }
 
 strong {
@@ -16,7 +17,8 @@ body {
 }
 
 header {
-    background-image:   -webkit-linear-gradient(left, #96cd32, #96cd32 15%, #1423dc 20%, #1423dc 45%, #1423dc 55%, #1423dc 55%, #1423dc 65%, #1423dc 65%,#1423dc 75%, #1423dc 85%, #1423dc 85%, #1423dc 85%, #1423dc 100%);
+    background-image:   -webkit-linear-gradient(left, #96cd32,
+        #96cd32 15%, #1423dc 20%, #1423dc 100%);
     background-size:    100% 0.6rem;
     background-repeat:  no-repeat;
     padding-top:        1rem;
@@ -32,17 +34,16 @@ a {
     text-decoration: none;
 }
 
-/* 
+/*
 ###################
 # Misc Parameters #
 ###################
 */
 
-#wastebin {
+#wastebin, #wastebinBtn {
     background: none;
     border: none;
-    font-size: 2rem;
-    color: #C0392B;
+    width: 3rem;
 }
 
 #returnArrow {
@@ -73,13 +74,13 @@ a {
     cursor: pointer;
 }
 
-/* 
+/*
 #######################
 # End Misc Parameters #
 #######################
 */
 
-/* 
+/*
 ##################
 # Nav Parameters #
 ##################
@@ -94,16 +95,13 @@ nav  {
     width: 2rem;
 }
 
-nav a:last-child {
-    margin-left: 10rem;
-}
-/* 
+/*
 ######################
 # End Nav parameters #
 ######################
 */
 
-/* 
+/*
 ############################
 # General Table Parameters #
 ############################
@@ -130,13 +128,13 @@ td {
 }
 
 
-/* 
+/*
 ################################
 # End General Table Parameters #
 ################################
 */
 
-/* 
+/*
 #############
 # Home Page #
 #############
@@ -148,7 +146,7 @@ td {
     margin: 0 0 1rem 0;
 }
 
-.homeTable {
+#homeTable {
     text-align: left;
     border-radius: 1rem;
     background-color: white;
@@ -171,13 +169,13 @@ td {
 #brdBttn {
     border-bottom: 0.125rem solid #666666;
 }
-/* 
+/*
 #################
 # End Home Page #
 #################
 */
 
-/* 
+/*
 #############################
 # Source & Info Create Page #
 #############################
@@ -228,7 +226,7 @@ td {
 }
 
 .nf-tr {
-    display: table-row;    
+    display: table-row;
 }
 
 .nf-td {
@@ -243,13 +241,13 @@ td {
     padding: 2rem 0 0 0;
 }
 
-/* 
+/*
 #################################
 # End Source & Info Create Page #
 #################################
 */
 
-/* 
+/*
 ###########################
 # Source & Info View Page #
 ###########################
@@ -316,6 +314,17 @@ td {
     width: 30%;
 }
 
+#searchPS {
+    background-image: url("/static/img/searchicon.png");
+    background-position: 0.4rem;
+    background-repeat: no-repeat;
+    border: 0.063rem solid #ddd;
+    height: 2rem;
+    max-height: 2rem;
+    padding: 0 0 0 2rem;
+    width: 100%;
+}
+
 #rightAlignSearch {
     text-align: right;
     padding: 1rem 0.19rem;
@@ -329,9 +338,9 @@ td {
     margin: 2rem 0 0 0;
 }
 
-/* 
+
+/*
 ###############################
 # End Source & Info View Page #
 ###############################
 */
-

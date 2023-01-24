@@ -21,11 +21,15 @@ func (app *application) notFound(w http.ResponseWriter) {
 	app.clientError(w, http.StatusNotFound)
 }
 
+// Allocates memory so that a template can be rendered.
+// It checks if the desired template exists before beeing sent
+// to http.ResponseWriter.
 func (app *application) render(w http.ResponseWriter, status int, page string, data *templateData) {
 	// Retrieve the appropriate template set from cache
 	ts, ok := app.templateCache[page]
 	if !ok {
-		err := fmt.Errorf("the template %s does not exist", page)
+		err := fmt.Errorf("the template %s does not exist",
+			page)
 		app.serverError(w, err)
 		return
 	}

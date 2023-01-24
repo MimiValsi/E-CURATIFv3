@@ -21,9 +21,9 @@ func (s *Source) MenuSource() ([]*Source, error) {
 	query := `
 SELECT id, name, created
     FROM sources
-	ORDER BY 
-	    name ASC;
-	`
+	ORDER BY
+	    name ASC
+`
 	rows, err := s.DB.Query(ctx, query)
 	if err != nil {
 		return nil, err
@@ -53,10 +53,10 @@ SELECT id, name, created
 func (s *Source) SourceGet(id int) (*Source, error) {
 	ctx := context.Background()
 	stmt := `
-SELECT id, name, created 
-    FROM sources 
-        WHERE 
-            id = $1
+SELECT *
+    FROM sources
+	WHERE
+	    id = $1
 `
 
 	row := s.DB.QueryRow(ctx, stmt, id)
@@ -81,10 +81,11 @@ func (s *Source) SourceInsert(name string) (int, error) {
 	query := `
 INSERT INTO sources
     (name, created)
-    	VALUES ($1, $2)
+	VALUES ($1, $2)
 	    RETURNING id
 `
-	err := s.DB.QueryRow(ctx, query, name, time.Now().UTC()).Scan(&s.ID)
+	err := s.DB.QueryRow(ctx, query, name,
+		time.Now().UTC()).Scan(&s.ID)
 	if err != nil {
 		return 0, nil
 	}
@@ -99,6 +100,21 @@ DELETE FROM sources
     WHERE id = $1
 `
 	_, err := s.DB.Exec(ctx, query, id)
+	if err != nil {
+		return err
+	}
+
+	return nil
+}
+
+func (s *Source) SourceUpdate(id int) error {
+	ctx := context.Background()
+	query := `
+UPDATE sources
+  SET name = $1
+    WHERE id = $2
+`
+	_, err := s.DB.Exec(ctx, query, s.Name, id)
 	if err != nil {
 		return err
 	}

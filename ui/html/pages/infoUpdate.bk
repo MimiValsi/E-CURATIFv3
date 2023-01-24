@@ -1,0 +1,22 @@
+{{ define "title" }}Info #{{ .Info.ID }}{{ end }}
+
+{{ define "nav" }}
+<nav>
+  <a href="/"><img class="iconeWidth"
+                   src="/static/img/icone_maison.png"></a>
+  <a href="/source/view/{{ .Info.SourceID }}">
+    <img class="iconeWidth" src="/static/img/icone_fleche.png">
+  </a>
+  <a href="/source/{{ .Info.SourceID }}/info/update/{{ .Info.ID }}">
+    <img class="iconeWidth" src="/static/img/icone_edition.png">
+  </a>
+</nav>
+{{ end }}
+
+{{ define "main" }}
+{{ with .Info }}
+
+<p> Material {{ .Material }}</p>
+{{ end }}
+
+{{ end }}

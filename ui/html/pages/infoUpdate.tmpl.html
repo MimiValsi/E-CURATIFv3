@@ -1,11 +1,10 @@
-{{ define "title" }}Créer nouvelle info{{ end }}
+{{ define "title" }}Info #{{ .Info.ID }}{{ end }}
 
 {{ define "nav" }}
 <nav>
-  <a href="/">
-    <img class="iconeWidth" src="/static/img/icone_maison.png">
-  </a>
-  <a href="/source/view/{{ .Source.ID }}">
+  <a href="/"><img class="iconeWidth"
+                   src="/static/img/icone_maison.png"></a>
+  <a href="/source/{{ .Info.SourceID}}/info/view/{{ .Info.ID }}">
     <img class="iconeWidth" src="/static/img/icone_fleche.png">
   </a>
 </nav>
@@ -13,7 +12,8 @@
 
 {{ define "main" }}
 <div id="srcName">
-  <form method="POST">
+  <form action="/source/{{ .Info.SourceID }}/info/update/{{ .Info.ID }}"
+        method="POST">
     <table>
       <tr>
         <th class="leftAlign">
@@ -23,13 +23,13 @@
       </tr>
       <tr>
         <td>
-          <input placeholder="..." class="infoInpt" type="text"
-                 name="agent">
+          <input value="{{ .Info.Agent }}"
+                 class="infoInpt" type="text" name="agent" autofocus>
         </td>
         <td></td>
         <td>
-          <input placeholder="..." class="infoInpt" type="text"
-                 name="doneby">
+          <input value="{{ .Info.Doneby }}"
+            class="infoInpt" type="text" name="doneby">
         </td>
       </tr>
       <tr>
@@ -43,13 +43,13 @@
       <tr>
         <td>
           <div>
-            <input placeholder="..." class="infoInpt" type="text"
-                   name="material">
+            <input class="infoInpt" value="{{ .Info.Material }}"
+                   type="text" name="material">
           </div>
         </td>
         <td colspan="2">
-          <input placeholder="..." class="infoInpt" type="text"
-                 name="detail">
+          <input class="infoInpt" value="{{ .Info.Detail }}"
+                 type="text" name="detail">
         </td>
       </tr>
       <tr>
@@ -63,53 +63,54 @@
       </tr>
       <tr>
         <td>
-          <input placeholder="..." class="infoInpt" type="text"
-                 name="event">
+          <input class="infoInpt" value="{{ .Info.Event }}"
+                 type="text" name="event">
         </td>
         <td>
-          <input placeholder="..." class="infoInpt" type="text"
-                 name="priority">
+          <input class="infoInpt" value="{{ .Info.Priority}}"
+                 type="text" name="priority">
         </td>
         <td>
-          <input placeholder="..." class="infoInpt" type="text"
-                 name="oups">
+          <input class="infoInpt" value="{{ .Info.Oups }}"
+                 type="text" name="oups">
         </td>
       </tr>
       <tr>
-        <th>Action AMEPS</th>
-        <th class="centerAlign">Action BRIPS</th>
-        <th class="rightAlign">Action RTE</th>
+        <th>Action<br />AMEPS</th>
+        <th class="centerAlign">Action<br />BRIPS</th>
+        <th class="rightAlign">Action<br />RTE</th>
       </tr>
       <tr>
         <td>
-          <input placeholder="..." class="infoInpt" type="text"
-                 name="ameps">
+          <input class="infoInpt" value="{{ .Info.Ameps }}"
+                 type="text" name="ameps">
         </td>
         <td>
-          <input placeholder="..." class="infoInpt" type="text"
-                 name="brips">
+          <input class="infoInpt" value="{{ .Info.Brips }}"
+                 type="text" name="brips">
         </td>
         <td>
-          <input placeholder="..." class="infoInpt" type="text"
-                 name="rte">
+          <input class="infoInpt" value="{{ .Info.Rte }}"
+                 type="text" name="rte">
         </td>
       <tr>
-        <th>Action AIS</th>
+        <th>Action<br />AIS</th>
         <th class="centerAlign">Devis</th>
         <th class="rightAlign">Date de Prévue</th>
       </tr>
       <tr>
         <td>
-          <input placeholder="..." class="infoInpt" type="text"
-                 name="ais">
+          <input class="infoInpt" value="{{ .Info.Ais }}"
+                 type="text" name="ais">
         </td>
         <td>
-          <input placeholder="..." class="infoInpt" type="text"
-                 name="estimate">
+          <input class="infoInpt" value="{{ .Info.Estimate }}"
+                 type="text" name="estimate">
         </td>
         <td>
-          <input placeholder="..." class="infoInpt" type="text"
-                 name="target">
+          <input class="infoInpt" placeholder="jj/mm/aaaa"
+                 value="{{ .Info.Target }}"
+                 type="text" name="target">
         </td>
       </tr>
       <tr>

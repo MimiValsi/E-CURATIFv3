@@ -1,22 +1,26 @@
 {{ define "title" }}Home{{ end }}
 
 {{ define "main" }}
-    {{ if .Sources }}
-    <div class="homeLimits">
-        <table class="homeTable">
-            <tr id="brdBttn">
-                <th>Name</th>
-                <th class="rightAlign">Created</th>
-            </tr>
-            {{ range .Sources }}
-            <tr>
-                <td><a href="/source/view/{{ .ID }}">{{ .Name }}</a></td>
-                <td class="rightAlign">{{ humanDate .Created }}</td>
-            </tr>
-            {{ end }}
-        </table>
-        {{ else }}
-        <p>Poste prope...</p>
-        {{ end }}
-    </div>
+{{ if .Sources }}
+<div class="homeLimits">
+  <table id="homeTable">
+    <tr id="brdBttn">
+      <th>Name</th>
+      <!-- <th class="rightAlign">Created</th> -->
+      <th>
+        <input id="searchPS" onkeyup="searchPS()"
+           placeholder="Chercher des PS...">
+      </th>
+    </tr>
+    {{ range .Sources }}
+    <tr>
+      <td colspan="2"><a href="/source/view/{{ .ID }}">{{ .Name }}</a></td>
+      <!-- <td class="rightAlign">{{ humanDate .Created }}</td> -->
+    </tr>
+    {{ end }}
+  </table>
+  {{ else }}
+  <p>Bienvenue chez e-Curatif !</p>
+  {{ end }}
+</div>
 {{ end }}
