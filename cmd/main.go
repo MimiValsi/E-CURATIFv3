@@ -13,12 +13,14 @@ import (
 	"github.com/jackc/pgx/v4/pgxpool"
 )
 
+// Main struct,
 type application struct {
 	sources       *database.Source
 	infos         *database.Info
 	templateCache map[string]*template.Template
 	errorLog      *log.Logger
 	infoLog       *log.Logger
+	csv           *database.CSVdata
 }
 
 const (
@@ -46,6 +48,7 @@ func main() {
 		sources:       &database.Source{DB: db},
 		infos:         &database.Info{DB: db},
 		templateCache: templateCache,
+		csv:           &database.CSVdata{DB: db},
 	}
 
 	srv := &http.Server{
@@ -54,10 +57,11 @@ func main() {
 		ReadTimeout:  10 * time.Second,
 		WriteTimeout: 10 * time.Second,
 	}
-
+	// database.VerifyCSV("test.csv")
 	infoLog.Printf("Starting server on %s", addr)
 	err = srv.ListenAndServe()
 	errorLog.Fatal(err)
+
 
 }
 

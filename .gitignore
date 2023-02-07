@@ -2,3 +2,7 @@ Relicas_PS_NT.csv
 Relicas_PS_NT.xlsm
 TODO
 misc.txt
+cmd/converter.go
+test.txt
+database/csv_test.go
+test.csv

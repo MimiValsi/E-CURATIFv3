@@ -11,7 +11,7 @@ import (
 	"github.com/go-chi/chi/v5"
 )
 
-func(app *application) home(w http.ResponseWriter, r *http.Request) {
+func (app *application) home(w http.ResponseWriter, r *http.Request) {
 	sources, err := app.sources.MenuSource()
 	if err != nil {
 		app.serverError(w, err)
@@ -34,7 +34,7 @@ type sourceCreateForm struct {
 	validator.Validator
 }
 
-func(app *application) sourceView(w http.ResponseWriter, r *http.Request) {
+func (app *application) sourceView(w http.ResponseWriter, r *http.Request) {
 
 	key := chi.URLParam(r, "id")
 	id, err := strconv.Atoi(key)
@@ -69,7 +69,7 @@ func(app *application) sourceView(w http.ResponseWriter, r *http.Request) {
 
 }
 
-func(app *application) sourceCreate(w http.ResponseWriter, r *http.Request) {
+func (app *application) sourceCreate(w http.ResponseWriter, r *http.Request) {
 
 	data := app.newTemplateData(r)
 	data.Form = sourceCreateForm{}
@@ -77,7 +77,7 @@ func(app *application) sourceCreate(w http.ResponseWriter, r *http.Request) {
 	app.render(w, http.StatusOK, "sourceCreate.tmpl.html", data)
 }
 
-func(app *application) sourceCreatePost(w http.ResponseWriter, r *http.Request) {
+func (app *application) sourceCreatePost(w http.ResponseWriter, r *http.Request) {
 
 	err := r.ParseForm()
 	if err != nil {
@@ -161,7 +161,7 @@ func (app *application) sourceUpdate(w http.ResponseWriter, r *http.Request) {
 	app.render(w, http.StatusOK, "sourceUpdate.tmpl.html", data)
 }
 
-func(app *application) sourceUpdatePost(w http.ResponseWriter, r *http.Request) {
+func (app *application) sourceUpdatePost(w http.ResponseWriter, r *http.Request) {
 	err := r.ParseForm()
 	if err != nil {
 		app.clientError(w, http.StatusBadRequest)
@@ -203,6 +203,7 @@ func(app *application) sourceUpdatePost(w http.ResponseWriter, r *http.Request) 
 		http.StatusSeeOther)
 
 }
+
 //
 // Infos Handlers
 //
@@ -317,19 +318,19 @@ func (app *application) infoCreatePost(w http.ResponseWriter, r *http.Request) {
 
 	// By copying form.xxx into app.infos.xxx, it will
 	// send the data to Infos struct @ database/infos.go
-	app.infos.Agent         = form.Agent
-	app.infos.Material      = form.Material
-	app.infos.Detail        = form.Detail
-	app.infos.Event         = form.Event
-	app.infos.Oups          = form.Oups
-	app.infos.Ameps         = form.Ameps
-	app.infos.Brips         = form.Brips
-	app.infos.Rte           = form.Rte
-	app.infos.Ais           = form.Ais
-	app.infos.Estimate      = form.Estimate
-	app.infos.Target        = form.Target
-	app.infos.Status        = form.Status
-	app.infos.Doneby        = form.Doneby
+	app.infos.Agent = form.Agent
+	app.infos.Material = form.Material
+	app.infos.Detail = form.Detail
+	app.infos.Event = form.Event
+	app.infos.Oups = form.Oups
+	app.infos.Ameps = form.Ameps
+	app.infos.Brips = form.Brips
+	app.infos.Rte = form.Rte
+	app.infos.Ais = form.Ais
+	app.infos.Estimate = form.Estimate
+	app.infos.Target = form.Target
+	app.infos.Status = form.Status
+	app.infos.Doneby = form.Doneby
 	app.infos.Priority, err = strconv.Atoi(form.Priority)
 	if err != nil {
 		app.notFound(w)
@@ -425,14 +426,13 @@ func (app *application) infoUpdate(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-
 	data := app.newTemplateData(r)
 	data.Info = info
 
 	app.render(w, http.StatusOK, "infoUpdate.tmpl.html", data)
 }
 
-func(app *application) infoUpdatePost(w http.ResponseWriter, r *http.Request) {
+func (app *application) infoUpdatePost(w http.ResponseWriter, r *http.Request) {
 	// Fetch input
 	err := r.ParseForm()
 	if err != nil {
@@ -454,7 +454,6 @@ func(app *application) infoUpdatePost(w http.ResponseWriter, r *http.Request) {
 		app.notFound(w)
 		return
 	}
-
 
 	form := infoCreateForm{
 		Agent:    r.PostForm.Get("agent"),
@@ -497,19 +496,19 @@ func(app *application) infoUpdatePost(w http.ResponseWriter, r *http.Request) {
 	// }
 
 	// app.infos.__ go fetch the Info struct @ database/infos.go
-	app.infos.Agent         = form.Agent
-	app.infos.Material      = form.Material
-	app.infos.Detail        = form.Detail
-	app.infos.Event         = form.Event
-	app.infos.Oups          = form.Oups
-	app.infos.Ameps         = form.Ameps
-	app.infos.Brips         = form.Brips
-	app.infos.Rte           = form.Rte
-	app.infos.Ais           = form.Ais
-	app.infos.Estimate      = form.Estimate
-	app.infos.Target        = form.Target
-	app.infos.Status        = form.Status
-	app.infos.Doneby        = form.Doneby
+	app.infos.Agent = form.Agent
+	app.infos.Material = form.Material
+	app.infos.Detail = form.Detail
+	app.infos.Event = form.Event
+	app.infos.Oups = form.Oups
+	app.infos.Ameps = form.Ameps
+	app.infos.Brips = form.Brips
+	app.infos.Rte = form.Rte
+	app.infos.Ais = form.Ais
+	app.infos.Estimate = form.Estimate
+	app.infos.Target = form.Target
+	app.infos.Status = form.Status
+	app.infos.Doneby = form.Doneby
 	app.infos.Priority, err = strconv.Atoi(form.Priority)
 	if err != nil {
 		app.notFound(w)

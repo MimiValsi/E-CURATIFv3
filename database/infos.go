@@ -10,26 +10,29 @@ import (
 )
 
 type Info struct {
-	ID       int
-	Agent    string
-	Material string
-	Priority int
-	Target   string
-	Rte      string
-	Detail   string
-	Estimate string
-	Brips    string
-	Oups     string
-	Ameps    string
-	Ais      string
-	SourceID int
-	Created  time.Time
-	Updated  time.Time
-	Status   string
-	Event    string
-	Doneby   string
-	ZeroTime time.Time
-	DB       *pgxpool.Pool
+	ID         int
+	Agent      string
+	Material   string
+	Priority   int
+	Target     string
+	Rte        string
+	Detail     string
+	Estimate   string
+	Brips      string
+	Oups       string
+	Ameps      string
+	Ais        string
+	SourceID   int
+	Created    time.Time
+	Updated    time.Time
+	Status     string
+	Event      string
+	Doneby     string
+	Pilot      string
+	ActionDate string
+	DayDone    string
+	ZeroTime   time.Time
+	DB         *pgxpool.Pool
 }
 
 // Func to create new Info of a Source
@@ -39,17 +42,18 @@ func (i *Info) Insert(id int) (int, error) {
 INSERT INTO infos
     (source_id, agent, material, detail, event, priority,
        oups, ameps, brips, rte, ais, estimate,
-	target, status, doneby, created)
+	target, status, doneby, pilot, action_date created)
 	  VALUES
 	    ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10,
-	      $11, $12, $13, $14, $15, $16)
+	      $11, $12, $13, $14, $15, $16, $17, $18)
 		RETURNING id;
 `
 	err := i.DB.QueryRow(ctx, query, id, i.Agent,
 		i.Material, i.Detail, i.Event, i.Priority,
 		i.Oups, i.Ameps, i.Brips, i.Rte, i.Ais,
 		i.Estimate, i.Target, i.Status,
-		i.Doneby, time.Now().UTC()).Scan(&i.ID)
+		i.Doneby, i.Pilot, i.ActionDate,
+		time.Now().UTC()).Scan(&i.ID)
 	if err != nil {
 		return 0, err
 	}
@@ -69,7 +73,7 @@ SELECT *
 	row := i.DB.QueryRow(ctx, query, id)
 
 	var rte, ameps, ais, brips, oups, estimate, target,
-		doneby *string
+		doneby, pilot, actionDate *string
 	// var priority *int
 	var updated *time.Time
 
@@ -78,7 +82,8 @@ SELECT *
 	err := row.Scan(&iObj.ID, &iObj.Agent, &iObj.Material,
 		&iObj.Priority, &rte, &iObj.Detail, &estimate, &brips,
 		&oups, &ameps, &ais, &iObj.SourceID, &iObj.Created,
-		&updated, &iObj.Status, &iObj.Event, &target, &doneby)
+		&updated, &iObj.Status, &iObj.Event, &target, &doneby,
+		&pilot, &actionDate)
 	if err != nil {
 		if errors.Is(err, pgx.ErrNoRows) {
 			return nil, ErrNoRecord
@@ -89,7 +94,6 @@ SELECT *
 
 	iObj.ZeroTime = time.Date(0001, time.January,
 		1, 0, 0, 0, 0, time.UTC)
-
 
 	// if agent != nil {
 	//	iObj.Agent = *agent
@@ -155,6 +159,14 @@ SELECT *
 		iObj.Doneby = *doneby
 	}
 
+	if pilot != nil {
+		iObj.Pilot = *pilot
+	}
+
+	if actionDate != nil {
+		iObj.ActionDate = *actionDate
+	}
+
 	return iObj, nil
 }
 
@@ -209,7 +221,7 @@ DELETE FROM infos
 	return nil
 }
 
-func(i *Info) InfoUpdate(id int) error {
+func (i *Info) InfoUpdate(id int) error {
 	ctx := context.Background()
 	query := `
 UPDATE infos
@@ -227,13 +239,15 @@ UPDATE infos
       updated = $12,
       status = $13,
       event = $14,
-      doneby = $15
-	WHERE id = $16
+      doneby = $15,
+      pilot = $16,
+      action_date = $17
+	WHERE id = $18
 `
 	_, err := i.DB.Exec(ctx, query, i.Agent, i.Material,
 		i.Priority, i.Target, i.Rte, i.Detail, i.Estimate,
 		i.Brips, i.Oups, i.Ameps, i.Ais, time.Now().UTC(),
-		i.Status, i.Event, i.Doneby, id)
+		i.Status, i.Event, i.Doneby, i.Pilot, i.ActionDate, id)
 	if err != nil {
 		return err
 	}
@@ -241,7 +255,7 @@ UPDATE infos
 	return nil
 }
 
-func(i *Info) InfoUp(id int) error {
+func (i *Info) InfoUp(id int) error {
 	ctx := context.Background()
 	query := `
 UPDATE infos
