@@ -22,39 +22,39 @@ E-CURATIFv3/
 │   └── validator/
 │        └── validator.go
 │
-├── ui/
-│   ├── html/
-│   │   ├── pages/
-│   │   │   ├── home.tmpl.html
-│   │   │   ├── infoCreate.tmpl.html
-│   │   │   ├── infoUpdate.tmpl.html
-│   │   │   ├── infoView.tmpl.html
-│   │   │   ├── sourceCreate.tmpl.html
-│   │   │   ├── sourceUpdate.tmpl.html
-│   │   │   └──  sourceView.tmpl.html
-│   │   │
-│   │   ├── partials/
-│   │   │   └── nav.tmpl.html
-│   │   │
-│   │   └── base.tmpl.html
-│   │
-│   └── static/
-│       ├── css/
-│       │   └── main.css
-│       │
-│       ├── img/
-│       │   ├── ecuratif.png
-│       │   ├── favicon.png
-│       │   ├── icone_corbeille.png
-│       │   ├── icone_edition.png
-│       │   ├── icone_fleche.png
-│       │   ├── icone_maison.png
-│       │   ├── icone_ps.png
-│       │   ├── searchicon.png
-│       │   ├── wall_1a.png
-│       │   └── wall_1a_1080p.png
-│       │
-│       └── js/
+└── ui/
+    ├── html/
+    │   ├── pages/
+    │   │   ├── home.tmpl.html
+    │   │   ├── infoCreate.tmpl.html
+    │   │   ├── infoUpdate.tmpl.html
+    │   │   ├── infoView.tmpl.html
+    │   │   ├── sourceCreate.tmpl.html
+    │   │   ├── sourceUpdate.tmpl.html
+    │   │   └──  sourceView.tmpl.html
+    │   │
+    │   ├── partials/
+    │   │   └── nav.tmpl.html
+    │   │
+    │   └── base.tmpl.html
+    │
+    └── static/
+        ├── css/
+        │   └── main.css
+        │
+        ├── img/
+        │   ├── ecuratif.png
+        │   ├── favicon.png
+        │   ├── icone_corbeille.png
+        │   ├── icone_edition.png
+        │   ├── icone_fleche.png
+        │   ├── icone_maison.png
+        │   ├── icone_ps.png
+        │   ├── searchicon.png
+        │   ├── wall_1a.png
+        │   └── wall_1a_1080p.png
+        │
+        └── js/
             └── main.js
 ```
 
