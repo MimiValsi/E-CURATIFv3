@@ -9,7 +9,10 @@ import (
 	"os/exec"
 	"strconv"
 	"strings"
+	"time"
+	"errors"
 
+	"github.com/jackc/pgx/v4"
 	"github.com/jackc/pgx/v4/pgxpool"
 )
 
@@ -36,7 +39,8 @@ import (
 // for every file scanned, we verify it's encoding
 // if it's not UTF-8 then run cmd to change to it.
 
-type CSVdata struct {
+type CSVInfo struct {
+	ID int
 	Agent    string
 	Event    string
 	Created  string // Cast to date with PSQL
@@ -56,8 +60,17 @@ type CSVdata struct {
 	infoLog  *log.Logger
 }
 
+type CSVSource struct {
+	ID int
+	Name string
+	Created time.Time
+	DB *pgxpool.Pool
+	errorlog *log.Logger
+	infoLog *log.Logger
+}
+
 func VerifyCSV(s string) {
-	data := CSVdata{}
+	data := CSVInfo{}
 	file := strings.Split(s, ".")
 	length := len(file)
 
@@ -68,7 +81,7 @@ func VerifyCSV(s string) {
 	}
 }
 
-func (data *CSVdata) encodingCSV(s string) {
+func (data *CSVInfo) encodingCSV(s string) {
 	cmd, err := exec.Command("file", "-i", s).Output()
 	if err != nil {
 		data.infoLog.Println(err)
@@ -93,7 +106,7 @@ func (data *CSVdata) encodingCSV(s string) {
 	}
 }
 
-func (data *CSVdata) dataCSV(s string) {
+func (data *CSVInfo) dataCSV(s string) {
 	file, err := os.Open(s)
 	if err != nil {
 		fmt.Println(err)
@@ -132,17 +145,17 @@ func (data *CSVdata) dataCSV(s string) {
 	}
 }
 
-func (data *CSVdata) insertDB() {
+func (data *CSVInfo) insertDB() {
 	ctx := context.Background()
 	query := `
 INSERT INTO infos
   (agent, event, material, pilot, detail, target, day_done,
     priority, estimate, oups, brips, ameps, created, source_id)
-VALUES
-  ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12,
-    (to_date($13, dd/mm/yyyy)), $14)
-	`
-	err := data.DB.QueryRow(ctx, query, data.Agent, data.Event,
+      VALUES
+	($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12,
+	  (to_date($13, dd/mm/yyyy)), $14)
+`
+	_, err := data.DB.Exec(ctx, query, data.Agent, data.Event,
 		data.Material, data.Pilot, data.Detail, data.Target,
 		data.DayDone, data.Priority, data.Estimate,
 		data.Oups, data.Brips, data.Ameps, data.Created,
@@ -152,9 +165,24 @@ VALUES
 	}
 }
 
-// func (data *CSVdata) sourceNumber(s string) int {
-//	switch s {
-//	case ""
-//	}
-//	return 0
-// }
+func (csv *CSVSource) SourceNumber(s string) {
+	ctx := context.Background()
+	query := `
+SELECT *
+  FROM sources
+    WHERE name = $1
+`
+
+	err := csv.DB.QueryRow(ctx, query, s).Scan(&csv.ID,
+		&csv.Name, &csv.Created)
+	if err != nil {
+		if errors.Is(err, pgx.ErrNoRows) {
+			fmt.Println(ErrNoRecord)
+		} else {
+			fmt.Println(err)
+		}
+	}
+	fmt.Printf("%v %v %v \n\n", csv.ID, csv.Name, csv.Created)
+	//return 0
+
+}

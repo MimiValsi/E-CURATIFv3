@@ -16,15 +16,16 @@ type Source struct {
 	DB      *pgxpool.Pool
 }
 
-func (s *Source) MenuSource() ([]*Source, error) {
+func (src *Source) MenuSource() ([]*Source, error) {
 	ctx := context.Background()
 	query := `
 SELECT id, name, created
-    FROM sources
-	ORDER BY
-	    name ASC
+  FROM sources
+    ORDER BY
+      name ASC
 `
-	rows, err := s.DB.Query(ctx, query)
+
+	rows, err := src.DB.Query(ctx, query)
 	if err != nil {
 		return nil, err
 	}
@@ -50,20 +51,16 @@ SELECT id, name, created
 	return sources, nil
 }
 
-func (s *Source) SourceGet(id int) (*Source, error) {
+func (src *Source) SourceGet(id int) (*Source, error) {
 	ctx := context.Background()
-	stmt := `
+	query := `
 SELECT *
-    FROM sources
-	WHERE
-	    id = $1
+  FROM sources
+    WHERE id = $1
 `
-
-	row := s.DB.QueryRow(ctx, stmt, id)
-
 	sObj := &Source{}
-
-	err := row.Scan(&sObj.ID, &sObj.Name, &sObj.Created)
+	err := src.DB.QueryRow(ctx, query, id).Scan(&sObj.ID, &sObj.Name,
+		&sObj.Created)
 	if err != nil {
 		if errors.Is(err, pgx.ErrNoRows) {
 			return nil, ErrNoRecord
@@ -76,30 +73,30 @@ SELECT *
 
 }
 
-func (s *Source) SourceInsert(name string) (int, error) {
+func (src *Source) SourceInsert(name string) (int, error) {
 	ctx := context.Background()
 	query := `
 INSERT INTO sources
-    (name, created)
-	VALUES ($1, $2)
-	    RETURNING id
+  (name, created)
+    VALUES ($1, $2)
+      RETURNING id
 `
-	err := s.DB.QueryRow(ctx, query, name,
-		time.Now().UTC()).Scan(&s.ID)
+	err := src.DB.QueryRow(ctx, query, name,
+		time.Now().UTC()).Scan(&src.ID)
 	if err != nil {
 		return 0, nil
 	}
 
-	return s.ID, nil
+	return src.ID, nil
 }
 
-func (s *Source) SourceDelete(id int) error {
+func (src *Source) SourceDelete(id int) error {
 	ctx := context.Background()
 	query := `
 DELETE FROM sources
     WHERE id = $1
 `
-	_, err := s.DB.Exec(ctx, query, id)
+	_, err := src.DB.Exec(ctx, query, id)
 	if err != nil {
 		return err
 	}
@@ -107,14 +104,14 @@ DELETE FROM sources
 	return nil
 }
 
-func (s *Source) SourceUpdate(id int) error {
+func (src *Source) SourceUpdate(id int) error {
 	ctx := context.Background()
 	query := `
 UPDATE sources
   SET name = $1
     WHERE id = $2
 `
-	_, err := s.DB.Exec(ctx, query, s.Name, id)
+	_, err := src.DB.Exec(ctx, query, src.Name, id)
 	if err != nil {
 		return err
 	}

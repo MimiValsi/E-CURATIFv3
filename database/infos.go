@@ -40,19 +40,18 @@ func (i *Info) Insert(id int) (int, error) {
 	ctx := context.Background()
 	query := `
 INSERT INTO infos
-    (source_id, agent, material, detail, event, priority,
-       oups, ameps, brips, rte, ais, estimate,
-	target, status, doneby, pilot, action_date created)
+    (source_id, agent, material, detail, event, priority, oups, ameps,
+       brips, rte, ais, estimate, target, status, doneby, created)
 	  VALUES
-	    ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10,
-	      $11, $12, $13, $14, $15, $16, $17, $18)
+	    ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12, $13,
+	      $14, $15, $16, $17, $18)
 		RETURNING id;
 `
 	err := i.DB.QueryRow(ctx, query, id, i.Agent,
 		i.Material, i.Detail, i.Event, i.Priority,
 		i.Oups, i.Ameps, i.Brips, i.Rte, i.Ais,
 		i.Estimate, i.Target, i.Status,
-		i.Doneby, i.Pilot, i.ActionDate,
+		i.Doneby, i.ActionDate,
 		time.Now().UTC()).Scan(&i.ID)
 	if err != nil {
 		return 0, err
@@ -65,25 +64,21 @@ INSERT INTO infos
 func (i *Info) InfoGet(id int) (*Info, error) {
 	ctx := context.Background()
 	query := `
-SELECT *
-  FROM infos
-    WHERE id = $1
+SELECT id, agent, material, priority, rte, detail, estimate, brips,
+  oups, ameps, ais, source_id, created, updated, status, event, target
+    FROM infos
+      WHERE id = $1
 `
-
-	row := i.DB.QueryRow(ctx, query, id)
-
 	var rte, ameps, ais, brips, oups, estimate, target,
 		doneby, pilot, actionDate *string
-	// var priority *int
 	var updated *time.Time
 
 	iObj := &Info{}
-
-	err := row.Scan(&iObj.ID, &iObj.Agent, &iObj.Material,
-		&iObj.Priority, &rte, &iObj.Detail, &estimate, &brips,
-		&oups, &ameps, &ais, &iObj.SourceID, &iObj.Created,
-		&updated, &iObj.Status, &iObj.Event, &target, &doneby,
-		&pilot, &actionDate)
+	err := i.DB.QueryRow(ctx, query, id).Scan(&iObj.ID, &iObj.Agent,
+		&iObj.Material, &iObj.Priority, &rte, &iObj.Detail,
+		&estimate, &brips, &oups, &ameps, &ais, &iObj.SourceID,
+		&iObj.Created, &updated, &iObj.Status, &iObj.Event,
+		&target)
 	if err != nil {
 		if errors.Is(err, pgx.ErrNoRows) {
 			return nil, ErrNoRecord
@@ -95,18 +90,6 @@ SELECT *
 	iObj.ZeroTime = time.Date(0001, time.January,
 		1, 0, 0, 0, 0, time.UTC)
 
-	// if agent != nil {
-	//	iObj.Agent = *agent
-	// }
-
-	// if material != nil {
-	//	iObj.Material = *material
-	// }
-
-	// if priority != nil {
-	//	iObj.Priority = *priority
-	// }
-
 	if target != nil {
 		iObj.Target = *target
 	}
@@ -114,10 +97,6 @@ SELECT *
 	if rte != nil {
 		iObj.Rte = *rte
 	}
-
-	// if detail != nil {
-	//	iObj.Detail = *detail
-	// }
 
 	if ameps != nil {
 		iObj.Ameps = *ameps
@@ -134,18 +113,6 @@ SELECT *
 	if oups != nil {
 		iObj.Oups = *oups
 	}
-
-	// if status != nil {
-	//	iObj.Status = *status
-	// }
-
-	// if event != nil {
-	//	iObj.Event = *event
-	// }
-
-	// if created != nil {
-	//	iObj.Created = *created
-	// }
 
 	if updated != nil {
 		iObj.Updated = *updated
@@ -172,14 +139,14 @@ SELECT *
 
 func (i *Info) InfoList(id int) ([]*Info, error) {
 	ctx := context.Background()
-	stmt := `
+	query := `
 SELECT id, material, created, status, source_id, priority
-    FROM infos
-	WHERE source_id = $1
-	    ORDER BY
-		created ASC
+  FROM infos
+    WHERE source_id = $1
+      ORDER
+	created ASC
 `
-	rows, err := i.DB.Query(ctx, stmt, id)
+	rows, err := i.DB.Query(ctx, query, id)
 	if err != nil {
 		return nil, err
 	}
@@ -225,24 +192,11 @@ func (i *Info) InfoUpdate(id int) error {
 	ctx := context.Background()
 	query := `
 UPDATE infos
-  SET agent = $1,
-      material = $2,
-      priority = $3,
-      target = $4,
-      rte = $5,
-      detail = $6,
-      estimate = $7,
-      brips = $8,
-      oups = $9,
-      ameps = $10,
-      ais = $11,
-      updated = $12,
-      status = $13,
-      event = $14,
-      doneby = $15,
-      pilot = $16,
-      action_date = $17
-	WHERE id = $18
+  SET agent = $1, material = $2, priority = $3, target = $4, rte = $5,
+    detail = $6, estimate = $7, brips = $8, oups = $9, ameps = $10,
+      ais = $11, updated = $12, status = $13, event = $14, doneby = $15,
+	pilot = $16, action_date = $17
+	  WHERE id = $18
 `
 	_, err := i.DB.Exec(ctx, query, i.Agent, i.Material,
 		i.Priority, i.Target, i.Rte, i.Detail, i.Estimate,
@@ -259,9 +213,8 @@ func (i *Info) InfoUp(id int) error {
 	ctx := context.Background()
 	query := `
 UPDATE infos
-  SET material = $1,
-      updated = $2
-	WHERE id = $3
+  SET material = $1, updated = $2
+    WHERE id = $3
 `
 	_, err := i.DB.Exec(ctx, query, i.Material,
 		time.Now().UTC(), id)

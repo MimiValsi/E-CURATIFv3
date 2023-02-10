@@ -1,17 +1,20 @@
 package main
 
 import (
-	"E-CURATIFv3/database"
-	"E-CURATIFv3/internal/validator"
 	"errors"
 	"fmt"
 	"net/http"
 	"strconv"
 
+	"E-CURATIFv3/database"
+	"E-CURATIFv3/internal/validator"
+
+	// See routers.go for description
 	"github.com/go-chi/chi/v5"
 )
 
 func (app *application) home(w http.ResponseWriter, r *http.Request) {
+	// MenuSource func @ database folder
 	sources, err := app.sources.MenuSource()
 	if err != nil {
 		app.serverError(w, err)
