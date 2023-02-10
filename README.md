@@ -10,13 +10,13 @@ E-CURATIFv3/
 │   ├── templates.go
 │   ├── handlers.go
 │   ├── helpers.go
-│   └──  converter.go (to be refactored)
+│   └── converter.go (to be refactored)
 │
 ├── database/
 │   ├── errors.go
 │   ├── importCSV.go
 │   ├── infos.go
-│   └──  sources.go
+│   └── sources.go
 │
 ├── internal/
 │   └── validator/
@@ -31,7 +31,7 @@ E-CURATIFv3/
     │   │   ├── infoView.tmpl.html
     │   │   ├── sourceCreate.tmpl.html
     │   │   ├── sourceUpdate.tmpl.html
-    │   │   └──  sourceView.tmpl.html
+    │   │   └── sourceView.tmpl.html
     │   │
     │   ├── partials/
     │   │   └── nav.tmpl.html
