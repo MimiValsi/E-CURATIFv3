@@ -39,23 +39,23 @@ E-CURATIFv3/
 │   │   └── base.tmpl.html
 │   │
 │   └── static/
-│        ├── css/
-│        │   └── main.css
-│        │
-│        ├── img/
-│        │   ├── ecuratif.png
-│        │   ├── favicon.png
-│        │   ├── icone_corbeille.png
-│        │   ├── icone_edition.png
-│        │   ├── icone_fleche.png
-│        │   ├── icone_maison.png
-│        │   ├── icone_ps.png
-│        │   ├── searchicon.png
-│        │   ├── wall_1a.png
-│        │   └── wall_1a_1080p.png
-│        │
-│        └── js/
-               └── main.js
+│       ├── css/
+│       │   └── main.css
+│       │
+│       ├── img/
+│       │   ├── ecuratif.png
+│       │   ├── favicon.png
+│       │   ├── icone_corbeille.png
+│       │   ├── icone_edition.png
+│       │   ├── icone_fleche.png
+│       │   ├── icone_maison.png
+│       │   ├── icone_ps.png
+│       │   ├── searchicon.png
+│       │   ├── wall_1a.png
+│       │   └── wall_1a_1080p.png
+│       │
+│       └── js/
+             └── main.js
 ```
 
 <!---
