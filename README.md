@@ -55,7 +55,7 @@ E-CURATIFv3/
 │       │   └── wall_1a_1080p.png
 │       │
 │       └── js/
-             └── main.js
+            └── main.js
 ```
 
 <!---
