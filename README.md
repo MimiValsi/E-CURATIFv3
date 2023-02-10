@@ -2,57 +2,57 @@
 
 ## Tree settings
 
-E-CURATIFv3/<br />
-|<br />
-|- cmd/<br />
-|  |- main.go<br />
-|  |- routers.go<br />
-|  |- templates.go<br />
-|  |- handlers.go<br />
-|  |- helpers.go<br />
-|  |- converter.go (to be refactored)<br />
-|<br />
-|- database/<br />
-|  |- errors.go<br />
-|  |- importCSV.go<br />
-|  |- infos.go<br />
-|  |- sources.go<br />
-|<br />
-|- internal/<br />
-|  |- validator/<br />
-|  |  |- validator.go<br />
-|<br />
-|- ui/<br />
-|  |- html/<br />
-|  |  |- pages/<br />
-|  |  |  |- home.tmpl.html<br />
-|  |  |  |- infoCreate.tmpl.html<br />
-|  |  |  |- infoUpdate.tmpl.html<br />
-|  |  |  |- infoView.tmpl.html<br />
-|  |  |  |- sourceCreate.tmpl.html<br />
-|  |  |  |- sourceUpdate.tmpl.html<br />
-|  |  |  |- sourceView.tmpl.html<br />
-|  |  |<br />
-|  |  |- partials/<br />
-|  |  |  |- nav.tmpl.html<br />
-|  |  |<br />
-|  |  |- base.tmpl.html<br />
-|  |<br />
-|  |- static/<br />
-|  |  |- css/<br />
-|  |  |  |- main.css<br />
-|  |  |<br />
-|  |  |- img/<br />
-|  |  |  |- ecuratif.png<br />
-|  |  |  |- favicon.png<br />
-|  |  |  |- icone_corbeille.png<br />
-|  |  |  |- icone_edition.png<br />
-|  |  |  |- icone_fleche.png<br />
-|  |  |  |- icone_maison.png<br />
-|  |  |  |- icone_ps.png<br />
-|  |  |  |- searchicon.png<br />
-|  |  |  |- wall_1a.png<br />
-|  |  |  |- wall_1a_1080p.png<br />
-|  |  |<br />
-|  |  |- js/<br />
-|  |  |  |- main.js<br />
+E-CURATIFv3/
+|
+|- cmd/
+|  |- main.go
+|  |- routers.go
+|  |- templates.go
+|  |- handlers.go
+|  |- helpers.go
+|  |- converter.go (to be refactored)
+|
+|- database/
+|  |- errors.go
+|  |- importCSV.go
+|  |- infos.go
+|  |- sources.go
+|
+|- internal/
+|  |- validator/
+|  |  |- validator.go
+|
+|- ui/
+|  |- html/
+|  |  |- pages/
+|  |  |  |- home.tmpl.html
+|  |  |  |- infoCreate.tmpl.html
+|  |  |  |- infoUpdate.tmpl.html
+|  |  |  |- infoView.tmpl.html
+|  |  |  |- sourceCreate.tmpl.html
+|  |  |  |- sourceUpdate.tmpl.html
+|  |  |  |- sourceView.tmpl.html
+|  |  |
+|  |  |- partials/
+|  |  |  |- nav.tmpl.html
+|  |  |
+|  |  |- base.tmpl.html
+|  |
+|  |- static/
+|  |  |- css/
+|  |  |  |- main.css
+|  |  |
+|  |  |- img/
+|  |  |  |- ecuratif.png
+|  |  |  |- favicon.png
+|  |  |  |- icone_corbeille.png
+|  |  |  |- icone_edition.png
+|  |  |  |- icone_fleche.png
+|  |  |  |- icone_maison.png
+|  |  |  |- icone_ps.png
+|  |  |  |- searchicon.png
+|  |  |  |- wall_1a.png
+|  |  |  |- wall_1a_1080p.png
+|  |  |
+|  |  |- js/
+|  |  |  |- main.js
