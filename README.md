@@ -20,7 +20,7 @@ E-CURATIFv3/
 │
 ├── internal/
 │   └── validator/
-│        └── validator.go
+│       └── validator.go
 │
 └── ui/
     ├── html/
