@@ -7,6 +7,9 @@ import (
 	"github.com/go-chi/chi/v5/middleware"
 )
 
+// routers file
+// each page starts with chi.NewRouter()
+// See github.com/go-chi/chi for better infos
 func (app *application) routes() http.Handler {
 	r := chi.NewRouter()
 	r.Use(middleware.Logger)
@@ -15,6 +18,7 @@ func (app *application) routes() http.Handler {
 	r.Get("/", app.home)
 
 	// Sources pages
+	// Each placeholder must be unique for each route
 	r.Get("/source/view/{id}", app.sourceView)
 	r.Get("/source/create", app.sourceCreate)
 	r.Post("/source/create", app.sourceCreatePost)

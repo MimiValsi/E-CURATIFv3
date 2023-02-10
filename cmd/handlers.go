@@ -14,13 +14,14 @@ import (
 )
 
 func (app *application) home(w http.ResponseWriter, r *http.Request) {
-	// MenuSource func @ database folder
+	// MenuSource func @ database/sources.go
 	sources, err := app.sources.MenuSource()
 	if err != nil {
 		app.serverError(w, err)
 		return
 	}
 
+	// newTemplateData @ cmd/templates.go
 	data := app.newTemplateData(r)
 	data.Sources = sources
 

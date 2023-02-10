@@ -143,8 +143,8 @@ func (i *Info) InfoList(id int) ([]*Info, error) {
 SELECT id, material, created, status, source_id, priority
   FROM infos
     WHERE source_id = $1
-      ORDER
-	created ASC
+      ORDER BY
+	priority ASC
 `
 	rows, err := i.DB.Query(ctx, query, id)
 	if err != nil {

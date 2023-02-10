@@ -71,12 +71,12 @@ func main() {
 	}
 
 	// Function test
-	app.csvSource.SourceNumber("Nanterre")
+	// app.csvSource.SourceNumber("Nanterre")
+	// app.csvInfo.VerifyCSV("test.csv")
 
 	infoLog.Printf("Starting server on %s", addr)
 	err = srv.ListenAndServe()
 	errorLog.Fatal(err)
-
 
 }
 

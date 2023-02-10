@@ -8,6 +8,7 @@ import (
 	"E-CURATIFv3/database"
 )
 
+// Template struct to generate and parse data to xxx.tmpl.html files
 type templateData struct {
 	Source  *database.Source
 	Sources []*database.Source
@@ -16,10 +17,17 @@ type templateData struct {
 	Form    any
 }
 
+// @ sources and infos tables, "Created" and "Updated" column are
+// timestamp (UTC)
+// SELECT NOW()::timestamp;
+// 2023-02-10 19:28:53.116296
+// |________| needed
 func humanDate(t time.Time) string {
 	return t.Format("02/01/2006")
 }
 
+// template.FuncMap object is stored in a global variable
+// it facilitate the use of humanDate function
 var functions = template.FuncMap{
 	"humanDate": humanDate,
 }

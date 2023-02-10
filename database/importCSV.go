@@ -2,12 +2,12 @@ package database
 
 import (
 	"context"
-	"encoding/csv"
+_	"encoding/csv"
 	"fmt"
 	"log"
 	"os"
 	"os/exec"
-	"strconv"
+_	"strconv"
 	"strings"
 	"time"
 	"errors"
@@ -39,8 +39,10 @@ import (
 // for every file scanned, we verify it's encoding
 // if it's not UTF-8 then run cmd to change to it.
 
+// 2 structs are created to separate each PSQL tables
+// and for better readability
 type CSVInfo struct {
-	ID int
+	ID       int
 	Agent    string
 	Event    string
 	Created  string // Cast to date with PSQL
@@ -69,8 +71,8 @@ type CSVSource struct {
 	infoLog *log.Logger
 }
 
-func VerifyCSV(s string) {
-	data := CSVInfo{}
+func (data *CSVInfo) VerifyCSV(s string) {
+
 	file := strings.Split(s, ".")
 	length := len(file)
 
@@ -113,38 +115,72 @@ func (data *CSVInfo) dataCSV(s string) {
 	}
 	defer file.Close()
 
-	lines, err := csv.NewReader(file).ReadAll()
-	if err != nil {
-		fmt.Println(err)
-	}
+	// lines, err := csv.NewReader(file).ReadAll()
+	// if err != nil {
+	//	fmt.Println(err)
+	// }
 
 	//data.sourceNumber(lines[0][0])
 	// fmt.Println(lines[0][0])
 
-	for i := 2; i < len(lines); i++ {
-		line := lines[i]
-		j := 0
+	for i := 2; i < 3; i++ {
+		// line := lines[i]
+		// j := 0
 
-		data.Agent = line[j]
-		data.Event = line[j+1]
-		data.Created = line[j+2]
-		data.Material = line[j+3]
-		data.Pilot = line[j+4]
-		data.Detail = line[j+5]
-		data.Target = line[j+6]
-		data.DayDone = line[j+7]
-		tmp := line[j+8]
-		priority, _ := strconv.Atoi(tmp)
-		data.Priority = priority
-		data.Estimate = line[j+9]
-		data.Oups = line[j+10]
-		data.Brips = line[j+11]
-		data.Ameps = line[j+12]
+		// data.Agent = line[j]
+		// data.Event = line[j+1]
+		// data.Created = line[j+2]
+		// data.Material = line[j+3]
+		// data.Pilot = line[j+4]
+		// data.Detail = line[j+5]
+		// data.Target = line[j+6]
+		// data.DayDone = line[j+7]
+		// fmt.Printf("line[j+8] >%v\n\n", line[j+8])
+		// fmt.Printf("line[j+8] > %T\n\n", line[j+8])
+		// data.Priority, err = strconv.Atoi(line[j+8])
+		// if err != nil {
+		//	data.errorlog.Println(err)
+		// }
+		// data.Priority = 1
+		// data.Estimate = line[j+9]
+		// data.Oups = line[j+10]
+		// data.Brips = line[j+11]
+		// data.Ameps = line[j+12]
+		// data.SourceID = 20
+		data.Agent = "Bob"
+		data.Event = "Inc Bat"
+		data.Created = "20/12/2017"
+		data.Material = "TR 611"
+		data.Pilot = "AMEPS CE"
+		data.Detail = "HS"
+		data.Target = "20/01/2018"
+		data.DayDone = ""
+		data.Priority = 1
+		data.Estimate = "10EUR"
+		data.Oups = ""
+		data.Brips = ""
+		data.Ameps = ""
+		data.SourceID = 20
 
-		// insertDB()
+		data.insertDB()
+		// fmt.Printf("%v\n", data.Agent)
+		// fmt.Printf("%v\n", data.Event)
+		// fmt.Printf("%v\n", data.Created)
+		// fmt.Printf("%v\n", data.Material)
+		// fmt.Printf("%v\n", data.Pilot)
+		// fmt.Printf("%v\n", data.Detail)
+		// fmt.Printf("%v\n", data.Target)
+		// fmt.Printf("%v\n", data.DayDone)
+		// fmt.Printf("%v\n", line[j+8])
+		// fmt.Printf("%v\n", data.Estimate)
+		// fmt.Printf("%v\n", data.Oups)
+		// fmt.Printf("%v\n", data.Brips)
+		// fmt.Printf("%v\n", data.Ameps)
+		// fmt.Printf("%v\n", data.SourceID)
 	}
 }
 
+// add source_id manualy for testing
 func (data *CSVInfo) insertDB() {
 	ctx := context.Background()
 	query := `
@@ -153,7 +189,7 @@ INSERT INTO infos
     priority, estimate, oups, brips, ameps, created, source_id)
       VALUES
 	($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12,
-	  (to_date($13, dd/mm/yyyy)), $14)
+	  (to_date($13, 'DD/MM/YYYY')), $14)
 `
 	_, err := data.DB.Exec(ctx, query, data.Agent, data.Event,
 		data.Material, data.Pilot, data.Detail, data.Target,
@@ -162,7 +198,10 @@ INSERT INTO infos
 		data.SourceID)
 	if err != nil {
 		data.errorlog.Println(err)
+	} else {
+		fmt.Println("data send")
 	}
+	// fmt.Print(data)
 }
 
 func (csv *CSVSource) SourceNumber(s string) {

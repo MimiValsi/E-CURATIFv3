@@ -70,7 +70,6 @@ SELECT *
 	}
 
 	return sObj, nil
-
 }
 
 func (src *Source) SourceInsert(name string) (int, error) {
