@@ -1,7 +1,7 @@
 # E-CURATIF
 
 ## Tree settings
-
+```
 E-CURATIFv3/
 │
 ├── cmd/
@@ -56,3 +56,4 @@ E-CURATIFv3/
 │  │  │
 │  │  ├── js/
 └──  │  │  ├── main.js
+```
