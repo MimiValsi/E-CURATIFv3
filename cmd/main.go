@@ -34,7 +34,9 @@ const (
 )
 
 func main() {
-	// info and error need to be refactored
+	// infoLog and errorLog may give a bit more information about
+	// errors and/or others.
+	// Ldate = Local data & Ltime = Local time
 	infoLog := log.New(os.Stderr, "INFO\t", log.Ldate|log.Ltime)
 	errorLog := log.New(os.Stderr, "ERROR\t",
 		log.Ldate|log.Ltime|log.Lshortfile)
@@ -52,13 +54,16 @@ func main() {
 		errorLog.Fatal(err)
 	}
 
-	// Every struct that communicates to PSQL are parse throw here
+	// To allow communication with PSQL or others functions,
+	// like infoLog / errorLog, they must be parse throw here.
 	app := &application{
 		sources:       &database.Source{DB: db},
 		infos:         &database.Info{DB: db},
 		templateCache: templateCache,
-		csvInfo:       &database.CSVInfo{DB: db},
-		csvSource:     &database.CSVSource{DB: db},
+		csvInfo:       &database.CSVInfo{DB: db,
+			ErrorLog: errorLog, InfoLog: infoLog},
+		csvSource:     &database.CSVSource{DB: db,
+			Errorlog: errorLog, InfoLog: infoLog},
 	}
 
 	// Default parameters values to routes
@@ -72,7 +77,7 @@ func main() {
 
 	// Function test
 	// app.csvSource.SourceNumber("Nanterre")
-	// app.csvInfo.VerifyCSV("test.csv")
+	app.csvInfo.VerifyCSV("test.txt")
 
 	infoLog.Printf("Starting server on %s", addr)
 	err = srv.ListenAndServe()

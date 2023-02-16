@@ -2,19 +2,23 @@ package database
 
 import (
 	"context"
-_	"encoding/csv"
+	"encoding/csv"
+	"errors"
 	"fmt"
 	"log"
 	"os"
 	"os/exec"
-_	"strconv"
+	_"strconv"
 	"strings"
 	"time"
-	"errors"
 
 	"github.com/jackc/pgx/v4"
 	"github.com/jackc/pgx/v4/pgxpool"
 )
+
+// TODO:
+// Put everything back to normal, test it.
+//
 
 // We start by verifying if the input file is a .csv
 // if true than proceed to EncodingCSV()
@@ -56,10 +60,15 @@ type CSVInfo struct {
 	Oups     string
 	Brips    string
 	Ameps    string
+	Status   string
 	SourceID int
 	DB       *pgxpool.Pool
-	errorlog *log.Logger
-	infoLog  *log.Logger
+	ErrorLog *log.Logger
+	InfoLog  *log.Logger
+
+	srcID    int
+	srcName  string
+
 }
 
 type CSVSource struct {
@@ -67,8 +76,8 @@ type CSVSource struct {
 	Name string
 	Created time.Time
 	DB *pgxpool.Pool
-	errorlog *log.Logger
-	infoLog *log.Logger
+	Errorlog *log.Logger
+	InfoLog *log.Logger
 }
 
 func (data *CSVInfo) VerifyCSV(s string) {
@@ -77,7 +86,7 @@ func (data *CSVInfo) VerifyCSV(s string) {
 	length := len(file)
 
 	if file[length-1] != "csv" {
-		fmt.Println("Wrong type of file")
+		data.ErrorLog.Println("Wrong type of file")
 	} else {
 		data.encodingCSV(s)
 	}
@@ -86,7 +95,7 @@ func (data *CSVInfo) VerifyCSV(s string) {
 func (data *CSVInfo) encodingCSV(s string) {
 	cmd, err := exec.Command("file", "-i", s).Output()
 	if err != nil {
-		data.infoLog.Println(err)
+		data.ErrorLog.Println(err)
 	}
 
 	strSplit := []string{}
@@ -102,7 +111,7 @@ func (data *CSVInfo) encodingCSV(s string) {
 		cmd := exec.Command("iconv", "-f", tmp2,
 			"-t", "UTF-8", s, "-o", s)
 		iconvErr := cmd.Run()
-		fmt.Println(iconvErr)
+		data.ErrorLog.Println(iconvErr)
 	} else {
 		data.dataCSV(s)
 	}
@@ -111,57 +120,70 @@ func (data *CSVInfo) encodingCSV(s string) {
 func (data *CSVInfo) dataCSV(s string) {
 	file, err := os.Open(s)
 	if err != nil {
-		fmt.Println(err)
+		data.ErrorLog.Println(err)
 	}
 	defer file.Close()
 
-	// lines, err := csv.NewReader(file).ReadAll()
-	// if err != nil {
-	//	fmt.Println(err)
-	// }
+	lines, err := csv.NewReader(file).ReadAll()
+	if err != nil {
+		data.ErrorLog.Println(err)
+	}
 
 	//data.sourceNumber(lines[0][0])
 	// fmt.Println(lines[0][0])
 
 	for i := 2; i < 3; i++ {
-		// line := lines[i]
-		// j := 0
+		line := lines[i]
+		j := 0
 
-		// data.Agent = line[j]
-		// data.Event = line[j+1]
-		// data.Created = line[j+2]
-		// data.Material = line[j+3]
-		// data.Pilot = line[j+4]
-		// data.Detail = line[j+5]
-		// data.Target = line[j+6]
-		// data.DayDone = line[j+7]
+		data.Agent = line[j]
+		data.Event = line[j+1]
+		data.Created = line[j+2]
+		data.Material = line[j+3]
+		data.Pilot = line[j+4]
+		data.Detail = line[j+5]
+		data.Target = line[j+6]
+		data.DayDone = line[j+7]
 		// fmt.Printf("line[j+8] >%v\n\n", line[j+8])
 		// fmt.Printf("line[j+8] > %T\n\n", line[j+8])
 		// data.Priority, err = strconv.Atoi(line[j+8])
 		// if err != nil {
 		//	data.errorlog.Println(err)
 		// }
-		// data.Priority = 1
-		// data.Estimate = line[j+9]
-		// data.Oups = line[j+10]
-		// data.Brips = line[j+11]
-		// data.Ameps = line[j+12]
-		// data.SourceID = 20
-		data.Agent = "Bob"
-		data.Event = "Inc Bat"
-		data.Created = "20/12/2017"
-		data.Material = "TR 611"
-		data.Pilot = "AMEPS CE"
-		data.Detail = "HS"
-		data.Target = "20/01/2018"
-		data.DayDone = ""
 		data.Priority = 1
-		data.Estimate = "10EUR"
-		data.Oups = ""
-		data.Brips = ""
-		data.Ameps = ""
+		data.Estimate = line[j+9]
+		data.Oups = line[j+10]
+		data.Brips = line[j+11]
+		data.Ameps = line[j+12]
 		data.SourceID = 20
+		// data.Agent = "Bob"
+		// data.Event = "Inc Bat"
+		// data.Created = "20/12/2017"
+		// data.Material = "TR 611"
+		// data.Pilot = "AMEPS CE"
+		// data.Detail = "HS"
+		// data.Target = "20/01/2018"
+		// data.DayDone = ""
+		// data.Priority = 1
+		// data.Estimate = "10EUR"
+		// data.Oups = "X"
+		// data.Brips = "X"
+		// data.Ameps = "X"
+		// data.SourceID, err = data.sourceNumber("Novion")
+		// if err != nil {
+		//	fmt.Println(err)
+		// }
+		if data.Status == "" && data.DayDone == "" &&
+			data.Target == ""{
+			data.Status = "en attente"
+		} else if data.Target != "" && data.DayDone == "" {
+			data.Status = "affecté"
+		} else if data.Target != "" && data.DayDone != "" {
+			data.Status = "résolu"
+		}
 
+
+		// fmt.Println(data)
 		data.insertDB()
 		// fmt.Printf("%v\n", data.Agent)
 		// fmt.Printf("%v\n", data.Event)
@@ -185,43 +207,44 @@ func (data *CSVInfo) insertDB() {
 	ctx := context.Background()
 	query := `
 INSERT INTO infos
-  (agent, event, material, pilot, detail, target, day_done,
-    priority, estimate, oups, brips, ameps, created, source_id)
+  (source_id, agent, event, material, pilot, detail, target, day_done,
+    priority, estimate, oups, brips, ameps, created, status)
       VALUES
-	($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12,
-	  (to_date($13, 'DD/MM/YYYY')), $14)
+	($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12, $13,
+	  (to_date($14, 'DD/MM/YYYY')), $15)
 `
-	_, err := data.DB.Exec(ctx, query, data.Agent, data.Event,
-		data.Material, data.Pilot, data.Detail, data.Target,
-		data.DayDone, data.Priority, data.Estimate,
+	_, err := data.DB.Exec(ctx, query, data.SourceID, data.Agent,
+		data.Event, data.Material, data.Pilot, data.Detail,
+		data.Target, data.DayDone, data.Priority, data.Estimate,
 		data.Oups, data.Brips, data.Ameps, data.Created,
-		data.SourceID)
+		data.Status)
 	if err != nil {
-		data.errorlog.Println(err)
+		data.ErrorLog.Println(err)
 	} else {
-		fmt.Println("data send")
+		data.ErrorLog.Println("data sent")
 	}
 	// fmt.Print(data)
 }
 
-func (csv *CSVSource) SourceNumber(s string) {
+func (csv *CSVInfo) sourceNumber(s string) (int, error) {
 	ctx := context.Background()
 	query := `
-SELECT *
+SELECT id
   FROM sources
     WHERE name = $1
 `
 
-	err := csv.DB.QueryRow(ctx, query, s).Scan(&csv.ID,
-		&csv.Name, &csv.Created)
+	var id int
+	err := csv.DB.QueryRow(ctx, query, s).Scan(&id)
 	if err != nil {
 		if errors.Is(err, pgx.ErrNoRows) {
-			fmt.Println(ErrNoRecord)
+			return -1, ErrNoRecord
 		} else {
-			fmt.Println(err)
+			return -1, err
 		}
 	}
-	fmt.Printf("%v %v %v \n\n", csv.ID, csv.Name, csv.Created)
-	//return 0
 
+	fmt.Printf("@ sourceNumber: id > %v \n\n", id)
+
+	return id, nil
 }
