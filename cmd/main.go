@@ -8,7 +8,8 @@ import (
 	"text/template"
 	"time"
 
-	// Every func that send or request someting from PSQL are here
+	// Database regroupe toutes les fonctions pour communiquer
+	// avec PSQL
 	"E-CURATIFv3/database"
 
 	// PostgreSQL driver
