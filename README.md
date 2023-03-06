@@ -32,6 +32,7 @@ E-CURATIFv3/
     │   │   ├── sourceCreate.tmpl.html
     │   │   ├── sourceUpdate.tmpl.html
     │   │   └── sourceView.tmpl.html
+    │   │   └── infoUpload.tmpl.html
     │   │
     │   ├── partials/
     │   │   └── nav.tmpl.html
