@@ -16,6 +16,8 @@ type Source struct {
 	DB      *pgxpool.Pool
 }
 
+// fonction afin de choper tous les postes sources
+// pour la page d'accueil
 func (src *Source) MenuSource() ([]*Source, error) {
 	ctx := context.Background()
 	query := `
@@ -51,6 +53,7 @@ SELECT id, name, created
 	return sources, nil
 }
 
+// fonction d'obtention de donnée spécific source
 func (src *Source) SourceGet(id int) (*Source, error) {
 	ctx := context.Background()
 	query := `
@@ -72,6 +75,7 @@ SELECT *
 	return sObj, nil
 }
 
+// fonction de création donnée source
 func (src *Source) SourceInsert(name string) (int, error) {
 	ctx := context.Background()
 	query := `
@@ -89,6 +93,7 @@ INSERT INTO sources
 	return src.ID, nil
 }
 
+// fonction de suppréssion source
 func (src *Source) SourceDelete(id int) error {
 	ctx := context.Background()
 	query := `
@@ -103,6 +108,8 @@ DELETE FROM sources
 	return nil
 }
 
+
+// Fonction de MaJ source
 func (src *Source) SourceUpdate(id int) error {
 	ctx := context.Background()
 	query := `

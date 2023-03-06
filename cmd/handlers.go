@@ -3,13 +3,15 @@ package main
 import (
 	"errors"
 	"fmt"
+	"io"
 	"net/http"
+	"os"
 	"strconv"
 
 	"E-CURATIFv3/database"
 	"E-CURATIFv3/internal/validator"
 
-	// See routers.go for description
+	// package pour les routers
 	"github.com/go-chi/chi/v5"
 )
 
@@ -38,6 +40,7 @@ type sourceCreateForm struct {
 	validator.Validator
 }
 
+// Ici on génère la page de visu d'un poste source avec ces curatifs
 func (app *application) sourceView(w http.ResponseWriter, r *http.Request) {
 
 	key := chi.URLParam(r, "id")
@@ -47,6 +50,9 @@ func (app *application) sourceView(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
+	// Fait appel à la fonctin dans database/sources.go
+	// On récupère le "id" du source dans le URL
+	// créé auparavant
 	source, err := app.sources.SourceGet(id)
 	if err != nil {
 		if errors.Is(err, database.ErrNoRecord) {
@@ -56,6 +62,8 @@ func (app *application) sourceView(w http.ResponseWriter, r *http.Request) {
 		}
 	}
 
+	// Fait appel à la fonction dans database/infos.go
+	// en prenant en compte le id du source
 	info, err := app.infos.InfoList(id)
 	if err != nil {
 		if errors.Is(err, database.ErrNoRecord) {
@@ -65,14 +73,20 @@ func (app *application) sourceView(w http.ResponseWriter, r *http.Request) {
 		}
 	}
 
+	// Allocation de mémoire
 	data := app.newTemplateData(r)
 	data.Infos = info
 	data.Source = source
 
+	// Génération de la page web
 	app.render(w, http.StatusOK, "sourceView.tmpl.html", data)
 
 }
 
+// Génération de la page de création de source
+// Celle-ci est faite en deux parties:
+// La première est une GET, une fois le nom du source choisi
+// on passe à la fonction sourceCreatePost
 func (app *application) sourceCreate(w http.ResponseWriter, r *http.Request) {
 
 	data := app.newTemplateData(r)
@@ -229,6 +243,7 @@ type infoCreateForm struct {
 	Oups     string
 	Ameps    string
 	Doneby   string
+
 	validator.Validator
 }
 
@@ -436,6 +451,8 @@ func (app *application) infoUpdate(w http.ResponseWriter, r *http.Request) {
 	app.render(w, http.StatusOK, "infoUpdate.tmpl.html", data)
 }
 
+
+
 func (app *application) infoUpdatePost(w http.ResponseWriter, r *http.Request) {
 	// Fetch input
 	err := r.ParseForm()
@@ -476,29 +493,6 @@ func (app *application) infoUpdatePost(w http.ResponseWriter, r *http.Request) {
 		Doneby:   r.PostForm.Get("doneby"),
 	}
 
-	// emptyField := "Ce champ ne doit pas être vide"
-
-	// form.CheckField(validator.NotBlank(form.Agent),
-	//	"agent", emptyField)
-	// form.CheckField(validator.NotBlank(form.Material),
-	//	"material", emptyField)
-	// form.CheckField(validator.NotBlank(form.Detail),
-	//	"detail", emptyField)
-	// form.CheckField(validator.NotBlank(form.Event),
-	//	"event", emptyField)
-	// form.CheckField(validator.NotBlank(form.Priority),
-	//	"priority", emptyField)
-	// form.CheckField(validator.NotBlank(form.Status),
-	//	"status", emptyField)
-
-	// if !form.Valid() {
-	//	data := app.newTemplateData(r)
-	//	data.Form = form
-	//	app.render(w, http.StatusUnprocessableEntity,
-	//		"infoUpdate.tmpl.html", data)
-	//	return
-	// }
-
 	// app.infos.__ go fetch the Info struct @ database/infos.go
 	app.infos.Agent = form.Agent
 	app.infos.Material = form.Material
@@ -527,4 +521,50 @@ func (app *application) infoUpdatePost(w http.ResponseWriter, r *http.Request) {
 
 	http.Redirect(w, r, fmt.Sprintf("/source/%d/info/view/%d",
 		sID, iID), http.StatusSeeOther)
+}
+
+func (app *application) infoUpload(w http.ResponseWriter, r *http.Request) {
+
+	data := app.newTemplateData(r)
+	app.render(w, http.StatusOK, "infoUpload.tmpl.html", data)
+}
+
+func (app *application) infoUploadPost(w http.ResponseWriter, r *http.Request) {
+	// Taille max du fichier: 2MB
+	r.ParseMultipartForm(2 << 20)
+
+	// Crée handler pour filename, size et headers
+	file, handler, err := r.FormFile("myFile")
+	if err != nil {
+		app.errorLog.Println("Error Retrieving the File")
+		app.errorLog.Println(err)
+		return
+	}
+
+	defer file.Close()
+	app.infoLog.Printf("Uploaded File: %+v\n", handler.Filename)
+	app.infoLog.Printf("File Size: %+v\n", handler.Size)
+	app.infoLog.Printf("MIME Header: %+v\n", handler.Header)
+
+	// Creation du fichier
+	dst, err := os.Create("csvFiles/" + handler.Filename)
+	defer dst.Close()
+	if err != nil {
+		app.errorLog.Println(w, err.Error(),
+			http.StatusInternalServerError)
+		return
+	}
+
+	// Copie le fichier transféré dans le système
+	if _, err := io.Copy(dst, file); err != nil {
+		app.errorLog.Println(w, err.Error(),
+			http.StatusInternalServerError)
+		return
+	}
+
+	// Lance la verification de l'extension et encodage du fichier,
+	// si concluant, les données seront transférées dans la BD
+	app.csvInfo.VerifyCSV("csvFiles/" + handler.Filename)
+
+	http.Redirect(w, r, fmt.Sprintf("/"), http.StatusSeeOther)
 }

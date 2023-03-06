@@ -8,7 +8,8 @@ import (
 	"E-CURATIFv3/database"
 )
 
-// Template struct to generate and parse data to xxx.tmpl.html files
+// Struct Template qui génère et analyse la data
+// vers les fichiers .tmpl.html
 type templateData struct {
 	Source  *database.Source
 	Sources []*database.Source
@@ -17,17 +18,17 @@ type templateData struct {
 	Form    any
 }
 
-// @ sources and infos tables, "Created" and "Updated" column are
-// timestamp (UTC)
+// @ tables sources et infos, colonnes "Created" et "Updated"
+// ont un timestamp (UTC)
 // SELECT NOW()::timestamp;
 // 2023-02-10 19:28:53.116296
-// |________| needed
+// |________| besoin
 func humanDate(t time.Time) string {
 	return t.Format("02/01/2006")
 }
 
-// template.FuncMap object is stored in a global variable
-// it facilitate the use of humanDate function
+// l'Objet template.FuncMap est stpcké dans une variable global
+// afin de faciliter l'utilisation de la fonction humanDate
 var functions = template.FuncMap{
 	"humanDate": humanDate,
 }
@@ -35,19 +36,19 @@ var functions = template.FuncMap{
 func newTemplateCache() (map[string]*template.Template, error) {
 	cache := map[string]*template.Template{}
 
-	// filepath.Glob get a slice of all paths
+	// filepath.Glob crée une slice de tous les chemins
 	pages, err := filepath.Glob("./ui/html/pages/*.tmpl.html")
 	if err != nil {
 		return nil, err
 	}
 
 	for _, page := range pages {
-		// Extract file name from full filepath
+		// Extrait le nom du fichier du chemin du fichier
 		name := filepath.Base(page)
 
-		// Create new empty template, use Funcs()
-		// to register the template.FuncMap and
-		// then parse the file.
+		// Crée une nouvelle template vide, l'ajout de Funcs()
+		// sert à enregistrer le template.FuncMap
+		// et analyse le fichier
 		ts, err := template.New(name).Funcs(functions).
 			ParseFiles("./ui/html/base.tmpl.html")
 		if err != nil {
@@ -64,7 +65,7 @@ func newTemplateCache() (map[string]*template.Template, error) {
 			return nil, err
 		}
 
-		// Add template set to the map
+		// Ajoute le set de template ver le map
 		cache[name] = ts
 	}
 

@@ -57,3 +57,12 @@ function searchPS() {
     }
   }
 }
+
+function required() {
+  var empt = document.forms["agent"].value;
+
+  if (empt == "") {
+    alert("Entrez une valeur")
+    return false;
+  }
+}

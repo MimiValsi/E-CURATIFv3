@@ -5,19 +5,19 @@ import (
 	"unicode/utf8"
 )
 
-// Validator type which contains a map of validation errors
+// Validator type qui contient un map d'erreurs de validation
 type Validator struct {
 	FieldErrors map[string]string
 }
 
-// Valid() returns true if the FieldErrors map doesn't
-// contain any entries.
+// Valid() retourne un "vrai" si les FieldErrors map
+// si la case n'est pas vide.
 func (v *Validator) Valid() bool {
 	return len(v.FieldErrors) == 0
 }
 
-// AddFieldError() adds an error message to the FieldErrors map
-// (so long as no entry already exists for the given key).
+// AddFieldError() génère un message d'erreur vers FieldErrors map
+// et ensuite dans la page web
 func (v *Validator) AddFieldError(key, message string) {
 	if v.FieldErrors == nil {
 		v.FieldErrors = make(map[string]string)
@@ -28,21 +28,20 @@ func (v *Validator) AddFieldError(key, message string) {
 	}
 }
 
-// CheckField() adds an error message to the FieldErrors map only if a
-// validation check is not 'ok'.
+// CheckField() ajoute une message dans FieldErrors map seulement
+// si la validation n'est pas 'ok'
 func (v *Validator) CheckField(ok bool, key, message string) {
 	if !ok {
 		v.AddFieldError(key, message)
 	}
 }
 
-// NotBlank() returns true if a value is not an empty string.
+// Vérifie si la case n'est pas vide
 func NotBlank(value string) bool {
 	return strings.TrimSpace(value) != ""
 }
 
-// MaxChars() returns true
-// if a value contains no more than n characters.
+// Retourne vrai si le nombre de caractères est plus grand que 'n'
 func MaxChars(value string, n int) bool {
 	return utf8.RuneCountInString(value) <= n
 }

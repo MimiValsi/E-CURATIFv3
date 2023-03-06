@@ -20,10 +20,8 @@ import (
 // Put everything back to normal, test it.
 //
 
-// We start by verifying if the input file is a .csv
-// if true than proceed to EncodingCSV()
-//
-// Execute command to fetch encoding type
+// On commence par vérifier si le fichier fini par .csv
+// si vrai, alors on démarre EncodingCSV()
 //
 // Exemple:
 
@@ -31,20 +29,20 @@ import (
 // file.csv: text/csv; charset=iso-8859-1
 //                            ^
 //
-// 1st run the command with Output() to fetch the string
-// 2nd split @ "="
+// D'abord on lance la commande avec Output() afin de choper le string
+// puis on la sépare avec "="
 //
-// We'll get:
+// On obtient:
 // str[0] = file.csv: text/csv; charset
 // str[1] = iso-8859-1
 //
-// Copy str[1] to uppercase into a tmp variable
-// As we don't know which encoding type a file might have
-// for every file scanned, we verify it's encoding
-// if it's not UTF-8 then run cmd to change to it.
+// Copie str[1] en majuscule dans une variable tmp
+// Comme on ne sait pas quelle encodage le fichier peut avoir
+// on le vérifie
+// Si ce n'est pas en UTF-8, on change
 
-// 2 structs are created to separate each PSQL tables
-// and for better readability
+// 2 structs sont créées afin de séparer chaque DB
+// pour une meilleure lisibilité
 type CSVInfo struct {
 	ID       int
 	Agent    string
@@ -104,9 +102,8 @@ func (data *CSVInfo) encodingCSV(s string) {
 
 	tmp2 := strings.ToUpper(strSplit[1])
 
-	// // Check if encoding type is UTF-8
-	// // if false then run encoding cmd
-	// // \n at the end not good...
+	// Vérif si encodage est en UTF-8
+	// si faux, on lance la commande de changement
 	if tmp2 != "UTF-8\n" {
 		cmd := exec.Command("iconv", "-f", tmp2,
 			"-t", "UTF-8", s, "-o", s)
@@ -129,10 +126,15 @@ func (data *CSVInfo) dataCSV(s string) {
 		data.ErrorLog.Println(err)
 	}
 
-	//data.sourceNumber(lines[0][0])
-	// fmt.Println(lines[0][0])
+	// Le fichier attendue a en première ligne et colonne
+	// le nom du poste source.
+	// Ce positionnement ne doit pas être changé!
+	source, err := data.SourceNumber(lines[0][0])
+	if err != nil {
+		data.ErrorLog.Println(err)
+	}
 
-	for i := 2; i < 3; i++ {
+	for i := 2; i < len(lines); i++ {
 		line := lines[i]
 		j := 0
 
@@ -144,35 +146,12 @@ func (data *CSVInfo) dataCSV(s string) {
 		data.Detail = line[j+5]
 		data.Target = line[j+6]
 		data.DayDone = line[j+7]
-		// fmt.Printf("line[j+8] >%v\n\n", line[j+8])
-		// fmt.Printf("line[j+8] > %T\n\n", line[j+8])
-		// data.Priority, err = strconv.Atoi(line[j+8])
-		// if err != nil {
-		//	data.errorlog.Println(err)
-		// }
 		data.Priority = 1
 		data.Estimate = line[j+9]
 		data.Oups = line[j+10]
 		data.Brips = line[j+11]
 		data.Ameps = line[j+12]
-		data.SourceID = 20
-		// data.Agent = "Bob"
-		// data.Event = "Inc Bat"
-		// data.Created = "20/12/2017"
-		// data.Material = "TR 611"
-		// data.Pilot = "AMEPS CE"
-		// data.Detail = "HS"
-		// data.Target = "20/01/2018"
-		// data.DayDone = ""
-		// data.Priority = 1
-		// data.Estimate = "10EUR"
-		// data.Oups = "X"
-		// data.Brips = "X"
-		// data.Ameps = "X"
-		// data.SourceID, err = data.sourceNumber("Novion")
-		// if err != nil {
-		//	fmt.Println(err)
-		// }
+		data.SourceID = source
 		if data.Status == "" && data.DayDone == "" &&
 			data.Target == ""{
 			data.Status = "en attente"
@@ -182,23 +161,7 @@ func (data *CSVInfo) dataCSV(s string) {
 			data.Status = "résolu"
 		}
 
-
-		// fmt.Println(data)
 		data.insertDB()
-		// fmt.Printf("%v\n", data.Agent)
-		// fmt.Printf("%v\n", data.Event)
-		// fmt.Printf("%v\n", data.Created)
-		// fmt.Printf("%v\n", data.Material)
-		// fmt.Printf("%v\n", data.Pilot)
-		// fmt.Printf("%v\n", data.Detail)
-		// fmt.Printf("%v\n", data.Target)
-		// fmt.Printf("%v\n", data.DayDone)
-		// fmt.Printf("%v\n", line[j+8])
-		// fmt.Printf("%v\n", data.Estimate)
-		// fmt.Printf("%v\n", data.Oups)
-		// fmt.Printf("%v\n", data.Brips)
-		// fmt.Printf("%v\n", data.Ameps)
-		// fmt.Printf("%v\n", data.SourceID)
 	}
 }
 
@@ -221,12 +184,11 @@ INSERT INTO infos
 	if err != nil {
 		data.ErrorLog.Println(err)
 	} else {
-		data.ErrorLog.Println("data sent")
+		data.InfoLog.Println("data sent")
 	}
-	// fmt.Print(data)
 }
 
-func (csv *CSVInfo) sourceNumber(s string) (int, error) {
+func (csv *CSVInfo) SourceNumber(s string) (int, error) {
 	ctx := context.Background()
 	query := `
 SELECT id
@@ -243,6 +205,7 @@ SELECT id
 			return -1, err
 		}
 	}
+
 
 	fmt.Printf("@ sourceNumber: id > %v \n\n", id)
 
