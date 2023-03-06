@@ -5,4 +5,5 @@ misc.txt
 cmd/converter.go
 test.txt
 database/csv_test.go
-test.csv
+misc/test.csv
+misc/test.zip
