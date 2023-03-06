@@ -526,7 +526,7 @@ func (app *application) infoUpdatePost(w http.ResponseWriter, r *http.Request) {
 func (app *application) infoUpload(w http.ResponseWriter, r *http.Request) {
 
 	data := app.newTemplateData(r)
-	app.render(w, http.StatusOK, "infoUpload.tmpl.html", data)
+	app.render(w, http.StatusOK, "importCSV.tmpl.html", data)
 }
 
 func (app *application) infoUploadPost(w http.ResponseWriter, r *http.Request) {
