@@ -65,6 +65,8 @@ func main() {
 			ErrorLog: errorLog, InfoLog: infoLog},
 		csvSource:     &database.CSVSource{DB: db,
 			Errorlog: errorLog, InfoLog: infoLog},
+		infoLog: infoLog,
+		errorLog: errorLog,
 	}
 
 	// Default parameters values to routes
@@ -78,7 +80,9 @@ func main() {
 
 	// Function test
 	// app.csvSource.SourceNumber("Nanterre")
-	app.csvInfo.VerifyCSV("test.txt")
+	// app.csvInfo.VerifyCSV("test.csv")
+	// app.csvInfo.SourceNumber("Ampère")
+	// app.csvInfo.DataCSV("test.csv")
 
 	infoLog.Printf("Starting server on %s", addr)
 	err = srv.ListenAndServe()

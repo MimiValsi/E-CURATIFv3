@@ -10,7 +10,7 @@ import (
 )
 
 type Info struct {
-	ID         int
+	ID         int // primary key
 	Agent      string
 	Material   string
 	Priority   int
@@ -22,7 +22,7 @@ type Info struct {
 	Oups       string
 	Ameps      string
 	Ais        string
-	SourceID   int
+	SourceID   int // foreign key en référence au PK de source
 	Created    time.Time
 	Updated    time.Time
 	Status     string
@@ -35,7 +35,7 @@ type Info struct {
 	DB         *pgxpool.Pool
 }
 
-// Func to create new Info of a Source
+// Fonction de création donnée info
 func (i *Info) Insert(id int) (int, error) {
 	ctx := context.Background()
 	query := `
@@ -60,7 +60,7 @@ INSERT INTO infos
 	return i.ID, nil
 }
 
-// Func to gather data from infos table
+// Fonction d'obtention de donnée spécific
 func (i *Info) InfoGet(id int) (*Info, error) {
 	ctx := context.Background()
 	query := `
@@ -137,6 +137,8 @@ SELECT id, agent, material, priority, rte, detail, estimate, brips,
 	return iObj, nil
 }
 
+// Fonction afin de choper plusieurs données et la transférer
+// dans un slice
 func (i *Info) InfoList(id int) ([]*Info, error) {
 	ctx := context.Background()
 	query := `
@@ -188,6 +190,7 @@ DELETE FROM infos
 	return nil
 }
 
+// Fonction de mise à jour donnée
 func (i *Info) InfoUpdate(id int) error {
 	ctx := context.Background()
 	query := `
@@ -209,6 +212,7 @@ UPDATE infos
 	return nil
 }
 
+// Fonction de test
 func (i *Info) InfoUp(id int) error {
 	ctx := context.Background()
 	query := `

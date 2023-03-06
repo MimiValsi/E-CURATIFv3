@@ -7,33 +7,33 @@ import (
 	"runtime/debug"
 )
 
-// Web status are handle here
+// Les status web sont gérés icin
 
-// The serverError helper writes and error message
-// then sends a generic 500 Internal server Error response to the user.
+// Le serverError écrit les message d'erreur
+// puis envoi 500 Internal Server Error à l'utilisateur
 func (app *application) serverError(w http.ResponseWriter, err error) {
 	trace := fmt.Sprintf("%s\n%s", err.Error(), debug.Stack())
 
 	app.errorLog.Print(trace)
 }
 
-// clientError sends a specific status code and corresponding
-// description to the user.
+// clientError envoi un status spécific et la déscription
+// correspondante à l'utilisateur
 func (app *application) clientError(w http.ResponseWriter, status int) {
 	http.Error(w, http.StatusText(status), status)
 }
 
-// notFound do the same as clientError but sends a 404 Not Found
-// response to the user.
+// notFound fait la même que clientError mais envoi 404 Not Found
+// à l'utilisateur
 func (app *application) notFound(w http.ResponseWriter) {
 	app.clientError(w, http.StatusNotFound)
 }
 
-// Allocates memory so that a template can be rendered.
-// It checks if the desired template exists before beeing sent
-// to http.ResponseWriter.
+// Alloue de la mémoire pour qu'un template puisse être rendue
+// Vérifie si le template dérisé existe avant d´être envoyé
+// au http.ResponseWriter
 func (app *application) render(w http.ResponseWriter, status int, page string, data *templateData) {
-	// Retrieve the appropriate template set from cache
+	// Récupère le template approprié du cache
 	ts, ok := app.templateCache[page]
 	if !ok {
 		err := fmt.Errorf("the template %s does not exist",
@@ -44,7 +44,7 @@ func (app *application) render(w http.ResponseWriter, status int, page string, d
 
 	buf := new(bytes.Buffer)
 
-	// Executes the template set and write the response body
+	// Execute les templates et envoie au response body
 	err := ts.ExecuteTemplate(buf, "base", data)
 	if err != nil {
 		app.serverError(w, err)
@@ -56,8 +56,9 @@ func (app *application) render(w http.ResponseWriter, status int, page string, d
 
 }
 
-// newTemplateData returns a pointer to a templateData not initialized
-// and is used on all Handler functions. Makes code more readable
+// newTemplateData retourne un pointeur vers templateData
+// non initializé et est utilisé par toutes les fonctions dans
+// Handler. Permer une meilleur lisibilité du code
 func (app *application) newTemplateData(r *http.Request) *templateData {
 	return &templateData{}
 }
