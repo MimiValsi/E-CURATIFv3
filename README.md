@@ -9,8 +9,7 @@ E-CURATIFv3/
 │   ├── routers.go
 │   ├── templates.go
 │   ├── handlers.go
-│   ├── helpers.go
-│   └── converter.go (to be refactored)
+│   └── helpers.go
 │
 ├── database/
 │   ├── errors.go

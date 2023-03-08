@@ -523,13 +523,13 @@ func (app *application) infoUpdatePost(w http.ResponseWriter, r *http.Request) {
 		sID, iID), http.StatusSeeOther)
 }
 
-func (app *application) infoUpload(w http.ResponseWriter, r *http.Request) {
+func (app *application) importCSV(w http.ResponseWriter, r *http.Request) {
 
 	data := app.newTemplateData(r)
 	app.render(w, http.StatusOK, "importCSV.tmpl.html", data)
 }
 
-func (app *application) infoUploadPost(w http.ResponseWriter, r *http.Request) {
+func (app *application) importCSVPost(w http.ResponseWriter, r *http.Request) {
 	// Taille max du fichier: 2MB
 	r.ParseMultipartForm(2 << 20)
 

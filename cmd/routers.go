@@ -34,8 +34,8 @@ func (app *application) routes() http.Handler {
 	r.Get("/source/{sid}/info/update/{id}", app.infoUpdate)
 	r.Post("/source/{sid}/info/update/{id}", app.infoUpdatePost)
 
-	r.Get("/info/upload", app.infoUpload)
-	r.Post("/info/upload", app.infoUploadPost)
+	r.Get("/importCSV", app.importCSV)
+	r.Post("/importCSV", app.importCSVPost)
 
 	// Statics files
 	fileServer := http.FileServer(http.Dir("./ui/static/"))

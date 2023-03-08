@@ -134,6 +134,8 @@ func (data *CSVInfo) dataCSV(s string) {
 		data.ErrorLog.Println(err)
 	}
 
+	// i = 0 -> Nom du poste
+	// i = 1 -> Nom des colonnes
 	for i := 2; i < len(lines); i++ {
 		line := lines[i]
 		j := 0

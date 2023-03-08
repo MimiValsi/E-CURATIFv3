@@ -44,14 +44,14 @@ INSERT INTO infos
        brips, rte, ais, estimate, target, status, doneby, created)
 	  VALUES
 	    ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12, $13,
-	      $14, $15, $16, $17, $18)
+	      $14, $15, $16)
 		RETURNING id;
 `
 	err := i.DB.QueryRow(ctx, query, id, i.Agent,
 		i.Material, i.Detail, i.Event, i.Priority,
 		i.Oups, i.Ameps, i.Brips, i.Rte, i.Ais,
 		i.Estimate, i.Target, i.Status,
-		i.Doneby, i.ActionDate,
+		i.Doneby,
 		time.Now().UTC()).Scan(&i.ID)
 	if err != nil {
 		return 0, err
