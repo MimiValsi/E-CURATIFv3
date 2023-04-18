@@ -1,0 +1,356 @@
+/* @import 'bulma/css/bulma.css' */
+* {
+    box-sizing:   border-box;
+    margin:       0;
+    padding:      0;
+    /* font-family:  "Ubuntu Mono", monospace; */
+    font-family: "Lucida Grande", "monospace";
+}
+
+strong {
+    color: black;
+}
+
+/* body { */
+/*     background-image:  url("/static/img/wall_light_mode.png"); */
+/*     background-size:   cover; */
+/*     background-repeat: no-repeat; */
+/* } */
+
+header {
+    background-image:   -webkit-linear-gradient(left, #96cd32,
+        #96cd32 15%, #1423dc 20%, #1423dc 100%);
+    background-size:    100% 0.6rem;
+    background-repeat:  no-repeat;
+    padding-top:        1rem;
+    text-align:         center;
+}
+
+/* main { */
+/*     margin: 1rem 30% 0; */
+/* } */
+
+a {
+    text-decoration: none;
+}
+
+/*
+###################
+# Misc Parameters #
+###################
+*/
+
+#wastebin, #wastebinBtn {
+    background: none;
+    border: none;
+    width: 3rem;
+}
+
+#returnArrow {
+    background: none;
+    border: none;
+    font-size: 3rem;
+    position: absolute;
+    right: 0%;
+    color: #4eb722;
+}
+
+#returnArrow-2 {
+    background: none;
+    border: none;
+    font-size: 3rem;
+    color: #4eb722;
+    width: 100%;
+    text-align: right;
+}
+
+#container {
+    display: inline-flex;
+    position: relative;
+    width: 100%;
+}
+
+#wastebin:hover, #returnArrow:hover, #returnArrow-2:hover {
+    cursor: pointer;
+}
+
+/*
+#######################
+# End Misc Parameters #
+#######################
+*/
+
+/*
+##################
+# Nav Parameters #
+##################
+*/
+
+nav  {
+    padding-left: 1rem;
+    border-bottom: 0.063rem solid #e4e5e7;
+}
+
+nav .iconeWidth {
+    width: 3rem;
+}
+
+/*
+######################
+# End Nav parameters #
+######################
+*/
+
+/*
+############################
+# General Table Parameters #
+############################
+*/
+table {
+    width: 100%;
+    border-collapse: collapse;
+    table-layout: fixed;
+}
+
+th, td {
+    padding: 1rem;
+}
+
+th {
+    background: #e4e5e7;
+    font-weight: bold;
+    text-align: left;
+}
+
+td {
+    border-top: 0.063rem solid white;
+    background: #f7f9fa;
+}
+
+
+/*
+################################
+# End General Table Parameters #
+################################
+*/
+
+/*
+#############
+# Home Page #
+#############
+*/
+
+.homeLimits {
+    border: 0.063rem solid;
+    border-radius: 1rem;
+    margin: 0 0 1rem 0;
+}
+
+#homeTable {
+    text-align: left;
+    border-radius: 1rem;
+    background-color: white;
+    overflow: hidden;
+    font-size: 1.2rem;
+}
+
+.rightAlign {
+    text-align: right;
+}
+
+.centerAlign {
+    text-align: center;
+}
+
+.leftAlign {
+    text-align: left;
+}
+
+#brdBttn {
+    border-bottom: 0.125rem solid #666666;
+}
+/*
+#################
+# End Home Page #
+#################
+*/
+
+/*
+#############################
+# Source & Info Create Page #
+#############################
+*/
+
+#myLabel {
+    font-size: 1.2rem;
+}
+
+#inpt {
+    padding: 1rem;
+    margin: 0.5rem 0;
+    font-size: 1rem;
+}
+
+#srcBtn {
+    font-size: 1.2rem;
+    padding: 0.2rem;
+    background-color: #96cd32;
+    color: white;
+    border: none;
+    line-height: 2rem;
+}
+
+#srcBtn:hover {
+    cursor: pointer;
+    background-color: #4eb722;
+}
+
+.error {
+    color: #C0392B;
+    font-weight: bold;
+    display: block;
+}
+
+.infoInpt {
+    max-height: 3rem;
+    font-size: 1.2rem;
+    height: 3rem;
+    background: none;
+    border: none;
+    margin: 0.5rem 0;
+    width: 100%;
+}
+
+.nf-tbl {
+    display: table;
+}
+
+.nf-tr {
+    display: table-row;
+}
+
+.nf-td {
+    display: table-cell;
+}
+
+.nf-tc {
+    display: table-column;
+}
+
+#btnpad {
+    padding: 2rem 0 0 0;
+}
+
+/*
+#################################
+# End Source & Info Create Page #
+#################################
+*/
+
+/*
+###########################
+# Source & Info View Page #
+###########################
+*/
+
+#statusWait {
+    color: #C0392B;
+}
+
+#statusAffected {
+    color: #c0732b;
+}
+
+#statusDone {
+    color: #4eb722;
+}
+
+#statusArchived {
+    color: #1423dc;
+}
+
+#statusWait, #statusAffected, #statusDone, #statusArchived {
+    text-align: right;
+}
+
+#srcName {
+    border: 0.063rem solid;
+    border-radius: 1rem;
+    padding: 1rem;
+    background-color: #e4e5e7;
+    margin: 0 0 1rem 0;
+}
+
+#srcInfos {
+    margin: 1rem 0 1rem 0;
+    overflow: hidden;
+    text-align: left;
+}
+
+#createInfo {
+    margin: 1rem 0 0 0;
+    text-align: right;
+}
+
+#infoBtn {
+    background: none;
+    border: none;
+    font-size: 1rem;
+    color: #4eb722;
+}
+
+#infoBtn:hover {
+    cursor: pointer;
+}
+
+#searchStatus {
+    background-image: url("/static/img/searchicon.png");
+    background-position: 0.4rem;
+    background-repeat: no-repeat;
+    border: 0.063rem solid #ddd;
+    height: 2rem;
+    max-height: 2rem;
+    padding: 0 0 0 2rem;
+    width: 30%;
+}
+
+#searchPS {
+    background-image: url("/static/img/searchicon.png");
+    background-position: 0.4rem;
+    background-repeat: no-repeat;
+    border: 0.063rem solid #ddd;
+    height: 2rem;
+    max-height: 2rem;
+    padding: 0 0 0 2rem;
+    width: 100%;
+}
+
+#rightAlignSearch {
+    text-align: right;
+    padding: 1rem 0.19rem;
+}
+
+#myTable {
+    width: 100%;
+}
+
+#infoDate {
+    margin: 2rem 0 0 0;
+}
+
+
+/*
+###############################
+# End Source & Info View Page #
+###############################
+*/
+
+/*
+#############
+# TEST PART #
+#############
+*/
+
+.btnT {
+    border: 0;
+}
