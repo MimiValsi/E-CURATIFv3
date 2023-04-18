@@ -8,7 +8,6 @@ import (
 	"log"
 	"os"
 	"os/exec"
-	_"strconv"
 	"strings"
 	"time"
 
@@ -45,6 +44,8 @@ import (
 // pour une meilleure lisibilité
 type CSVInfo struct {
 	ID       int
+	Priority int
+	SourceID int
 	Agent    string
 	Event    string
 	Created  string // Cast to date with PSQL
@@ -53,20 +54,17 @@ type CSVInfo struct {
 	Detail   string
 	Target   string
 	DayDone  string
-	Priority int
 	Estimate string
 	Oups     string
 	Brips    string
 	Ameps    string
 	Status   string
-	SourceID int
 	DB       *pgxpool.Pool
 	ErrorLog *log.Logger
 	InfoLog  *log.Logger
 
-	srcID    int
-	srcName  string
-
+	// srcID    int
+	// srcName  string
 }
 
 type CSVSource struct {
@@ -167,12 +165,13 @@ func (data *CSVInfo) dataCSV(s string) {
 	}
 }
 
+
 // add source_id manualy for testing
 func (data *CSVInfo) insertDB() {
 	ctx := context.Background()
 	query := `
 INSERT INTO infos
-  (source_id, agent, event, material, pilot, detail, target, day_done,
+  (source_id, agent, event, material, pilote, detail, target, day_done,
     priority, estimate, oups, brips, ameps, created, status)
       VALUES
 	($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12, $13,
