@@ -10,10 +10,12 @@ import (
 )
 
 type Source struct {
-	ID      int
-	Name    string
-	Created time.Time
-	DB      *pgxpool.Pool
+	ID       int
+	Curatifs int
+	SID      int
+	Name     string
+	Created  time.Time
+	DB       *pgxpool.Pool
 }
 
 // fonction afin de choper tous les postes sources
@@ -21,16 +23,19 @@ type Source struct {
 func (src *Source) MenuSource() ([]*Source, error) {
 	ctx := context.Background()
 	query := `
-SELECT id, name, created
-  FROM sources
-    ORDER BY
-      name ASC
+SELECT sources.id, name, COUNT(status)
+  FILTER (WHERE status <> 'archivé')
+    FROM sources
+      LEFT JOIN infos ON source_id = sources.id
+	GROUP BY sources.id
+	  ORDER BY name ASC
 `
 
 	rows, err := src.DB.Query(ctx, query)
 	if err != nil {
 		return nil, err
 	}
+
 	defer rows.Close()
 
 	sources := []*Source{}
@@ -38,7 +43,7 @@ SELECT id, name, created
 	for rows.Next() {
 		sObj := &Source{}
 
-		err := rows.Scan(&sObj.ID, &sObj.Name, &sObj.Created)
+		err := rows.Scan(&sObj.ID, &sObj.Name, &sObj.Curatifs)
 		if err != nil {
 			return nil, err
 		}
