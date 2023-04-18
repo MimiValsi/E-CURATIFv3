@@ -1,8 +1,9 @@
 package main
 
 import (
+	"html/template"
 	"path/filepath"
-	"text/template"
+
 	"time"
 
 	"E-CURATIFv3/database"
