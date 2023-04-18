@@ -11,9 +11,11 @@ import (
 
 type Info struct {
 	ID         int // primary key
+	Priority   int
+	SourceID   int // foreign key en référence au PK de source
+	Counter    int
 	Agent      string
 	Material   string
-	Priority   int
 	Target     string
 	Rte        string
 	Detail     string
@@ -22,9 +24,6 @@ type Info struct {
 	Oups       string
 	Ameps      string
 	Ais        string
-	SourceID   int // foreign key en référence au PK de source
-	Created    time.Time
-	Updated    time.Time
 	Status     string
 	Event      string
 	Doneby     string
@@ -32,6 +31,8 @@ type Info struct {
 	ActionDate string
 	DayDone    string
 	ZeroTime   time.Time
+	Created    time.Time
+	Updated    time.Time
 	DB         *pgxpool.Pool
 }
 
@@ -197,14 +198,13 @@ func (i *Info) InfoUpdate(id int) error {
 UPDATE infos
   SET agent = $1, material = $2, priority = $3, target = $4, rte = $5,
     detail = $6, estimate = $7, brips = $8, oups = $9, ameps = $10,
-      ais = $11, updated = $12, status = $13, event = $14, doneby = $15,
-	pilot = $16, action_date = $17
-	  WHERE id = $18
+      ais = $11, updated = $12, status = $13, event = $14, doneby = $15
+	  WHERE id = $16
 `
 	_, err := i.DB.Exec(ctx, query, i.Agent, i.Material,
 		i.Priority, i.Target, i.Rte, i.Detail, i.Estimate,
 		i.Brips, i.Oups, i.Ameps, i.Ais, time.Now().UTC(),
-		i.Status, i.Event, i.Doneby, i.Pilot, i.ActionDate, id)
+		i.Status, i.Event, i.Doneby, id)
 	if err != nil {
 		return err
 	}
