@@ -58,11 +58,11 @@ function searchPS() {
   }
 }
 
-function required() {
-  var empt = document.forms["agent"].value;
+function checkInpt() {
+  let input = document.forms["srcInpt"]["name"].value;
 
-  if (empt == "") {
-    alert("Entrez une valeur")
+  if (input == "" || input == null) {
+    alert("Le champ ne doit pas être vide!");
     return false;
   }
 }
