@@ -67,17 +67,20 @@
 
     {{ end }}<!-- Sources loop end -->
     <script>
-      let incStruct = {{.Sources}};
+  // <a data-href="{{.Sources}}"></a>
+      let incStruct = {{ .Sources }};
 
       let nbCuratifs = [];
       for (let i = 0; i < incStruct.length; i++) {
-        nbCuratifs.push(incStruct[i].Curatifs);
+        nbCuratifs.push(incStruct[i].curatifs);
       }
 
       let nomSources = [];
       for (let i = 0; i < incStruct.length; i++) {
-        nomSources.push(incStruct[i].Name);
+        nomSources.push(incStruct[i].name);
       }
+
+
 
     </script>
 
@@ -90,6 +93,9 @@
 
 
 {{ end }} <!-- if Sources end -->
+<script>
+  let js = {{ .JSource }}
+</script>
 
 {{ end }} <!-- main end -->
 <!-- TODO:

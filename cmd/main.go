@@ -2,10 +2,10 @@ package main
 
 import (
 	"context"
+	"html/template"
 	"log"
 	"net/http"
 	"os"
-	"text/template"
 	"time"
 
 	// Database regroupe toutes les fonctions pour communiquer
@@ -16,57 +16,68 @@ import (
 	"github.com/jackc/pgx/v4/pgxpool"
 )
 
-// Main struct, every other struct must be "connected" to this one
-// It enables to parse informations and communicate with PSQL
+// Structure principale, toute structure doit être "connecté" à celle-ci
+// permet de vérifier les informations et communiquer avec PSQL
 type application struct {
-	sources       *database.Source
-	infos         *database.Info
+	sources *database.Source
+	infos   *database.Info
+
 	templateCache map[string]*template.Template
-	errorLog      *log.Logger
-	infoLog       *log.Logger
-	csvSource     *database.CSVSource
-	csvInfo       *database.CSVInfo
+
+	errorLog *log.Logger
+	infoLog  *log.Logger
+
+	csvSource *database.CSVSource
+	csvInfo   *database.CSVInfo
+
+	jSource *database.JsonSource
 }
 
-// This 2 variables aren't meant to be change nor to production
+// Ces 2 variables ne sont pas sensé être ni modifiés ni pour la prod
 const (
 	addr    = ":3001"
 	dataURL = "postgres://web:pass@localhost:5432/ecuratif"
 )
 
 func main() {
-	// infoLog and errorLog may give a bit more information about
-	// errors and/or others.
+	// infoLog et errorLog permettent d'avoir un peu plus d'info
+	// de ce qui se passe en cas d'erreur
+
 	// Ldate = Local data & Ltime = Local time
 	infoLog := log.New(os.Stderr, "INFO\t", log.Ldate|log.Ltime)
 	errorLog := log.New(os.Stderr, "ERROR\t",
 		log.Ldate|log.Ltime|log.Lshortfile)
 
-	// Run DB connexion func
+	// Execute la fonction de connection de la BD
 	db, err := openDB(dataURL)
 	if err != nil {
 		errorLog.Fatal(err)
 	}
 	defer db.Close()
 
-	// Func @ cmd/template.go
+	// Fontion @ cmd/template.go
 	templateCache, err := newTemplateCache()
 	if err != nil {
 		errorLog.Fatal(err)
 	}
 
-	// To allow communication with PSQL or others functions,
-	// like infoLog / errorLog, they must be parse throw here.
+	// Permet la comm avec PSQL et autres fonctions
+	// Tout passe par ici
 	app := &application{
-		sources:       &database.Source{DB: db},
-		infos:         &database.Info{DB: db},
+		sources: &database.Source{DB: db},
+		infos:   &database.Info{DB: db},
+
 		templateCache: templateCache,
-		csvInfo:       &database.CSVInfo{DB: db,
+
+		csvInfo: &database.CSVInfo{DB: db,
 			ErrorLog: errorLog, InfoLog: infoLog},
-		csvSource:     &database.CSVSource{DB: db,
+		csvSource: &database.CSVSource{DB: db,
 			Errorlog: errorLog, InfoLog: infoLog},
-		infoLog: infoLog,
+
+		infoLog:  infoLog,
 		errorLog: errorLog,
+
+		jSource: &database.JsonSource{DB: db},
 	}
 
 	// Default parameters values to routes
@@ -78,19 +89,13 @@ func main() {
 		WriteTimeout: 10 * time.Second,
 	}
 
-	// Function test
-	// app.csvSource.SourceNumber("Nanterre")
-	// app.csvInfo.VerifyCSV("test.csv")
-	// app.csvInfo.SourceNumber("Ampère")
-	// app.csvInfo.DataCSV("test.csv")
-
 	infoLog.Printf("Starting server on %s", addr)
 	err = srv.ListenAndServe()
 	errorLog.Fatal(err)
 
 }
 
-// Function that allows to connect to PSQL via pgxpool
+// Fonction qui permet la connection avec PSQL via pgx.pgxpool
 func openDB(dataURL string) (*pgxpool.Pool, error) {
 	ctx := context.Background()
 

@@ -40,7 +40,7 @@ type Info struct {
 func (i *Info) Insert(id int) (int, error) {
 	ctx := context.Background()
 	query := `
-INSERT INTO infos
+INSERT INTO info
     (source_id, agent, material, detail, event, priority, oups, ameps,
        brips, rte, ais, estimate, target, status, doneby, created)
 	  VALUES
@@ -66,9 +66,9 @@ func (i *Info) InfoGet(id int) (*Info, error) {
 	ctx := context.Background()
 	query := `
 SELECT id, agent, material, priority, rte, detail, estimate, brips,
-  oups, ameps, ais, source_id, created, updated, status, event, target
-    FROM infos
-      WHERE id = $1
+       oups, ameps, ais, source_id, created, updated, status, event, target
+FROM info
+  WHERE id = $1
 `
 	var rte, ameps, ais, brips, oups, estimate, target,
 		doneby, pilot, actionDate *string
@@ -143,11 +143,15 @@ SELECT id, agent, material, priority, rte, detail, estimate, brips,
 func (i *Info) InfoList(id int) ([]*Info, error) {
 	ctx := context.Background()
 	query := `
-SELECT id, material, created, status, source_id, priority
-  FROM infos
-    WHERE source_id = $1
-      ORDER BY
-	priority ASC
+SELECT id,
+       material,
+       created,
+       status,
+       source_id,
+       priority
+FROM info
+  WHERE source_id = $1
+  ORDER BY priority ASC
 `
 	rows, err := i.DB.Query(ctx, query, id)
 	if err != nil {
@@ -180,8 +184,8 @@ SELECT id, material, created, status, source_id, priority
 func (i *Info) InfoDelete(id int) error {
 	ctx := context.Background()
 	query := `
-DELETE FROM infos
-    WHERE id = $1
+DELETE FROM info
+  WHERE id = $1
 `
 	_, err := i.DB.Exec(ctx, query, id)
 	if err != nil {
@@ -195,11 +199,11 @@ DELETE FROM infos
 func (i *Info) InfoUpdate(id int) error {
 	ctx := context.Background()
 	query := `
-UPDATE infos
-  SET agent = $1, material = $2, priority = $3, target = $4, rte = $5,
+UPDATE info
+SET agent = $1, material = $2, priority = $3, target = $4, rte = $5,
     detail = $6, estimate = $7, brips = $8, oups = $9, ameps = $10,
-      ais = $11, updated = $12, status = $13, event = $14, doneby = $15
-	  WHERE id = $16
+    ais = $11, updated = $12, status = $13, event = $14, doneby = $15
+WHERE id = $16
 `
 	_, err := i.DB.Exec(ctx, query, i.Agent, i.Material,
 		i.Priority, i.Target, i.Rte, i.Detail, i.Estimate,
@@ -216,9 +220,10 @@ UPDATE infos
 func (i *Info) InfoUp(id int) error {
 	ctx := context.Background()
 	query := `
-UPDATE infos
-  SET material = $1, updated = $2
-    WHERE id = $3
+UPDATE info
+SET material = $1,
+    updated = $2
+WHERE id = $3
 `
 	_, err := i.DB.Exec(ctx, query, i.Material,
 		time.Now().UTC(), id)

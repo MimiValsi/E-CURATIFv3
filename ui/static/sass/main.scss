@@ -86,6 +86,11 @@ nav .fileSize {
     // border-bottom: 0.063rem solid;
 }
 
+#myPlot {
+    margin-left: auto;
+    margin-right: auto;
+}
+
 /*****************
  * CREATION PAGE *
  *****************/
@@ -93,8 +98,10 @@ nav .fileSize {
     margin: 0 0 0.5rem 0.5rem;
 }
 
-.title {
-    font-size: 1.5rem;
+.ps-title {
+    font-size: 3rem;
+    font-style: bold;
+    text-align: center;
 }
 
 .inpt {
@@ -123,9 +130,10 @@ nav .fileSize {
 }
 
 table {
-    width: 100%;
+    width: calc(100% / 2);
     border-collapse: collapse;
     table-layout: fixed;
+    margin: 1rem auto;
 }
 
 th, td {
@@ -149,6 +157,19 @@ td {
 
 top-margin {
     margin-top: 1rem;
+}
+
+.center-text {
+    text-align: center !important;
+}
+
+.right-text {
+    text-align: right !important;
+    padding-right: 0.5rem;
+}
+
+.left-text {
+    padding-left: 0.5rem;
 }
 
 /*****************

@@ -1,6 +1,7 @@
 package main
 
 import (
+	"encoding/json"
 	"errors"
 	"fmt"
 	"io"
@@ -16,6 +17,7 @@ import (
 )
 
 func (app *application) home(w http.ResponseWriter, r *http.Request) {
+	// w.Header().Set("Content-Type", "application/json")
 
 	// MenuSource func @ database/sources.go
 	sources, err := app.sources.MenuSource()
@@ -24,9 +26,26 @@ func (app *application) home(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
+	jData, err := json.Marshal(sources)
+	if err != nil {
+		app.serverError(w, err)
+		return
+	}
+	// w.Header().Set("Content-Type", "application/json")
+	// w.Write(jData)
+
+	// jSource, err := app.jSource.JSource(sources)
+	// if err != nil {
+	//	app.serverError(w, err)
+	//	return
+	// }
+
+	// json.NewEncoder(w).Encode(sources)
+
 	// newTemplateData @ cmd/templates.go
 	data := app.newTemplateData(r)
 	data.Sources = sources
+	data.JSource = jData
 
 	app.render(w, http.StatusOK, "home.tmpl.html", data)
 

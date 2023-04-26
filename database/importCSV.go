@@ -68,12 +68,12 @@ type CSVInfo struct {
 }
 
 type CSVSource struct {
-	ID int
-	Name string
-	Created time.Time
-	DB *pgxpool.Pool
+	ID       int
+	Name     string
+	Created  time.Time
+	DB       *pgxpool.Pool
 	Errorlog *log.Logger
-	InfoLog *log.Logger
+	InfoLog  *log.Logger
 }
 
 func (data *CSVInfo) VerifyCSV(s string) {
@@ -153,7 +153,7 @@ func (data *CSVInfo) dataCSV(s string) {
 		data.Ameps = line[j+12]
 		data.SourceID = source
 		if data.Status == "" && data.DayDone == "" &&
-			data.Target == ""{
+			data.Target == "" {
 			data.Status = "en attente"
 		} else if data.Target != "" && data.DayDone == "" {
 			data.Status = "affecté"
@@ -165,12 +165,11 @@ func (data *CSVInfo) dataCSV(s string) {
 	}
 }
 
-
 // add source_id manualy for testing
 func (data *CSVInfo) insertDB() {
 	ctx := context.Background()
 	query := `
-INSERT INTO infos
+INSERT INTO info
   (source_id, agent, event, material, pilote, detail, target, day_done,
     priority, estimate, oups, brips, ameps, created, status)
       VALUES
@@ -193,7 +192,7 @@ func (csv *CSVInfo) SourceNumber(s string) (int, error) {
 	ctx := context.Background()
 	query := `
 SELECT id
-  FROM sources
+  FROM source
     WHERE name = $1
 `
 
@@ -206,7 +205,6 @@ SELECT id
 			return -1, err
 		}
 	}
-
 
 	fmt.Printf("@ sourceNumber: id > %v \n\n", id)
 

@@ -14,9 +14,13 @@ import (
 type templateData struct {
 	Source  *database.Source
 	Sources []*database.Source
-	Info    *database.Info
-	Infos   []*database.Info
-	Form    any
+
+	Info  *database.Info
+	Infos []*database.Info
+
+	JSource []byte
+
+	Form any
 }
 
 // @ tables sources et infos, colonnes "Created" et "Updated"

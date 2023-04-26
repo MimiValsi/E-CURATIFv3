@@ -17,22 +17,22 @@
 
 {{ with .Source }}
 <div class="margin">
-  <strong class="title top-margin">{{ .Name }}</strong>
-  <input class="search-info top-margin" id="searchStatus" onkeyup="searchStatus()"
-           placeholder="Chercher des status...">
+  <h2 class="ps-title">{{ .Name }}</h2>
+  <br>
   {{ end }}
   <div>
 
-
-  <table id="myTable">
     {{ if .Infos }}
+    <input class="search-info top-margin" id="searchStatus" onkeyup="searchStatus()"
+           placeholder="Chercher des status...">
+    <table id="myTable">
     <!-- id @ "Home Page section" border-bottom -->
 
 
     <tr>
-      <th><strong>Ouvrage</strong></th>
-      <th><strong>Priorité</strong></th>
-      <th><strong>Status</strong></th>
+      <th class="left-text"><strong>Ouvrage</strong></th>
+      <th class="center-text"><strong>Priorité</strong></th>
+      <th class="right-text"><strong>Status</strong></th>
     </tr>
     <!-- Infos table -->
     {{ range .Infos }}
@@ -43,25 +43,25 @@
     {{ $arch := eq .Status "archivé" }}
 
     <tr>
-      <td><a href="/source/{{ .SourceID }}/info/view/{{ .ID }}">
+      <td class="left-text"><a href="/source/{{ .SourceID }}/info/view/{{ .ID }}">
           {{ .Material }}</a></td>
       <!-- <td class="centerAlign">{{ humanDate .Created }}</td> -->
-      <td>{{ .Priority }}</td>
+      <td class="center-text">{{ .Priority }}</td>
 
       {{ if $att }}
-      <td>{{ .Status }}</td>
+      <td class="right-text">{{ .Status }}</td>
       {{ end }}
 
       {{ if $aff }}
-      <td>{{ .Status }}</td>
+      <td class="right-text">{{ .Status }}</td>
       {{ end }}
 
       {{ if $res }}
-      <td>{{ .Status }}</td>
+      <td class="right-text">{{ .Status }}</td>
       {{ end }}
 
       {{ if $arch }}
-      <td>{{ .Status }}</td>
+      <td class="right-text">{{ .Status }}</td>
       {{ end }}
     </tr>
     {{ end }}
