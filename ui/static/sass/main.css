@@ -1,6 +1,5 @@
 @charset "UTF-8";
-@import "./@mdi/font/css/materialdesignicons.min.css";
-/*! bulma.io v0.9.4 | MIT License | github.com/jgthms/bulma */
+@import "./@mdi/font/css/materialdesignicons.min.css"; /*! bulma.io v0.9.4 | MIT License | github.com/jgthms/bulma */
 /* Bulma Utilities */
 @import "../js/node_modules/billboard.js/dist/billboard.css";
 .pagination-previous,
@@ -10383,6 +10382,13 @@ nav .fileSize {
   border-radius: 0.25rem;
 }
 
+.inptAlert {
+  height: 3rem;
+  font-size: 1.2rem;
+  border-radius: 0.25rem;
+  border-color: red;
+}
+
 .hidden {
   display: none;
 }
@@ -10445,6 +10451,27 @@ top-margin {
   padding-left: 0.5rem;
 }
 
+.statusWait {
+  color: #c0392b;
+}
+
+.statusAffected {
+  color: #c0732b;
+}
+
+.statusDone {
+  color: #4eb722;
+}
+
+.statusArchived {
+  color: #1423dc;
+}
+
+.statusWait, .statusAffected, .statusDone, .statusArchived {
+  text-align: right !important;
+  padding-right: 0.5rem;
+}
+
 /*****************
  * VIEW PAGE END *
  *****************/
@@ -10482,12 +10509,14 @@ top-margin {
 }
 
 .delete-img {
-  height: 4rem;
+  height: 3rem;
 }
 
 .delete-btn {
   border: transparent;
   background: none;
+  cursor: pointer;
+  padding: 0;
 }
 
 /***************
