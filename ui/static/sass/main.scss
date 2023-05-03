@@ -1,5 +1,7 @@
 @charset "utf-8";
-@import "https://cdn.jsdelivr.net/npm/@mdi/font@7.2.96/css/materialdesignicons.min.css";
+@import "./@mdi/font/css/materialdesignicons.min.css";
+@import "./mybulma/bulma.sass";
+@import "../js/node_modules/billboard.js/dist/billboard.css";
 
 /*******************
  * BULMA VARIABLES *
@@ -237,18 +239,3 @@ top-margin {
 /*************
  * GRAPH END *
  *************/
-
-@import "./mybulma/bulma.sass";
-@import "../js/node_modules/billboard.js/dist/billboard.css";
-// @import "./graphing-library-docs/"
-
-// elements
-// @import "./mybulma/sass/elements/_all.sass";
-
-// form
-// @import "./mybulma/sass/form/_all.sass";
-
-// utilities
-// @import "./mybulma/sass/utilities/extends.sass";
-
-// @import "https://cdn.jsdelivr.net/npm/bulma@0.9.4/css/bulma.min.css";
