@@ -13,13 +13,15 @@ for (let i = 0; i < incStruct.length; i++) {
 // import bb, {bar} from "billboard.js";
 
 var chart = bb.generate({
+  bindto: "#myPlot",
+
   data: {
     names: {
       data1: "Curatifs",
       data2: "Sources"
     },
     columns: [
-      ["Nombre de Curatifs en cours", ...nbCuratifs],
+      ["Curatifs en cours", ...nbCuratifs],
     ],
     type: "bar", // for ESM specify as: bar()
   },
@@ -36,7 +38,8 @@ var chart = bb.generate({
   },
 
   size: {
-    width: 1000
+    width: 1000,
+    height: 400
   },
 
   padding: true,
@@ -54,9 +57,5 @@ var chart = bb.generate({
     width: {
       ratio: 0.5
     }
-    // radius: {
-    //   ratio: 0.5,
-    // }
-  },
-  bindto: "#myPlot"
+  }
 });
