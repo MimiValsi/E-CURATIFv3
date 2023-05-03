@@ -4,4 +4,4 @@ r
 TODO
 launch
 source.json
-ui/static/sass/main.css
+./ui/static/sass/main.css
