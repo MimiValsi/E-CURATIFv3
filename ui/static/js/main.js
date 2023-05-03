@@ -58,11 +58,56 @@ function searchPS() {
   }
 }
 
-function checkInpt() {
-  let input = document.forms["srcInpt"]["name"].value;
+// function checkInpt() {
+//   let input = document.forms["srcInpt"]["name"].value;
 
-  if (input == "" || input == null) {
-    alert("Le champ ne doit pas être vide!");
-    return false;
+//   if (input == "" || input == null) {
+//     alert("Le champ ne doit pas être vide!");
+//     document.getElementById("name").classList.remove('inpt')
+//     document.getElementById("name").classList.add('inptAlert')
+//     return false;
+//   }
+// }
+
+document.addEventListener("DOMContentLoaded", function() {
+  let elements = document.getElementsByTagName("INPUT");
+  let srcName = document.getElementById("name");
+
+  let infoAgent = document.getElementById("agent");
+  let infoMaterial = document.getElementById("material");
+  let infoDetail = document.getElementById("detail");
+  let infoEvent = document.getElementById("event");
+  let infoPriority = document.getElementById("priority");
+
+  for (let i = 0; i < elements.length; i++) {
+    elements[i].oninvalid = function(e) {
+      e.target.setCustomValidity("");
+      if (!e.target.validity.valid) {
+        e.target.setCustomValidity("Ce champ ne doit pas être vide");
+        if (srcName != null) {
+          srcName.classList.add('inptAlert');
+        }
+
+        if (infoAgent != null) {
+          infoAgent.classList.add('inptAlert');
+        }
+        if (infoMaterial != null) {
+          infoMaterial.classList.add('inptAlert');
+        }
+        if (infoDetail != null) {
+          infoDetail.classList.add('inptAlert');
+        }
+        if (infoEvent != null) {
+          infoEvent.classList.add('inptAlert');
+        }
+        if (infoPriority != null) {
+          infoPriority.classList.add('inptAlert');
+        }
+
+      }
+    };
+    elements[i].oninput = function(e) {
+      e.target.setCustomValidity("");
+    };
   }
-}
+})
