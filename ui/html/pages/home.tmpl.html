@@ -19,9 +19,6 @@
       <label class="file-label">
         <input class="file-input" type="file" name="inpt">
         <span class="file-cta">
-          <!-- <span class="mdi mdi-file-import-outline"> -->
-          <!--   <i class="fas fa-upload"></i> -->
-          <!-- </span> -->
           <span class="file-label">
             Choisir fichier csv...
           </span>
@@ -50,17 +47,23 @@
     <div>
       <form action="/source/view/{{ .ID }}" method="get">
         {{ if .ID }} <!-- if ID -->
+
         <!-- ge: Greater Equal
              le: Lesser Equal  -->
         {{ if (eq .Curatifs 0) }} <!-- if curatif -->
         <button name="{{ .Curatifs }}" class="button is-large is-responsive green-btn">{{ .Name }}</button>
+
         {{ else if and (ge .Curatifs 1) (le .Curatifs 5) }}
         <button name="{{ .Curatifs }}" class="button is-large is-responsive yellow-btn">{{ .Name }}</button>
+
         {{ else if and (ge .Curatifs 6) (le .Curatifs 9) }}
         <button name="{{ .Curatifs }}" class="button is-large is-responsive orange-btn">{{ .Name }}</button>
+
         {{ else if (ge .Curatifs 10) }}
         <button name="{{ .Curatifs }}" class="button is-large is-responsive red-btn">{{ .Name }}</button>
-        {{ end }} <!-- if curatif -->
+
+        {{ end }} <!-- if curatif end -->
+
         {{ end }} <!-- if ID end -->
       </form>
     </div>
@@ -83,11 +86,3 @@
 </script>
 
 {{ end }} <!-- main end -->
-<!-- TODO:
-     Créer query afin de calculer nombre de Infos ID par poste
-     afin de créer les couleurs correspondantes
-     Vert = 0
-     Jaune entre 1 et 5
-     Orange entre 6 et 9
-     Rouge clignotant +10
-  -->
