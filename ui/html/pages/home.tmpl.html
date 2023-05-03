@@ -66,31 +66,16 @@
     </div>
 
     {{ end }}<!-- Sources loop end -->
-    <script>
-  // <a data-href="{{.Sources}}"></a>
-      let incStruct = {{ .Sources }};
-
-      let nbCuratifs = [];
-      for (let i = 0; i < incStruct.length; i++) {
-        nbCuratifs.push(incStruct[i].curatifs);
-      }
-
-      let nomSources = [];
-      for (let i = 0; i < incStruct.length; i++) {
-        nomSources.push(incStruct[i].name);
-      }
-
-
-
-    </script>
 
   </div>
   <div id="myPlot">
+    <script>
+      let incStruct = {{ .Sources }};
+    </script>
+
     <script src="/static/js/graph.js"></script>
   </div>
-
 </div>
-
 
 {{ end }} <!-- if Sources end -->
 <script>
