@@ -1,21 +1,62 @@
-const data = [{
-  x:nomSources,
-  y:nbCuratifs,
-  type:"bar"
-}];
+// import bb, {bar} from "billboard.js";
 
-const layout = {
-  title:"Nombre de Curatifs en cours",
-  width: 1000,
-  height: 400,
-  autosize: true
-};
+let nbCuratifs = [];
+for (let i = 0; i < incStruct.length; i++) {
+  nbCuratifs.push(incStruct[i].curatifs);
+}
 
-var config = {
-  modeBarButtonsToRemove: ['sendDataToCloud', 'autoScale2d', 'hoverClosestCartesian', 'hoverCompareCartesian', 'lasso2d', 'select2d', 'toggleSpikelines', 'pan2d', 'zoomIn2d', 'zoomOut2d', 'zoom2d', 'drawclosedpath'],
-  displaylogo: false,
-  showTips: true,
-  responsive: true
-};
+let nomSources = [];
+for (let i = 0; i < incStruct.length; i++) {
+  nomSources.push(incStruct[i].name);
+}
+// for ESM environment, need to import modules as:
+// import bb, {bar} from "billboard.js";
 
-Plotly.newPlot("myPlot", data, layout, config);
+var chart = bb.generate({
+  data: {
+    names: {
+      data1: "Curatifs",
+      data2: "Sources"
+    },
+    columns: [
+      ["Nombre de Curatifs en cours", ...nbCuratifs],
+    ],
+    type: "bar", // for ESM specify as: bar()
+  },
+
+  axis: {
+    x: {
+      type: "category",
+      categories: [...nomSources],
+      tick: {
+        rotate: 75,
+        multiline: false
+      }
+    }
+  },
+
+  size: {
+    width: 1000
+  },
+
+  padding: true,
+
+  zoom: {
+    enabled: true,
+    type: "drag"
+  },
+
+  legend: {
+    position: "inset"
+  },
+
+  bar: {
+    width: {
+      ratio: 0.5
+    }
+    // radius: {
+    //   ratio: 0.5,
+    // }
+  },
+  bindto: "#myPlot"
+});
