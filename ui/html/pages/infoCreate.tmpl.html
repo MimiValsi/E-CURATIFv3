@@ -17,130 +17,143 @@
 
 {{ define "main" }}
 <div id="srcName">
-  <form method="POST">
+
+  <div class="center-text">
+    <span style="color: red">*</span>Infos obligatoires
+  </div>
+
+  <form method="POST" name="infoInpt">
     <table>
       <tr>
-        <th class="leftAlign">
+        <th>
           Demandeur<span style="color: red">*</span>
         </th>
-        <th colspan="2" class="rightAlign">Réparé par</th>
+        <th colspan="2" class="right-text">Réparé par</th>
       </tr>
       <tr>
         <td>
-          <input placeholder="..." class="infoInpt" type="text"
-                 name="agent" onsubmit="required()">
+          <input placeholder="..." class="input" type="text"
+                 name="agent" id="agent" required>
         </td>
         <td></td>
         <td>
-          <input placeholder="..." class="infoInpt" type="text"
+          <input placeholder="..." class="input" type="text"
                  name="doneby">
         </td>
       </tr>
       <tr>
-        <th class="leftAlign">
+        <th>
           Ouvrage<span style="color: red">*</span>
         </th>
-        <th colspan="2" class="centerAlign">
+        <th colspan="2" class="center-text">
           Détail<span style="color: red">*</span>
         </th>
       </tr>
       <tr>
         <td>
           <div>
-            <input placeholder="..." class="infoInpt" type="text"
-                   name="material">
+            <input placeholder="..." class="input" type="text"
+                   name="material" id="material" required>
           </div>
         </td>
         <td colspan="2">
-          <input placeholder="..." class="infoInpt" type="text"
-                 name="detail">
+          <textarea class="textarea" name="detail" id="detail" placeholder="..." required></textarea>
         </td>
       </tr>
       <tr>
         <th>
           Evénement<span style="color: red">*</span>
         </th>
-        <th class="centerAlign">
+        <th class="center-text">
           Priorité<span style="color: red">*</span>
         </th>
-        <th class="rightAlign">OUPS</th>
+        <th class="right-text">OUPS</th>
       </tr>
       <tr>
         <td>
-          <input placeholder="..." class="infoInpt" type="text"
-                 name="event">
+          <input placeholder="..." class="input" type="text"
+                 name="event" id="event" required>
         </td>
         <td>
-          <input placeholder="..." class="infoInpt" type="text"
-                 name="priority">
+          <input placeholder="..." class="input" type="text"
+                 name="priority" id="priority" required>
         </td>
         <td>
-          <input placeholder="..." class="infoInpt" type="text"
+          <input placeholder="..." class="input" type="text"
                  name="oups">
         </td>
       </tr>
       <tr>
         <th>Action AMEPS</th>
-        <th class="centerAlign">Action BRIPS</th>
-        <th class="rightAlign">Action RTE</th>
+        <th class="center-text">Action BRIPS</th>
+        <th class="right-text">Action RTE</th>
       </tr>
       <tr>
         <td>
-          <input placeholder="..." class="infoInpt" type="text"
+          <input placeholder="..." class="input" type="text"
                  name="ameps">
         </td>
         <td>
-          <input placeholder="..." class="infoInpt" type="text"
+          <input placeholder="..." class="input" type="text"
                  name="brips">
         </td>
         <td>
-          <input placeholder="..." class="infoInpt" type="text"
+          <input placeholder="..." class="input" type="text"
                  name="rte">
         </td>
+      </tr>
       <tr>
         <th>Action AIS</th>
-        <th class="centerAlign">Devis</th>
-        <th class="rightAlign">Date de Prévue</th>
+        <th class="center-text">Devis</th>
+        <th class="right-text">Date de Prévue</th>
       </tr>
       <tr>
         <td>
-          <input placeholder="..." class="infoInpt" type="text"
+          <input placeholder="..." class="input" type="text"
                  name="ais">
         </td>
         <td>
-          <input placeholder="..." class="infoInpt" type="text"
+          <input placeholder="..." class="input" type="text"
                  name="estimate">
         </td>
         <td>
-          <input placeholder="..." class="infoInpt" type="text"
+          <input placeholder="..." class="input" type="text"
                  name="target">
         </td>
       </tr>
       <tr>
-        <th>
+        <th colspan="3">
           <label>Status<span style="color: red">*</span></label>
         </th>
+      </tr>
       <tr>
+        <td colspan="3" class="control">
+          <label class="radio">
+            <input type="radio" name="status"
+                   value="en attente" checked>
+            en attente
+          </label>
 
+          <label class="radio">
+            <input type="radio" name="status"
+                   value="affecté">
+            affecté
+          </label>
+          <label class="radio">
+            <input type="radio" name="status"
+                   value="résolu">
+            résolu
+          </label>
+          <label class="radio">
+            <input type="radio" name="status"
+                   value="archivé">
+            archivé
+          </label>
+        </td>
       </tr>
-      <td colspan="3">
-        <input type="radio" name="status"
-               value="en attente" checked>en attente
-
-        <input type="radio" name="status"
-               value="affecté">affecté
-
-        <input type="radio" name="status"
-               value="résolu">résolu
-
-        <input type="radio" name="status"
-               value="archivé">archivé
-      </td>
-      </tr>
-      <th id="btnpad">
-        <button type="submit" id="srcBtn">Soumettre</button>
+      <th id="btnpad" colspan="3">
+        <button type="submit" class="button is-primary is-light is-medium blockMargin">Soumettre</button>
       </th>
-      <span style="color: red">*</span>Infos obligatoires
       </tr>
     </table>
   </form>
