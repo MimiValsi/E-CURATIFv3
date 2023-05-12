@@ -14,6 +14,7 @@ func (app *application) routes() http.Handler {
 
 	// Home page
 	r.Get("/", app.home)
+	r.Get("/jsonGraph", app.jsonData)
 
 	// Pages Source
 	// Chaque place réservée doit être unique pour chaque router

@@ -30,7 +30,9 @@ type application struct {
 	csvSource *database.CSVSource
 	csvInfo   *database.CSVInfo
 
-	jSource *database.JsonSource
+	DB *pgxpool.Pool
+
+	// jSource *database.JsonSource
 }
 
 // Ces 2 variables ne sont pas sensé être ni modifiés ni pour la prod
@@ -64,20 +66,23 @@ func main() {
 	// Permet la comm avec PSQL et autres fonctions
 	// Tout passe par ici
 	app := &application{
-		sources: &database.Source{DB: db},
-		infos:   &database.Info{DB: db},
+		DB: db,
+		sources: &database.Source{},
+		infos:   &database.Info{},
 
 		templateCache: templateCache,
 
+		// A reformuler
 		csvInfo: &database.CSVInfo{DB: db,
 			ErrorLog: errorLog, InfoLog: infoLog},
+		// A reformuler
 		csvSource: &database.CSVSource{DB: db,
 			Errorlog: errorLog, InfoLog: infoLog},
 
 		infoLog:  infoLog,
 		errorLog: errorLog,
 
-		jSource: &database.JsonSource{DB: db},
+		// jSource: &database.JsonSource{DB: db},
 	}
 
 	// Default parameters values to routes
