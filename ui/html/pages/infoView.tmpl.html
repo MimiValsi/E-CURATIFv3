@@ -149,12 +149,15 @@
 
 
     <tr>
+      {{ if eq .Updated .ZeroTime }}
+      <td colspan="3">
+        <time>Créé le: {{ humanDate .Created }}</time>
+      </td>
+      {{ else }}
       <td colspan="2">
         <time>Créé le: {{ humanDate .Created }}</time>
-        {{ if eq .Updated .ZeroTime }}
-        {{ else }}
-        <!-- TODO: Find a better solution -->
       </td>
+        <!-- TODO: Find a better solution -->
       <td class="right-text">
         <time>
           Mis à jour le: {{ humanDate .Updated }}</time>

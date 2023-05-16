@@ -26,6 +26,11 @@
     <div>
       <input class="search-info top-margin" id="searchStatus" onkeyup="searchStatus()" placeholder="Chercher des status...">
     </div>
+    <div>
+    <form action="/source/{{ .Source.ID }}/info/create">
+      <button name="createInfo" class="button is-info is-light">Créer Curatif</button>
+    </form>
+  </div>
 
     <table id="myTable">
     <!-- id @ "Home Page section" border-bottom -->
@@ -73,11 +78,7 @@
     {{ end }}
   </table>
   </div>
-  <div>
-    <form action="/source/{{ .Source.ID }}/info/create">
-      <button name="createInfo" class="button is-info is-light">Créer Curatif</button>
-    </form>
-  </div>
+
 </div>
 <!-- The ids are @ Misc Parameters -->
 <div>
