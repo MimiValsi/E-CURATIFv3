@@ -182,7 +182,7 @@ func (app *application) sourceCreatePost(w http.ResponseWriter, r *http.Request)
 		return
 	}
 
-	http.Redirect(w, r, fmt.Sprintf("/source/view/%d", id),
+	http.Redirect(w, r, fmt.Sprintf("/source/create/%d", id),
 		http.StatusSeeOther)
 }
 
@@ -441,14 +441,14 @@ func (app *application) infoCreatePost(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	id, err := app.infos.Insert(sID, conn)
+	_, err = app.infos.Insert(sID, conn)
 	if err != nil {
 		app.serverError(w, err)
 		return
 	}
 
-	http.Redirect(w, r, fmt.Sprintf("/source/%d/info/view/%d",
-		sID, id), http.StatusSeeOther)
+	http.Redirect(w, r, fmt.Sprintf("/source/%d/info/create",
+		sID), http.StatusSeeOther)
 }
 
 // Page permettant de visualiser en détails la fiche curatif
