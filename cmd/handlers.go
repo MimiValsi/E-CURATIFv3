@@ -54,7 +54,7 @@ func (app *application) home(w http.ResponseWriter, r *http.Request) {
 	data.Sources = sources
 	data.JSource = jData
 
-	app.render(w, http.StatusOK, "home.tmpl.html", data)
+	app.render(w, http.StatusOK, "home.html.gotpl", data)
 
 }
 
@@ -128,7 +128,7 @@ func (app *application) sourceView(w http.ResponseWriter, r *http.Request) {
 	data.Source = source
 
 	// Génération de la page web
-	app.render(w, http.StatusOK, "sourceView.tmpl.html", data)
+	app.render(w, http.StatusOK, "sourceView.html.gotpl", data)
 
 }
 
@@ -141,7 +141,7 @@ func (app *application) sourceCreate(w http.ResponseWriter, r *http.Request) {
 	data := app.newTemplateData(r)
 	data.Form = sourceCreateForm{}
 
-	app.render(w, http.StatusOK, "sourceCreate.tmpl.html", data)
+	app.render(w, http.StatusOK, "sourceCreate.html.gotpl", data)
 }
 
 func (app *application) sourceCreatePost(w http.ResponseWriter, r *http.Request) {
@@ -171,7 +171,7 @@ func (app *application) sourceCreatePost(w http.ResponseWriter, r *http.Request)
 		data := app.newTemplateData(r)
 		data.Form = form
 		app.render(w, http.StatusUnprocessableEntity,
-			"sourceCreate.tmpl.html", data)
+			"sourceCreate.html.gotpl", data)
 		return
 	}
 
@@ -245,7 +245,7 @@ func (app *application) sourceUpdate(w http.ResponseWriter, r *http.Request) {
 	data := app.newTemplateData(r)
 	data.Source = source
 
-	app.render(w, http.StatusOK, "sourceUpdate.tmpl.html", data)
+	app.render(w, http.StatusOK, "sourceUpdate.html.gotpl", data)
 }
 
 // Une fois les changements faites, elles sont reenvoyés vers la BD
@@ -279,7 +279,7 @@ func (app *application) sourceUpdatePost(w http.ResponseWriter, r *http.Request)
 		data := app.newTemplateData(r)
 		data.Form = form
 		app.render(w, http.StatusUnprocessableEntity,
-			"sourceUpdate.tmpl.html", data)
+			"sourceUpdate.html.gotpl", data)
 		return
 	}
 
@@ -355,7 +355,7 @@ func (app *application) infoCreate(w http.ResponseWriter, r *http.Request) {
 	data.Form = infoCreateForm{}
 	data.Source = source
 
-	app.render(w, http.StatusOK, "infoCreate.tmpl.html", data)
+	app.render(w, http.StatusOK, "infoCreate.html.gotpl", data)
 }
 
 func (app *application) infoCreatePost(w http.ResponseWriter, r *http.Request) {
@@ -418,7 +418,7 @@ func (app *application) infoCreatePost(w http.ResponseWriter, r *http.Request) {
 		data := app.newTemplateData(r)
 		data.Form = form
 		app.render(w, http.StatusUnprocessableEntity,
-			"infoCreate.tmpl.html", data)
+			"infoCreate.html.gotpl", data)
 		return
 	}
 
@@ -478,7 +478,7 @@ func (app *application) infoView(w http.ResponseWriter, r *http.Request) {
 	data := app.newTemplateData(r)
 	data.Info = info
 
-	app.render(w, http.StatusOK, "infoView.tmpl.html", data)
+	app.render(w, http.StatusOK, "infoView.html.gotpl", data)
 }
 
 // HTML POST afin de supprimer le curatif(info)
@@ -543,7 +543,7 @@ func (app *application) infoUpdate(w http.ResponseWriter, r *http.Request) {
 	data := app.newTemplateData(r)
 	data.Info = info
 
-	app.render(w, http.StatusOK, "infoUpdate.tmpl.html", data)
+	app.render(w, http.StatusOK, "infoUpdate.html.gotpl", data)
 }
 
 func (app *application) infoUpdatePost(w http.ResponseWriter, r *http.Request) {
@@ -628,7 +628,7 @@ func (app *application) infoUpdatePost(w http.ResponseWriter, r *http.Request) {
 func (app *application) importCSV(w http.ResponseWriter, r *http.Request) {
 
 	data := app.newTemplateData(r)
-	app.render(w, http.StatusOK, "importCSV.tmpl.html", data)
+	app.render(w, http.StatusOK, "importCSV.html.gotpl", data)
 }
 
 func (app *application) importCSVPost(w http.ResponseWriter, r *http.Request) {

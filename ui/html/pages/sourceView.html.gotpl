@@ -75,6 +75,10 @@
     <!-- End Infos table -->
     {{ else }}
     <p>Poste Source Prope...</p>
+
+    <form action="/source/{{ .Source.ID }}/info/create">
+      <button name="createInfo" class="button is-info is-light">Créer Curatif</button>
+    </form>
     {{ end }}
   </table>
   </div>
