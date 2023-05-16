@@ -49,6 +49,11 @@
     nomSources.push(jsData[i].name);
   }
 
+  let codeGMAO = []
+  for (let i = 0; i < jsData.length; i++) {
+    codeGMAO.push(jsData[i].code_GMAO)
+  }
+
   // for ESM environment, need to import modules as:
   // import bb, {bar} from "billboard.js";
 
@@ -69,10 +74,10 @@
     axis: {
       x: {
         type: "category",
-        categories: [...nomSources],
+        categories: [...codeGMAO],
         height: 16,
         tick: {
-          rotate: 75,
+          // rotate: 75,
           multiline: false,
           // fit: false
         }

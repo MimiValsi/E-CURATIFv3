@@ -10326,6 +10326,16 @@ nav .fileSize {
 /***********
  * NAV END *
  ***********/
+/**********
+ * HEADER *
+ **********/
+#header {
+  margin-bottom: 1rem;
+}
+
+/**************
+ * HEADER END *
+ **************/
 /********
  * GRID *
  ********/
@@ -10335,7 +10345,7 @@ nav .fileSize {
 }
 
 .grid-container div {
-  padding: 0.625rem 0.625rem;
+  padding: 0.625rem;
 }
 
 .grid-container button {
