@@ -4,7 +4,7 @@ import (
 	"context"
 	"encoding/json"
 	"errors"
-	"fmt"
+	//"fmt"
 	// "os"
 	"time"
 
@@ -16,10 +16,21 @@ type Source struct {
 	ID       int    `json:"-"`        // Source ID (PK)
 	Name     string `json:"name"`     // Source name
 	Curatifs int    `json:"curatifs"` // Info ouvrage
+	CodeGMAO string `json:"code_GMAO"`
 	SID      int    `json:"-"`        // Infos source_id (FK)
 
 	Created time.Time     `json:"-"`
-	// DB      * `json:"-"`
+}
+
+func (jsrc *Source) JSource() ([]byte, error) {
+	js := []*Source{}
+
+	jsonData, err := json.Marshal(js)
+	if err != nil {
+		return nil, err
+	}
+
+	return jsonData, nil
 }
 
 // fonction afin de choper tous les postes sources
@@ -29,6 +40,7 @@ func (src *Source) MenuSource(conn *pgxpool.Conn) ([]*Source, error) {
 	query := `
 SELECT s.id,
        s.name,
+       s.code_GMAO,
        COUNT(i.status) FILTER (WHERE i.status <> 'archivé')
   FROM source AS s
        LEFT JOIN info AS i ON i.source_id = s.id
@@ -48,7 +60,7 @@ SELECT s.id,
 	for rows.Next() {
 		sObj := &Source{}
 
-		err := rows.Scan(&sObj.ID, &sObj.Name, &sObj.Curatifs)
+		err := rows.Scan(&sObj.ID, &sObj.Name, &sObj.CodeGMAO, &sObj.Curatifs)
 		if err != nil {
 			return nil, err
 		}
@@ -60,28 +72,10 @@ SELECT s.id,
 		return nil, err
 	}
 
-	// jsonData, err := json.Marshal(sources)
-	// if err != nil {
-	//	return nil, err
-	// }
-
-	// fmt.Printf("sources data: %+v\nsources type: %[1]T\n\n", sources)
-
 	return sources, nil
 }
 
-func (jsrc *Source) JSource() ([]byte, error) {
-	js := []*Source{}
 
-	jsonData, err := json.Marshal(js)
-	if err != nil {
-		return nil, err
-	}
-
-	fmt.Printf("json data: %s\njson data type: %[1]T\n\n", jsonData)
-
-	return jsonData, nil
-}
 
 // fonction d'obtention de donnée spécific source
 func (src *Source) SourceGet(id int, conn *pgxpool.Conn) (*Source, error) {
