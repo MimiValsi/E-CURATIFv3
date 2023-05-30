@@ -8,6 +8,7 @@ import (
 	"log"
 	"os"
 	"os/exec"
+	"strconv"
 	"strings"
 	"time"
 
@@ -59,18 +60,17 @@ type CSVInfo struct {
 	Brips    string
 	Ameps    string
 	Status   string
+
 	DB       *pgxpool.Pool
 	ErrorLog *log.Logger
 	InfoLog  *log.Logger
-
-	// srcID    int
-	// srcName  string
 }
 
 type CSVSource struct {
 	ID       int
 	Name     string
 	Created  time.Time
+
 	DB       *pgxpool.Pool
 	Errorlog *log.Logger
 	InfoLog  *log.Logger
@@ -134,19 +134,18 @@ func (data *CSVInfo) dataCSV(s string) {
 
 	// i = 0 -> Nom du poste
 	// i = 1 -> Nom des colonnes
-	for i := 2; i < len(lines); i++ {
+	for i, j := 2, 0; i < len(lines); i++ {
 		line := lines[i]
-		j := 0
 
 		data.Agent = line[j]
 		data.Event = line[j+1]
 		data.Created = line[j+2]
 		data.Material = line[j+3]
-		data.Pilot = line[j+4]
-		data.Detail = line[j+5]
-		data.Target = line[j+6]
-		data.DayDone = line[j+7]
-		data.Priority = 1
+		// data.Pilot = line[j+4]
+		data.Detail = line[j+4]
+		data.Target = line[j+5]
+		// data.DayDone = line[j+7]
+		data.Priority, _ = strconv.Atoi(line[j+8])
 		data.Estimate = line[j+9]
 		data.Oups = line[j+10]
 		data.Brips = line[j+11]
