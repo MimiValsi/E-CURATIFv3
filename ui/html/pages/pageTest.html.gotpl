@@ -1,0 +1,10 @@
+{{ define "title"}}Page Test{{ end }}
+
+{{ define "nav"}}
+{{ end }}
+
+{{ define "main"}}
+<div id="myPlot">
+  <script src="/static/js/graph.js"></script>
+</div>
+{{ end }}
