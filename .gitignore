@@ -5,3 +5,5 @@ TODO
 launch
 source.json
 ./ui/static/sass/main.css
+./ui/html/pages/pageTest.html.gotpl
+./ui/static/img/vial-virus-solid.svg
