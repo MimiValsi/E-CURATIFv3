@@ -37,6 +37,9 @@ func (app *application) routes() http.Handler {
 	r.Get("/importCSV", app.importCSV)
 	r.Post("/importCSV", app.importCSVPost)
 
+	// Page de test
+	r.Get("/pageTest", app.pageTest)
+
 	// Fichiers statiques
 	fileServer := http.FileServer(http.Dir("./ui/static/"))
 	r.Handle("/static/*", http.StripPrefix("/static", fileServer))

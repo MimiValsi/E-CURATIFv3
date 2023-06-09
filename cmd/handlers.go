@@ -673,3 +673,8 @@ func (app *application) importCSVPost(w http.ResponseWriter, r *http.Request) {
 
 	http.Redirect(w, r, "/", http.StatusSeeOther)
 }
+
+func (app *application) pageTest(w http.ResponseWriter, r *http.Request) {
+
+	app.render(w, http.StatusOK, "pageTest.html.gotpl", nil)
+}
