@@ -75,9 +75,9 @@
       x: {
         type: "category",
         categories: [...codeGMAO],
-        height: 16,
+        height: 50,
         tick: {
-          // rotate: 75,
+          rotate: 75,
           multiline: false,
           // fit: false
         }
