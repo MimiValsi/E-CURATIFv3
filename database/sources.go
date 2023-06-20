@@ -4,22 +4,20 @@ import (
 	"context"
 	"encoding/json"
 	"errors"
-	//"fmt"
-	// "os"
 	"time"
 
 	"github.com/jackc/pgx/v4"
 	"github.com/jackc/pgx/v4/pgxpool"
-	// "github.com/jackc/pgx/v4/pgxpool"
 )
+
 type Source struct {
 	ID       int    `json:"-"`        // Source ID (PK)
 	Name     string `json:"name"`     // Source name
 	Curatifs int    `json:"curatifs"` // Info ouvrage
 	CodeGMAO string `json:"code_GMAO"`
-	SID      int    `json:"-"`        // Infos source_id (FK)
+	SID      int    `json:"-"` // Infos source_id (FK)
 
-	Created time.Time     `json:"-"`
+	Created time.Time `json:"-"`
 }
 
 func (jsrc *Source) JSource() ([]byte, error) {
@@ -43,9 +41,10 @@ SELECT s.id,
        s.code_GMAO,
        COUNT(i.status) FILTER (WHERE i.status <> 'archivé')
   FROM source AS s
-       LEFT JOIN info AS i ON i.source_id = s.id
-  GROUP BY s.id
-  ORDER BY name ASC
+       LEFT JOIN info AS i 
+       ON i.source_id = s.id
+ GROUP BY s.id
+ ORDER BY name ASC
 `
 
 	rows, err := conn.Query(ctx, query)
@@ -75,15 +74,13 @@ SELECT s.id,
 	return sources, nil
 }
 
-
-
 // fonction d'obtention de donnée spécific source
 func (src *Source) SourceGet(id int, conn *pgxpool.Conn) (*Source, error) {
 	ctx := context.Background()
 	query := `
 SELECT id, name, created
   FROM source
-    WHERE id = $1
+ WHERE id = $1
 `
 	sObj := &Source{}
 	err := conn.QueryRow(ctx, query, id).Scan(&sObj.ID, &sObj.Name,
@@ -121,7 +118,7 @@ func (src *Source) SourceDelete(id int, conn *pgxpool.Conn) error {
 	ctx := context.Background()
 	query := `
 DELETE FROM source
-  WHERE id = $1
+ WHERE id = $1
 `
 	_, err := conn.Exec(ctx, query, id)
 	if err != nil {
@@ -136,8 +133,8 @@ func (src *Source) SourceUpdate(id int, conn *pgxpool.Conn) error {
 	ctx := context.Background()
 	query := `
 UPDATE source
-  SET name = $1
-    WHERE id = $2
+   SET name = $1
+ WHERE id = $2
 `
 	_, err := conn.Exec(ctx, query, src.Name, id)
 	if err != nil {

@@ -66,7 +66,7 @@ func main() {
 	// Permet la comm avec PSQL et autres fonctions
 	// Tout passe par ici
 	app := &application{
-		DB: db,
+		DB:      db,
 		sources: &database.Source{},
 		infos:   &database.Info{},
 

@@ -39,11 +39,10 @@ E-CURATIFv3/
     │   └── base.tmpl.html
     │
     └── static/
-        ├── sass/
-        │   ├── icons/
-        │   ├── mybulma/
-        │   ├── @mdi/
-        │   └── main.scss
+        └── js/
+        │   ├── node_modules/...
+        │   ├── graph.js
+        │   └── main.js
         │
         ├── img/
         │   ├── ecuratif.png
@@ -54,7 +53,7 @@ E-CURATIFv3/
         │   ├── icone_maison.png
         │   ├── icone_ps.png
         │   ├── loupe.png
-        │   ├── petit_icome.png
+        │   ├── petit_icone.png
         │   ├── searchicon.png
         │   ├── wall_1a.png
         │   ├── wall_1a_1080p.png
@@ -62,11 +61,11 @@ E-CURATIFv3/
         │   ├── wall_gray_mode.png
         │   └── wall_light_mode.png
         │
-        └── js/
-            ├── node_modules/
-            ├── d3.v6.min.js
-            ├── graph.js
-            └── main.js
+        └── sass/
+            ├── icons/...
+            ├── mybulma/...
+            ├── @mdi/...
+            └── main.scss
 ```
 
 <!---

@@ -18,10 +18,11 @@ import (
 	"github.com/jackc/pgx/v4/pgxpool"
 )
 
-func (app *application) dbConn(ctx context.Context) (*pgxpool.Conn) {
+func (app *application) dbConn(ctx context.Context) *pgxpool.Conn {
 	conn, err := app.DB.Acquire(ctx)
 	if err != nil {
-		// TODO handle err
+		app.errorLog.Println("Couldn't connect to DB")
+		return nil
 	}
 
 	return conn
@@ -182,7 +183,7 @@ func (app *application) sourceCreatePost(w http.ResponseWriter, r *http.Request)
 		return
 	}
 
-	http.Redirect(w, r, fmt.Sprintf("/source/create/%d", id),
+	http.Redirect(w, r, fmt.Sprintf("/source/view/%d", id),
 		http.StatusSeeOther)
 }
 

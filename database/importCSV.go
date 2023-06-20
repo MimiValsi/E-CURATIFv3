@@ -16,10 +16,6 @@ import (
 	"github.com/jackc/pgx/v4/pgxpool"
 )
 
-// TODO:
-// Put everything back to normal, test it.
-//
-
 // On commence par vérifier si le fichier fini par .csv
 // si vrai, alors on démarre EncodingCSV()
 //
@@ -67,13 +63,15 @@ type CSVInfo struct {
 }
 
 type CSVSource struct {
-	ID       int
-	Name     string
-	Created  time.Time
+	ID   int
+	Name string
 
-	DB       *pgxpool.Pool
+	Created time.Time
+
 	Errorlog *log.Logger
 	InfoLog  *log.Logger
+
+	DB *pgxpool.Pool
 }
 
 func (data *CSVInfo) VerifyCSV(s string) {
@@ -107,9 +105,9 @@ func (data *CSVInfo) encodingCSV(s string) {
 			"-t", "UTF-8", s, "-o", s)
 		iconvErr := cmd.Run()
 		data.ErrorLog.Println(iconvErr)
-	} else {
-		data.dataCSV(s)
 	}
+
+	data.dataCSV(s)
 }
 
 func (data *CSVInfo) dataCSV(s string) {
@@ -141,10 +139,8 @@ func (data *CSVInfo) dataCSV(s string) {
 		data.Event = line[j+1]
 		data.Created = line[j+2]
 		data.Material = line[j+3]
-		// data.Pilot = line[j+4]
 		data.Detail = line[j+4]
 		data.Target = line[j+5]
-		// data.DayDone = line[j+7]
 		data.Priority, _ = strconv.Atoi(line[j+8])
 		data.Estimate = line[j+9]
 		data.Oups = line[j+10]

@@ -30,23 +30,25 @@ type Info struct {
 	Pilot      string
 	ActionDate string
 	DayDone    string
-	ZeroTime   time.Time
-	Created    time.Time
-	Updated    time.Time
-	// DB         *pgxpool.Pool
+
+	ZeroTime time.Time
+	Created  time.Time
+	Updated  time.Time
 }
 
 // Fonction de création donnée info
 func (i *Info) Insert(id int, conn *pgxpool.Conn) (int, error) {
 	ctx := context.Background()
 	query := `
-INSERT INTO info
-    (source_id, agent, material, detail, event, priority, oups, ameps,
-       brips, rte, ais, estimate, target, status, doneby, created)
-	  VALUES
-	    ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12, $13,
-	      $14, $15, $16)
-		RETURNING id;
+INSERT INTO info (source_id, agent, material, detail, 
+	   	  event, priority, oups, ameps,
+       		  brips, rte, ais, estimate, 
+		  target, status, doneby, created)
+VALUES ($1,  $2,  $3,  $4, 
+	$5,  $6,  $7,  $8, 
+	$9,  $10, $11, $12, 
+	$13, $14, $15, $16)
+  RETURNING id;
 `
 	err := conn.QueryRow(ctx, query, id, i.Agent,
 		i.Material, i.Detail, i.Event, i.Priority,
@@ -65,10 +67,12 @@ INSERT INTO info
 func (i *Info) InfoGet(id int, conn *pgxpool.Conn) (*Info, error) {
 	ctx := context.Background()
 	query := `
-SELECT id, agent, material, priority, rte, detail, estimate, brips,
-       oups, ameps, ais, source_id, created, updated, status, event, target
-FROM info
-  WHERE id = $1
+SELECT id, agent, material, priority, 
+       rte, detail, estimate, brips,
+       oups, ameps, ais, source_id, 
+       created, updated, status, event, target
+  FROM info
+ WHERE id = $1
 `
 	var rte, ameps, ais, brips, oups, estimate, target,
 		doneby, pilot, actionDate *string
@@ -143,15 +147,11 @@ FROM info
 func (i *Info) InfoList(id int, conn *pgxpool.Conn) ([]*Info, error) {
 	ctx := context.Background()
 	query := `
-SELECT id,
-       material,
-       created,
-       status,
-       source_id,
-       priority
-FROM info
-  WHERE source_id = $1
-  ORDER BY priority ASC
+SELECT id, material, created, 
+       status, source_id, priority
+  FROM info
+ WHERE source_id = $1
+ ORDER BY priority ASC
 `
 	rows, err := conn.Query(ctx, query, id)
 	if err != nil {
@@ -185,7 +185,7 @@ func (i *Info) InfoDelete(id int, conn *pgxpool.Conn) error {
 	ctx := context.Background()
 	query := `
 DELETE FROM info
-  WHERE id = $1
+ WHERE id = $1
 `
 	_, err := conn.Exec(ctx, query, id)
 	if err != nil {
@@ -200,10 +200,10 @@ func (i *Info) InfoUpdate(id int, conn *pgxpool.Conn) error {
 	ctx := context.Background()
 	query := `
 UPDATE info
-SET agent = $1, material = $2, priority = $3, target = $4, rte = $5,
-    detail = $6, estimate = $7, brips = $8, oups = $9, ameps = $10,
-    ais = $11, updated = $12, status = $13, event = $14, doneby = $15
-WHERE id = $16
+   SET agent = $1, material = $2, priority = $3, target = $4, rte = $5,
+       detail = $6, estimate = $7, brips = $8, oups = $9, ameps = $10,
+       ais = $11, updated = $12, status = $13, event = $14, doneby = $15
+ WHERE id = $16
 `
 	_, err := conn.Exec(ctx, query, i.Agent, i.Material,
 		i.Priority, i.Target, i.Rte, i.Detail, i.Estimate,
@@ -221,9 +221,8 @@ func (i *Info) InfoUp(id int, conn *pgxpool.Conn) error {
 	ctx := context.Background()
 	query := `
 UPDATE info
-SET material = $1,
-    updated = $2
-WHERE id = $3
+   SET material = $1, updated = $2
+ WHERE id = $3
 `
 	_, err := conn.Exec(ctx, query, i.Material,
 		time.Now().UTC(), id)
