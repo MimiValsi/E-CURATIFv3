@@ -7,7 +7,7 @@ import (
 	"runtime/debug"
 )
 
-// Les status web sont gérés icin
+// Les status web sont gérés ici
 
 // Le serverError écrit les message d'erreur
 // puis envoi 500 Internal Server Error à l'utilisateur

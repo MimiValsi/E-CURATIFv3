@@ -33,7 +33,7 @@ func (app *application) dbConn(ctx context.Context) *pgxpool.Conn {
 //
 
 func (app *application) home(w http.ResponseWriter, r *http.Request) {
-	// w.Header().Set("Content-Type", "application/json")
+
 	conn := app.dbConn(r.Context())
 	defer conn.Release()
 
