@@ -1,6 +1,8 @@
 package main
 
 import (
+	"context"
+	"encoding/json"
 	"errors"
 	"fmt"
 	"io"
@@ -13,11 +15,36 @@ import (
 
 	// package pour les routers
 	"github.com/go-chi/chi/v5"
+	"github.com/jackc/pgx/v4/pgxpool"
 )
 
+func (app *application) dbConn(ctx context.Context) *pgxpool.Conn {
+	conn, err := app.DB.Acquire(ctx)
+	if err != nil {
+		app.errorLog.Println("Couldn't connect to DB")
+		return nil
+	}
+
+	return conn
+}
+
+//
+// Home
+//
+
 func (app *application) home(w http.ResponseWriter, r *http.Request) {
+
+	conn := app.dbConn(r.Context())
+	defer conn.Release()
+
 	// MenuSource func @ database/sources.go
-	sources, err := app.sources.MenuSource()
+	sources, err := app.sources.MenuSource(conn)
+	if err != nil {
+		app.serverError(w, err)
+		return
+	}
+
+	jData, err := json.Marshal(sources)
 	if err != nil {
 		app.serverError(w, err)
 		return
@@ -26,9 +53,29 @@ func (app *application) home(w http.ResponseWriter, r *http.Request) {
 	// newTemplateData @ cmd/templates.go
 	data := app.newTemplateData(r)
 	data.Sources = sources
+	data.JSource = jData
 
-	app.render(w, http.StatusOK, "home.tmpl.html", data)
+	app.render(w, http.StatusOK, "home.html.gotpl", data)
 
+}
+
+func (app *application) jsonData(w http.ResponseWriter, r *http.Request) {
+	conn := app.dbConn(r.Context())
+	defer conn.Release()
+
+	sources, err := app.sources.MenuSource(conn)
+	if err != nil {
+		app.serverError(w, err)
+	}
+
+	jsonGraph, err := json.Marshal(sources)
+	if err != nil {
+		app.serverError(w, err)
+	}
+
+	w.WriteHeader(http.StatusCreated)
+	w.Header().Set("Content-Type", "application/json")
+	w.Write(jsonGraph)
 }
 
 //
@@ -37,11 +84,14 @@ func (app *application) home(w http.ResponseWriter, r *http.Request) {
 
 type sourceCreateForm struct {
 	Name string
+
 	validator.Validator
 }
 
 // Ici on génère la page de visu d'un poste source avec ces curatifs
 func (app *application) sourceView(w http.ResponseWriter, r *http.Request) {
+	conn := app.dbConn(r.Context())
+	defer conn.Release()
 
 	key := chi.URLParam(r, "id")
 	id, err := strconv.Atoi(key)
@@ -53,7 +103,7 @@ func (app *application) sourceView(w http.ResponseWriter, r *http.Request) {
 	// Fait appel à la fonctin dans database/sources.go
 	// On récupère le "id" du source dans le URL
 	// créé auparavant
-	source, err := app.sources.SourceGet(id)
+	source, err := app.sources.SourceGet(id, conn)
 	if err != nil {
 		if errors.Is(err, database.ErrNoRecord) {
 			app.notFound(w)
@@ -64,7 +114,7 @@ func (app *application) sourceView(w http.ResponseWriter, r *http.Request) {
 
 	// Fait appel à la fonction dans database/infos.go
 	// en prenant en compte le id du source
-	info, err := app.infos.InfoList(id)
+	info, err := app.infos.InfoList(id, conn)
 	if err != nil {
 		if errors.Is(err, database.ErrNoRecord) {
 			app.notFound(w)
@@ -79,24 +129,29 @@ func (app *application) sourceView(w http.ResponseWriter, r *http.Request) {
 	data.Source = source
 
 	// Génération de la page web
-	app.render(w, http.StatusOK, "sourceView.tmpl.html", data)
+	app.render(w, http.StatusOK, "sourceView.html.gotpl", data)
 
 }
 
 // Génération de la page de création de source
 // Celle-ci est faite en deux parties:
 // La première est une GET, une fois le nom du source choisi
-// on passe à la fonction sourceCreatePost
+// la fonction sourceCreatePost prend le relais
 func (app *application) sourceCreate(w http.ResponseWriter, r *http.Request) {
 
 	data := app.newTemplateData(r)
 	data.Form = sourceCreateForm{}
 
-	app.render(w, http.StatusOK, "sourceCreate.tmpl.html", data)
+	app.render(w, http.StatusOK, "sourceCreate.html.gotpl", data)
 }
 
 func (app *application) sourceCreatePost(w http.ResponseWriter, r *http.Request) {
 
+	conn := app.dbConn(r.Context())
+	defer conn.Release()
+
+	// ParseForm analyse le URL et le rend dispo
+	// afin de récuperer des infos avec PostForm.Get
 	err := r.ParseForm()
 	if err != nil {
 		app.clientError(w, http.StatusBadRequest)
@@ -106,22 +161,23 @@ func (app *application) sourceCreatePost(w http.ResponseWriter, r *http.Request)
 		Name: r.PostForm.Get("name"),
 	}
 
+	// Petite vérification que le champ ne soit pas vide.
+	// Ceci empêche que la BD génère une erreur
 	emptyField := "Ce champ ne doit pas être vide"
 
 	form.CheckField(validator.NotBlank(form.Name),
 		"name", emptyField)
-	// form.CheckField(validator.MaxChars(form.Name, 20),
-	// "name", "Nom de Poste Source trop grand")
 
 	if !form.Valid() {
 		data := app.newTemplateData(r)
 		data.Form = form
 		app.render(w, http.StatusUnprocessableEntity,
-			"sourceCreate.tmpl.html", data)
+			"sourceCreate.html.gotpl", data)
 		return
 	}
 
-	id, err := app.sources.SourceInsert(form.Name)
+	// Si pas d'erreur, les données sont envoyés vers la BD
+	id, err := app.sources.SourceInsert(form.Name, conn)
 	if err != nil {
 		app.serverError(w, err)
 		return
@@ -131,7 +187,15 @@ func (app *application) sourceCreatePost(w http.ResponseWriter, r *http.Request)
 		http.StatusSeeOther)
 }
 
+// La fonction récupère l'id du Source. L'id est un string
+// qui sera converti en tant que int.
+// Cette fonction n'est dispo que si le Source existe, même si on
+// vérifi son existance par acquit de conscience.
+// Une fois fini, on redirect vers la page d'accueil
 func (app *application) sourceDeletePost(w http.ResponseWriter, r *http.Request) {
+
+	conn := app.dbConn(r.Context())
+	defer conn.Release()
 
 	key := chi.URLParam(r, "id")
 
@@ -141,7 +205,7 @@ func (app *application) sourceDeletePost(w http.ResponseWriter, r *http.Request)
 		return
 	}
 
-	err = app.sources.SourceDelete(id)
+	err = app.sources.SourceDelete(id, conn)
 	if err != nil {
 		if errors.Is(err, database.ErrNoRecord) {
 			app.notFound(w)
@@ -155,7 +219,13 @@ func (app *application) sourceDeletePost(w http.ResponseWriter, r *http.Request)
 
 }
 
+// Même foncionnement que la création et suppréssion de Source.
+// On récupère l'id et on extrait les données de la BD
+// afin de changer le nom.
 func (app *application) sourceUpdate(w http.ResponseWriter, r *http.Request) {
+	conn := app.dbConn(r.Context())
+	defer conn.Release()
+
 	key := chi.URLParam(r, "id")
 	id, err := strconv.Atoi(key)
 	if err != nil || id < 1 {
@@ -163,7 +233,7 @@ func (app *application) sourceUpdate(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	source, err := app.sources.SourceGet(id)
+	source, err := app.sources.SourceGet(id, conn)
 	if err != nil {
 		if errors.Is(err, database.ErrNoRecord) {
 			app.notFound(w)
@@ -176,10 +246,15 @@ func (app *application) sourceUpdate(w http.ResponseWriter, r *http.Request) {
 	data := app.newTemplateData(r)
 	data.Source = source
 
-	app.render(w, http.StatusOK, "sourceUpdate.tmpl.html", data)
+	app.render(w, http.StatusOK, "sourceUpdate.html.gotpl", data)
 }
 
+// Une fois les changements faites, elles sont reenvoyés vers la BD
 func (app *application) sourceUpdatePost(w http.ResponseWriter, r *http.Request) {
+
+	conn := app.dbConn(r.Context())
+	defer conn.Release()
+
 	err := r.ParseForm()
 	if err != nil {
 		app.clientError(w, http.StatusBadRequest)
@@ -205,13 +280,13 @@ func (app *application) sourceUpdatePost(w http.ResponseWriter, r *http.Request)
 		data := app.newTemplateData(r)
 		data.Form = form
 		app.render(w, http.StatusUnprocessableEntity,
-			"sourceUpdate.tmpl.html", data)
+			"sourceUpdate.html.gotpl", data)
 		return
 	}
 
 	app.sources.Name = form.Name
 
-	err = app.sources.SourceUpdate(id)
+	err = app.sources.SourceUpdate(id, conn)
 	if err != nil {
 		app.serverError(w, err)
 		return
@@ -227,6 +302,7 @@ func (app *application) sourceUpdatePost(w http.ResponseWriter, r *http.Request)
 //
 
 type infoCreateForm struct {
+	ID       int
 	Agent    string
 	Material string
 	Priority string
@@ -247,11 +323,16 @@ type infoCreateForm struct {
 	validator.Validator
 }
 
-// GET form that fetch sourceID which is sent to URL and retrieved
-// by infoCreatePost func, so a info can be created.
-// Infos table id has a FK to Sources table id.
+// Même fonctionnement que "sourceCreate", la différence principale
+// est qu'on doit récuperer l'id du Source.
+//
+// Dans la tableau "Infos" de la BD, source_id = FK de id (Source)
 func (app *application) infoCreate(w http.ResponseWriter, r *http.Request) {
 
+	conn := app.dbConn(r.Context())
+	defer conn.Release()
+
+	// Ici on récupère l'id du Source
 	key := chi.URLParam(r, "id")
 
 	id, err := strconv.Atoi(key)
@@ -260,7 +341,8 @@ func (app *application) infoCreate(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	source, err := app.sources.SourceGet(id)
+	// La fonction attend comme paramètre un "int" dont l'id Source
+	source, err := app.sources.SourceGet(id, conn)
 	if err != nil {
 		if errors.Is(err, database.ErrNoRecord) {
 			app.notFound(w)
@@ -274,19 +356,19 @@ func (app *application) infoCreate(w http.ResponseWriter, r *http.Request) {
 	data.Form = infoCreateForm{}
 	data.Source = source
 
-	app.render(w, http.StatusOK, "infoCreate.tmpl.html", data)
+	app.render(w, http.StatusOK, "infoCreate.html.gotpl", data)
 }
 
-// POST form that fetch, control and sends data to psql server
 func (app *application) infoCreatePost(w http.ResponseWriter, r *http.Request) {
 
-	// Fetch input
+	conn := app.dbConn(r.Context())
+	defer conn.Release()
+
 	err := r.ParseForm()
 	if err != nil {
 		app.clientError(w, http.StatusBadRequest)
 	}
 
-	// Fetch SourceID
 	key := chi.URLParam(r, "id")
 
 	sID, err := strconv.Atoi(key)
@@ -295,6 +377,8 @@ func (app *application) infoCreatePost(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
+	// Les données récupérés depuis la page HTML sont envoyées
+	// vers la BD
 	form := infoCreateForm{
 		Agent:    r.PostForm.Get("agent"),
 		Material: r.PostForm.Get("material"),
@@ -312,6 +396,10 @@ func (app *application) infoCreatePost(w http.ResponseWriter, r *http.Request) {
 		Doneby:   r.PostForm.Get("doneby"),
 	}
 
+	// Certains champs ne doivent pas être vides.
+	// Afin de ne pas recevoir une erreur venant de la BD
+	// On la vérifie en avance.
+	// Ceci sera fait en JS en amont en plus
 	emptyField := "Ce champ ne doit pas être vide"
 
 	form.CheckField(validator.NotBlank(form.Agent),
@@ -331,12 +419,10 @@ func (app *application) infoCreatePost(w http.ResponseWriter, r *http.Request) {
 		data := app.newTemplateData(r)
 		data.Form = form
 		app.render(w, http.StatusUnprocessableEntity,
-			"infoCreate.tmpl.html", data)
+			"infoCreate.html.gotpl", data)
 		return
 	}
 
-	// By copying form.xxx into app.infos.xxx, it will
-	// send the data to Infos struct @ database/infos.go
 	app.infos.Agent = form.Agent
 	app.infos.Material = form.Material
 	app.infos.Detail = form.Detail
@@ -356,18 +442,22 @@ func (app *application) infoCreatePost(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	id, err := app.infos.Insert(sID)
+	_, err = app.infos.Insert(sID, conn)
 	if err != nil {
 		app.serverError(w, err)
 		return
 	}
 
-	http.Redirect(w, r, fmt.Sprintf("/source/%d/info/view/%d",
-		sID, id), http.StatusSeeOther)
+	http.Redirect(w, r, fmt.Sprintf("/source/%d/info/create",
+		sID), http.StatusSeeOther)
 }
 
-// Func that retrive Info table data and send it to be displayed
+// Page permettant de visualiser en détails la fiche curatif
+// de l'ouvrage concerné
 func (app *application) infoView(w http.ResponseWriter, r *http.Request) {
+	conn := app.dbConn(r.Context())
+	defer conn.Release()
+
 	iKey := chi.URLParam(r, "id")
 
 	id, err := strconv.Atoi(iKey)
@@ -376,7 +466,7 @@ func (app *application) infoView(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	info, err := app.infos.InfoGet(id)
+	info, err := app.infos.InfoGet(id, conn)
 	if err != nil {
 		if errors.Is(err, database.ErrNoRecord) {
 			app.notFound(w)
@@ -389,11 +479,14 @@ func (app *application) infoView(w http.ResponseWriter, r *http.Request) {
 	data := app.newTemplateData(r)
 	data.Info = info
 
-	app.render(w, http.StatusOK, "infoView.tmpl.html", data)
+	app.render(w, http.StatusOK, "infoView.html.gotpl", data)
 }
 
-// POST form to delete selected info
+// HTML POST afin de supprimer le curatif(info)
 func (app *application) infoDeletePost(w http.ResponseWriter, r *http.Request) {
+
+	conn := app.dbConn(r.Context())
+	defer conn.Release()
 
 	sKey := chi.URLParam(r, "sid")
 	iKey := chi.URLParam(r, "id")
@@ -410,7 +503,7 @@ func (app *application) infoDeletePost(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	err = app.infos.InfoDelete(id)
+	err = app.infos.InfoDelete(id, conn)
 	if err != nil {
 		if errors.Is(err, database.ErrNoRecord) {
 			app.notFound(w)
@@ -425,7 +518,10 @@ func (app *application) infoDeletePost(w http.ResponseWriter, r *http.Request) {
 
 }
 
+// Même fonctionnement que "sourceUpdate"
 func (app *application) infoUpdate(w http.ResponseWriter, r *http.Request) {
+	conn := app.dbConn(r.Context())
+	defer conn.Release()
 
 	key := chi.URLParam(r, "id")
 	id, err := strconv.Atoi(key)
@@ -435,7 +531,7 @@ func (app *application) infoUpdate(w http.ResponseWriter, r *http.Request) {
 	}
 
 	// id ~> Info id
-	info, err := app.infos.InfoGet(id)
+	info, err := app.infos.InfoGet(id, conn)
 	if err != nil {
 		if errors.Is(err, database.ErrNoRecord) {
 			app.notFound(w)
@@ -448,19 +544,21 @@ func (app *application) infoUpdate(w http.ResponseWriter, r *http.Request) {
 	data := app.newTemplateData(r)
 	data.Info = info
 
-	app.render(w, http.StatusOK, "infoUpdate.tmpl.html", data)
+	app.render(w, http.StatusOK, "infoUpdate.html.gotpl", data)
 }
 
-
-
 func (app *application) infoUpdatePost(w http.ResponseWriter, r *http.Request) {
-	// Fetch input
+
+	conn := app.dbConn(r.Context())
+	defer conn.Release()
+
 	err := r.ParseForm()
 	if err != nil {
 		app.clientError(w, http.StatusBadRequest)
 	}
 
-	// Fetch SourceID
+	// Etant donnée qu'un curatif(Info) est attaché à un source,
+	// on doit le récuperer
 	sKey := chi.URLParam(r, "sid")
 	sID, err := strconv.Atoi(sKey)
 	if err != nil || sID < 1 {
@@ -468,7 +566,7 @@ func (app *application) infoUpdatePost(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	// Fetch InfoID
+	// ainsi que l'id (forcément)
 	iKey := chi.URLParam(r, "id")
 	iID, err := strconv.Atoi(iKey)
 	if err != nil || iID < 1 {
@@ -476,6 +574,9 @@ func (app *application) infoUpdatePost(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
+	// Même fonctionnement que "infoCreate", on récupère tout
+	// et on envoi ce qui a été modifié
+	// Ceci sera traîtré dans "database.go"
 	form := infoCreateForm{
 		Agent:    r.PostForm.Get("agent"),
 		Material: r.PostForm.Get("material"),
@@ -493,7 +594,6 @@ func (app *application) infoUpdatePost(w http.ResponseWriter, r *http.Request) {
 		Doneby:   r.PostForm.Get("doneby"),
 	}
 
-	// app.infos.__ go fetch the Info struct @ database/infos.go
 	app.infos.Agent = form.Agent
 	app.infos.Material = form.Material
 	app.infos.Detail = form.Detail
@@ -513,7 +613,7 @@ func (app *application) infoUpdatePost(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	err = app.infos.InfoUpdate(iID)
+	err = app.infos.InfoUpdate(iID, conn)
 	if err != nil {
 		app.serverError(w, err)
 		return
@@ -523,18 +623,24 @@ func (app *application) infoUpdatePost(w http.ResponseWriter, r *http.Request) {
 		sID, iID), http.StatusSeeOther)
 }
 
-func (app *application) infoUpload(w http.ResponseWriter, r *http.Request) {
+// Page HTML en cours de création
+// en soit permet de d'ouvrir et lire des fichiers .csv
+// A l'heure actuelle les données ne sont pas importés correctement
+func (app *application) importCSV(w http.ResponseWriter, r *http.Request) {
 
 	data := app.newTemplateData(r)
-	app.render(w, http.StatusOK, "infoUpload.tmpl.html", data)
+	app.render(w, http.StatusOK, "importCSV.html.gotpl", data)
 }
 
-func (app *application) infoUploadPost(w http.ResponseWriter, r *http.Request) {
+func (app *application) importCSVPost(w http.ResponseWriter, r *http.Request) {
+	conn := app.dbConn(r.Context())
+	defer conn.Release()
+
 	// Taille max du fichier: 2MB
 	r.ParseMultipartForm(2 << 20)
 
 	// Crée handler pour filename, size et headers
-	file, handler, err := r.FormFile("myFile")
+	file, handler, err := r.FormFile("inpt")
 	if err != nil {
 		app.errorLog.Println("Error Retrieving the File")
 		app.errorLog.Println(err)
@@ -548,12 +654,12 @@ func (app *application) infoUploadPost(w http.ResponseWriter, r *http.Request) {
 
 	// Creation du fichier
 	dst, err := os.Create("csvFiles/" + handler.Filename)
-	defer dst.Close()
 	if err != nil {
 		app.errorLog.Println(w, err.Error(),
 			http.StatusInternalServerError)
 		return
 	}
+	defer dst.Close()
 
 	// Copie le fichier transféré dans le système
 	if _, err := io.Copy(dst, file); err != nil {
@@ -566,5 +672,10 @@ func (app *application) infoUploadPost(w http.ResponseWriter, r *http.Request) {
 	// si concluant, les données seront transférées dans la BD
 	app.csvInfo.VerifyCSV("csvFiles/" + handler.Filename)
 
-	http.Redirect(w, r, fmt.Sprintf("/"), http.StatusSeeOther)
+	http.Redirect(w, r, "/", http.StatusSeeOther)
+}
+
+func (app *application) pageTest(w http.ResponseWriter, r *http.Request) {
+
+	app.render(w, http.StatusOK, "pageTest.html.gotpl", nil)
 }

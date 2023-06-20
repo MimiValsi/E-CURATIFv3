@@ -1,0 +1,83 @@
+{{ define "title" }}Home{{ end }}
+
+{{ define "nav" }}
+<nav id="navHome">
+  <div>
+      <a href="/"><img class="iconeWidth"
+                       src="/static/img/icone_maison.png"></a>
+      <a href="/pageTest"><img class="iconeWidth"
+                               src="/static/img/vial-virus-solid.svg"></a>
+  </div>
+  <div>
+    <a href="/source/create"><img class="iconeWidth"
+                                  src="/static/img/icone_ps.png"></a>
+  </div>
+    <form
+      enctype="multipart/form-data"
+      action="http://localhost:3001/importCSV"
+      method="post">
+
+    <div class="file is-right fileSize">
+      <label class="file-label">
+        <input class="file-input" type="file" name="inpt">
+        <span class="file-cta">
+          <span class="file-label">
+            Choisir fichier csv...
+          </span>
+        </span>
+      </label>
+      <label class="file-label">
+        <input class="file-input" type="submit">
+        <span class="file-cta">
+          <span class="mdi mdi-file-import-outline upload-icon-size">
+            <i class="fas fa-upload"></i>
+          </span>
+        </span>
+      </label>
+    </div>
+</form>
+</nav>
+{{ end }}
+
+{{ define "main" }} <!-- main -->
+
+{{ if .Sources }} <!-- if Sources -->
+<div class="myGrid">
+  <div class="grid-container is-desktop is-mobile">
+    {{ range .Sources }} <!-- Sourcnes loop -->
+
+    <div>
+      <form action="/source/view/{{ .ID }}" method="get">
+        {{ if .ID }} <!-- if ID -->
+
+        <!-- ge: Greater Equal
+             le: Lesser Equal  -->
+        {{ if (eq .Curatifs 0) }} <!-- if curatif -->
+        <button name="{{ .Curatifs }}" class="button is-large is-responsive green-btn">{{ .Name }}</button>
+
+        {{ else if and (ge .Curatifs 1) (le .Curatifs 5) }}
+        <button name="{{ .Curatifs }}" class="button is-large is-responsive yellow-btn">{{ .Name }}</button>
+
+        {{ else if and (ge .Curatifs 6) (le .Curatifs 9) }}
+        <button name="{{ .Curatifs }}" class="button is-large is-responsive orange-btn">{{ .Name }}</button>
+
+        {{ else if (ge .Curatifs 10) }}
+        <button name="{{ .Curatifs }}" class="button is-large is-responsive red-btn">{{ .Name }}</button>
+
+        {{ end }} <!-- if curatif end -->
+
+        {{ end }} <!-- if ID end -->
+      </form>
+    </div>
+
+    {{ end }}<!-- Sources loop end -->
+
+  </div>
+  <div id="myPlot">
+    <script src="/static/js/graph.js"></script>
+  </div>
+</div>
+
+{{ end }} <!-- if Sources end -->
+
+{{ end }} <!-- main end -->

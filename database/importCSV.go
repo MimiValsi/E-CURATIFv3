@@ -8,17 +8,13 @@ import (
 	"log"
 	"os"
 	"os/exec"
-	_"strconv"
+	"strconv"
 	"strings"
 	"time"
 
 	"github.com/jackc/pgx/v4"
 	"github.com/jackc/pgx/v4/pgxpool"
 )
-
-// TODO:
-// Put everything back to normal, test it.
-//
 
 // On commence par vérifier si le fichier fini par .csv
 // si vrai, alors on démarre EncodingCSV()
@@ -45,6 +41,8 @@ import (
 // pour une meilleure lisibilité
 type CSVInfo struct {
 	ID       int
+	Priority int
+	SourceID int
 	Agent    string
 	Event    string
 	Created  string // Cast to date with PSQL
@@ -53,29 +51,27 @@ type CSVInfo struct {
 	Detail   string
 	Target   string
 	DayDone  string
-	Priority int
 	Estimate string
 	Oups     string
 	Brips    string
 	Ameps    string
 	Status   string
-	SourceID int
+
 	DB       *pgxpool.Pool
 	ErrorLog *log.Logger
 	InfoLog  *log.Logger
-
-	srcID    int
-	srcName  string
-
 }
 
 type CSVSource struct {
-	ID int
+	ID   int
 	Name string
+
 	Created time.Time
-	DB *pgxpool.Pool
+
 	Errorlog *log.Logger
-	InfoLog *log.Logger
+	InfoLog  *log.Logger
+
+	DB *pgxpool.Pool
 }
 
 func (data *CSVInfo) VerifyCSV(s string) {
@@ -109,9 +105,9 @@ func (data *CSVInfo) encodingCSV(s string) {
 			"-t", "UTF-8", s, "-o", s)
 		iconvErr := cmd.Run()
 		data.ErrorLog.Println(iconvErr)
-	} else {
-		data.dataCSV(s)
 	}
+
+	data.dataCSV(s)
 }
 
 func (data *CSVInfo) dataCSV(s string) {
@@ -134,26 +130,25 @@ func (data *CSVInfo) dataCSV(s string) {
 		data.ErrorLog.Println(err)
 	}
 
-	for i := 2; i < len(lines); i++ {
+	// i = 0 -> Nom du poste
+	// i = 1 -> Nom des colonnes
+	for i, j := 2, 0; i < len(lines); i++ {
 		line := lines[i]
-		j := 0
 
 		data.Agent = line[j]
 		data.Event = line[j+1]
 		data.Created = line[j+2]
 		data.Material = line[j+3]
-		data.Pilot = line[j+4]
-		data.Detail = line[j+5]
-		data.Target = line[j+6]
-		data.DayDone = line[j+7]
-		data.Priority = 1
+		data.Detail = line[j+4]
+		data.Target = line[j+5]
+		data.Priority, _ = strconv.Atoi(line[j+8])
 		data.Estimate = line[j+9]
 		data.Oups = line[j+10]
 		data.Brips = line[j+11]
 		data.Ameps = line[j+12]
 		data.SourceID = source
 		if data.Status == "" && data.DayDone == "" &&
-			data.Target == ""{
+			data.Target == "" {
 			data.Status = "en attente"
 		} else if data.Target != "" && data.DayDone == "" {
 			data.Status = "affecté"
@@ -169,8 +164,8 @@ func (data *CSVInfo) dataCSV(s string) {
 func (data *CSVInfo) insertDB() {
 	ctx := context.Background()
 	query := `
-INSERT INTO infos
-  (source_id, agent, event, material, pilot, detail, target, day_done,
+INSERT INTO info
+  (source_id, agent, event, material, pilote, detail, target, day_done,
     priority, estimate, oups, brips, ameps, created, status)
       VALUES
 	($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12, $13,
@@ -192,7 +187,7 @@ func (csv *CSVInfo) SourceNumber(s string) (int, error) {
 	ctx := context.Background()
 	query := `
 SELECT id
-  FROM sources
+  FROM source
     WHERE name = $1
 `
 
@@ -205,7 +200,6 @@ SELECT id
 			return -1, err
 		}
 	}
-
 
 	fmt.Printf("@ sourceNumber: id > %v \n\n", id)
 

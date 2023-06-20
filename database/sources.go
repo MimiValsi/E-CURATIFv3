@@ -2,6 +2,7 @@ package database
 
 import (
 	"context"
+	"encoding/json"
 	"errors"
 	"time"
 
@@ -10,27 +11,47 @@ import (
 )
 
 type Source struct {
-	ID      int
-	Name    string
-	Created time.Time
-	DB      *pgxpool.Pool
+	ID       int    `json:"-"`        // Source ID (PK)
+	Name     string `json:"name"`     // Source name
+	Curatifs int    `json:"curatifs"` // Info ouvrage
+	CodeGMAO string `json:"code_GMAO"`
+	SID      int    `json:"-"` // Infos source_id (FK)
+
+	Created time.Time `json:"-"`
+}
+
+func (jsrc *Source) JSource() ([]byte, error) {
+	js := []*Source{}
+
+	jsonData, err := json.Marshal(js)
+	if err != nil {
+		return nil, err
+	}
+
+	return jsonData, nil
 }
 
 // fonction afin de choper tous les postes sources
 // pour la page d'accueil
-func (src *Source) MenuSource() ([]*Source, error) {
+func (src *Source) MenuSource(conn *pgxpool.Conn) ([]*Source, error) {
 	ctx := context.Background()
 	query := `
-SELECT id, name, created
-  FROM sources
-    ORDER BY
-      name ASC
+SELECT s.id,
+       s.name,
+       s.code_GMAO,
+       COUNT(i.status) FILTER (WHERE i.status <> 'archivé')
+  FROM source AS s
+       LEFT JOIN info AS i 
+       ON i.source_id = s.id
+ GROUP BY s.id
+ ORDER BY name ASC
 `
 
-	rows, err := src.DB.Query(ctx, query)
+	rows, err := conn.Query(ctx, query)
 	if err != nil {
 		return nil, err
 	}
+
 	defer rows.Close()
 
 	sources := []*Source{}
@@ -38,7 +59,7 @@ SELECT id, name, created
 	for rows.Next() {
 		sObj := &Source{}
 
-		err := rows.Scan(&sObj.ID, &sObj.Name, &sObj.Created)
+		err := rows.Scan(&sObj.ID, &sObj.Name, &sObj.CodeGMAO, &sObj.Curatifs)
 		if err != nil {
 			return nil, err
 		}
@@ -54,15 +75,15 @@ SELECT id, name, created
 }
 
 // fonction d'obtention de donnée spécific source
-func (src *Source) SourceGet(id int) (*Source, error) {
+func (src *Source) SourceGet(id int, conn *pgxpool.Conn) (*Source, error) {
 	ctx := context.Background()
 	query := `
-SELECT *
-  FROM sources
-    WHERE id = $1
+SELECT id, name, created
+  FROM source
+ WHERE id = $1
 `
 	sObj := &Source{}
-	err := src.DB.QueryRow(ctx, query, id).Scan(&sObj.ID, &sObj.Name,
+	err := conn.QueryRow(ctx, query, id).Scan(&sObj.ID, &sObj.Name,
 		&sObj.Created)
 	if err != nil {
 		if errors.Is(err, pgx.ErrNoRows) {
@@ -76,15 +97,14 @@ SELECT *
 }
 
 // fonction de création donnée source
-func (src *Source) SourceInsert(name string) (int, error) {
+func (src *Source) SourceInsert(name string, conn *pgxpool.Conn) (int, error) {
 	ctx := context.Background()
 	query := `
-INSERT INTO sources
-  (name, created)
-    VALUES ($1, $2)
-      RETURNING id
+INSERT INTO source (name, created)
+VALUES ($1, $2)
+  RETURNING id
 `
-	err := src.DB.QueryRow(ctx, query, name,
+	err := conn.QueryRow(ctx, query, name,
 		time.Now().UTC()).Scan(&src.ID)
 	if err != nil {
 		return 0, nil
@@ -94,13 +114,13 @@ INSERT INTO sources
 }
 
 // fonction de suppréssion source
-func (src *Source) SourceDelete(id int) error {
+func (src *Source) SourceDelete(id int, conn *pgxpool.Conn) error {
 	ctx := context.Background()
 	query := `
-DELETE FROM sources
-    WHERE id = $1
+DELETE FROM source
+ WHERE id = $1
 `
-	_, err := src.DB.Exec(ctx, query, id)
+	_, err := conn.Exec(ctx, query, id)
 	if err != nil {
 		return err
 	}
@@ -108,16 +128,15 @@ DELETE FROM sources
 	return nil
 }
 
-
 // Fonction de MaJ source
-func (src *Source) SourceUpdate(id int) error {
+func (src *Source) SourceUpdate(id int, conn *pgxpool.Conn) error {
 	ctx := context.Background()
 	query := `
-UPDATE sources
-  SET name = $1
-    WHERE id = $2
+UPDATE source
+   SET name = $1
+ WHERE id = $2
 `
-	_, err := src.DB.Exec(ctx, query, src.Name, id)
+	_, err := conn.Exec(ctx, query, src.Name, id)
 	if err != nil {
 		return err
 	}

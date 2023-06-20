@@ -1,0 +1,284 @@
+@charset "utf-8";
+@import "./@mdi/font/css/materialdesignicons.min.css";
+@import "./mybulma/bulma.sass";
+@import "../js/node_modules/billboard.js/dist/billboard.css";
+
+/*******************
+ * BULMA VARIABLES *
+ *******************/
+$file-border-color: none;
+$file-cta-background-color: none;
+
+/***********************
+ * BULMA VARIABLES END *
+ ***********************/
+
+/****************
+ * MY VARIABLES *
+ ****************/
+
+/********************
+ * MY VARIABLES END *
+ ********************/
+
+/*******
+ * NAV *
+ *******/
+#navHome {
+    display: grid;
+    grid-template-columns: repeat(3, auto);
+}
+
+.upload-icon-size {
+    font-size: 3rem;
+}
+
+nav {
+    display: flex;
+}
+
+nav span {
+    color: black;
+    align-content: center;
+}
+
+nav .iconeWidth {
+    width: 3rem;
+}
+
+nav .fileSize {
+    font-size: 1.35rem;
+}
+/***********
+ * NAV END *
+ ***********/
+
+/**********
+ * HEADER *
+ **********/
+
+#header {
+    margin-bottom: 1rem;
+}
+
+/**************
+ * HEADER END *
+ **************/
+
+/********
+ * GRID *
+ ********/
+.grid-container {
+    display: grid;
+    grid-template-columns: repeat(4,minmax(0,11rem));
+}
+
+.grid-container div {
+    padding: 0.625rem;
+}
+
+.grid-container button {
+    width: 100%;
+}
+/************
+ * GRID END *
+ ************/
+
+
+#page-header {
+    padding: 1rem;
+}
+
+#header {
+    background-image: -webkit-linear-gradient(left, #96cd32 15%, #1423cd 30%, #1423cd 100%);
+    background-size: 100% 0.6rem;
+    background-repeat: no-repeat;
+    padding-top: 1rem;
+    text-align: center;
+
+    /* Temporaire, délimitation des divs*/
+    // border-bottom: 0.063rem solid;
+}
+
+#myPlot {
+    margin-left: auto;
+    margin-right: auto;
+}
+
+/*****************
+ * CREATION PAGE *
+ *****************/
+.blockMargin {
+    margin: 0 0 0.5rem 0.5rem;
+}
+
+.ps-title {
+    font-size: 3rem;
+    font-style: bold;
+    text-align: center;
+}
+
+.inpt {
+    height: 3rem;
+    font-size: 1.2rem;
+    border-radius: 0.25rem;
+}
+
+.inptAlert {
+    height: 3rem;
+    font-size: 1.2rem;
+    border-radius: 0.25rem;
+    border-color: red;
+}
+
+.hidden {
+    display: none;
+}
+/*********************
+ * CREATION PAGE END *
+ *********************/
+
+/*************
+ * VIEW PAGE *
+ *************/
+.search-info {
+    background-image: url("/static/img/loupe.png");
+    background-repeat: no-repeat;
+    background-size: 2rem;
+    background-position: left center;
+    font-size: 1rem;
+    padding: 0.75rem 1.25rem 0.75rem 2.5rem;
+}
+
+table {
+    width: calc(100% / 2);
+    border-collapse: collapse;
+    table-layout: fixed;
+    margin: 1rem auto;
+}
+
+th, td {
+    padding: 1rem;
+}
+
+th {
+    background: #e4e5e7;
+    font-weight: bold;
+    text-align: left;
+}
+
+td {
+    border-top: 0.063rem solid white;
+    background: #f7f9fa;
+}
+
+.margin {
+    margin: 0 1rem;
+}
+
+top-margin {
+    margin-top: 1rem;
+}
+
+.center-text {
+    text-align: center !important;
+}
+
+.right-text {
+    text-align: right !important;
+    padding-right: 0.5rem;
+}
+
+.left-text {
+    padding-left: 0.5rem;
+}
+
+.statusWait {
+    color: #c0392b;
+}
+
+.statusAffected {
+    color: #c0732b;
+}
+
+.statusDone {
+    color: #4eb722;
+}
+
+.statusArchived {
+    color: #1423dc;
+}
+
+.statusWait, .statusAffected, .statusDone, .statusArchived {
+    text-align: right !important;
+    padding-right: 0.5rem;
+}
+
+/*****************
+ * VIEW PAGE END *
+ *****************/
+
+/***********
+ * BUTTONS *
+ ***********/
+.green-btn {
+    background-color: #96cd32 !important;
+}
+
+.yellow-btn {
+    background-color: yellow !important;
+}
+
+.orange-btn {
+    background-color: orange !important;
+}
+
+@keyframes glowing {
+    0% {
+        background-color: #db0707;
+        box-shadow: 0 0 0.313rem #db0707;
+    }
+    50% {
+        background-color: #f72525;
+        box-shadow: 0 0 1.25rem #f72525;
+    }
+    100% {
+        background-color: #db0707;
+        box-shadow: 0 0 0.313rem #db0707;
+    }
+}
+
+.red-btn {
+    animation: glowing 1200ms infinite;
+}
+
+.delete-img {
+    height: 3rem;
+}
+
+.delete-btn {
+    border: transparent;
+    background: none;
+    cursor: pointer;
+    padding: 0;
+}
+
+/***************
+ * BUTTONS END *
+ ***************/
+
+/*********
+ * GRAPH *
+ *********/
+.graphClass {
+    display: flex;
+    width: 100%;
+    max-width: 42.75rem;
+}
+
+.myGrid {
+    display: flex;
+}
+/*************
+ * GRAPH END *
+ *************/

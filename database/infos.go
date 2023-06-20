@@ -11,9 +11,11 @@ import (
 
 type Info struct {
 	ID         int // primary key
+	Priority   int
+	SourceID   int // foreign key en référence au PK de source
+	Counter    int
 	Agent      string
 	Material   string
-	Priority   int
 	Target     string
 	Rte        string
 	Detail     string
@@ -22,36 +24,37 @@ type Info struct {
 	Oups       string
 	Ameps      string
 	Ais        string
-	SourceID   int // foreign key en référence au PK de source
-	Created    time.Time
-	Updated    time.Time
 	Status     string
 	Event      string
 	Doneby     string
 	Pilot      string
 	ActionDate string
 	DayDone    string
-	ZeroTime   time.Time
-	DB         *pgxpool.Pool
+
+	ZeroTime time.Time
+	Created  time.Time
+	Updated  time.Time
 }
 
 // Fonction de création donnée info
-func (i *Info) Insert(id int) (int, error) {
+func (i *Info) Insert(id int, conn *pgxpool.Conn) (int, error) {
 	ctx := context.Background()
 	query := `
-INSERT INTO infos
-    (source_id, agent, material, detail, event, priority, oups, ameps,
-       brips, rte, ais, estimate, target, status, doneby, created)
-	  VALUES
-	    ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12, $13,
-	      $14, $15, $16, $17, $18)
-		RETURNING id;
+INSERT INTO info (source_id, agent, material, detail, 
+	   	  event, priority, oups, ameps,
+       		  brips, rte, ais, estimate, 
+		  target, status, doneby, created)
+VALUES ($1,  $2,  $3,  $4, 
+	$5,  $6,  $7,  $8, 
+	$9,  $10, $11, $12, 
+	$13, $14, $15, $16)
+  RETURNING id;
 `
-	err := i.DB.QueryRow(ctx, query, id, i.Agent,
+	err := conn.QueryRow(ctx, query, id, i.Agent,
 		i.Material, i.Detail, i.Event, i.Priority,
 		i.Oups, i.Ameps, i.Brips, i.Rte, i.Ais,
 		i.Estimate, i.Target, i.Status,
-		i.Doneby, i.ActionDate,
+		i.Doneby,
 		time.Now().UTC()).Scan(&i.ID)
 	if err != nil {
 		return 0, err
@@ -61,20 +64,22 @@ INSERT INTO infos
 }
 
 // Fonction d'obtention de donnée spécific
-func (i *Info) InfoGet(id int) (*Info, error) {
+func (i *Info) InfoGet(id int, conn *pgxpool.Conn) (*Info, error) {
 	ctx := context.Background()
 	query := `
-SELECT id, agent, material, priority, rte, detail, estimate, brips,
-  oups, ameps, ais, source_id, created, updated, status, event, target
-    FROM infos
-      WHERE id = $1
+SELECT id, agent, material, priority, 
+       rte, detail, estimate, brips,
+       oups, ameps, ais, source_id, 
+       created, updated, status, event, target
+  FROM info
+ WHERE id = $1
 `
 	var rte, ameps, ais, brips, oups, estimate, target,
 		doneby, pilot, actionDate *string
 	var updated *time.Time
 
 	iObj := &Info{}
-	err := i.DB.QueryRow(ctx, query, id).Scan(&iObj.ID, &iObj.Agent,
+	err := conn.QueryRow(ctx, query, id).Scan(&iObj.ID, &iObj.Agent,
 		&iObj.Material, &iObj.Priority, &rte, &iObj.Detail,
 		&estimate, &brips, &oups, &ameps, &ais, &iObj.SourceID,
 		&iObj.Created, &updated, &iObj.Status, &iObj.Event,
@@ -139,16 +144,16 @@ SELECT id, agent, material, priority, rte, detail, estimate, brips,
 
 // Fonction afin de choper plusieurs données et la transférer
 // dans un slice
-func (i *Info) InfoList(id int) ([]*Info, error) {
+func (i *Info) InfoList(id int, conn *pgxpool.Conn) ([]*Info, error) {
 	ctx := context.Background()
 	query := `
-SELECT id, material, created, status, source_id, priority
-  FROM infos
-    WHERE source_id = $1
-      ORDER BY
-	priority ASC
+SELECT id, material, created, 
+       status, source_id, priority
+  FROM info
+ WHERE source_id = $1
+ ORDER BY priority ASC
 `
-	rows, err := i.DB.Query(ctx, query, id)
+	rows, err := conn.Query(ctx, query, id)
 	if err != nil {
 		return nil, err
 	}
@@ -176,13 +181,13 @@ SELECT id, material, created, status, source_id, priority
 	return infos, nil
 }
 
-func (i *Info) InfoDelete(id int) error {
+func (i *Info) InfoDelete(id int, conn *pgxpool.Conn) error {
 	ctx := context.Background()
 	query := `
-DELETE FROM infos
-    WHERE id = $1
+DELETE FROM info
+ WHERE id = $1
 `
-	_, err := i.DB.Exec(ctx, query, id)
+	_, err := conn.Exec(ctx, query, id)
 	if err != nil {
 		return err
 	}
@@ -191,20 +196,19 @@ DELETE FROM infos
 }
 
 // Fonction de mise à jour donnée
-func (i *Info) InfoUpdate(id int) error {
+func (i *Info) InfoUpdate(id int, conn *pgxpool.Conn) error {
 	ctx := context.Background()
 	query := `
-UPDATE infos
-  SET agent = $1, material = $2, priority = $3, target = $4, rte = $5,
-    detail = $6, estimate = $7, brips = $8, oups = $9, ameps = $10,
-      ais = $11, updated = $12, status = $13, event = $14, doneby = $15,
-	pilot = $16, action_date = $17
-	  WHERE id = $18
+UPDATE info
+   SET agent = $1, material = $2, priority = $3, target = $4, rte = $5,
+       detail = $6, estimate = $7, brips = $8, oups = $9, ameps = $10,
+       ais = $11, updated = $12, status = $13, event = $14, doneby = $15
+ WHERE id = $16
 `
-	_, err := i.DB.Exec(ctx, query, i.Agent, i.Material,
+	_, err := conn.Exec(ctx, query, i.Agent, i.Material,
 		i.Priority, i.Target, i.Rte, i.Detail, i.Estimate,
 		i.Brips, i.Oups, i.Ameps, i.Ais, time.Now().UTC(),
-		i.Status, i.Event, i.Doneby, i.Pilot, i.ActionDate, id)
+		i.Status, i.Event, i.Doneby, id)
 	if err != nil {
 		return err
 	}
@@ -213,14 +217,14 @@ UPDATE infos
 }
 
 // Fonction de test
-func (i *Info) InfoUp(id int) error {
+func (i *Info) InfoUp(id int, conn *pgxpool.Conn) error {
 	ctx := context.Background()
 	query := `
-UPDATE infos
-  SET material = $1, updated = $2
-    WHERE id = $3
+UPDATE info
+   SET material = $1, updated = $2
+ WHERE id = $3
 `
-	_, err := i.DB.Exec(ctx, query, i.Material,
+	_, err := conn.Exec(ctx, query, i.Material,
 		time.Now().UTC(), id)
 	if err != nil {
 		return err

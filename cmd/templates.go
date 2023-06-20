@@ -1,8 +1,9 @@
 package main
 
 import (
+	"html/template"
 	"path/filepath"
-	"text/template"
+
 	"time"
 
 	"E-CURATIFv3/database"
@@ -13,9 +14,13 @@ import (
 type templateData struct {
 	Source  *database.Source
 	Sources []*database.Source
-	Info    *database.Info
-	Infos   []*database.Info
-	Form    any
+
+	Info  *database.Info
+	Infos []*database.Info
+
+	JSource []byte
+
+	Form any
 }
 
 // @ tables sources et infos, colonnes "Created" et "Updated"
@@ -37,7 +42,7 @@ func newTemplateCache() (map[string]*template.Template, error) {
 	cache := map[string]*template.Template{}
 
 	// filepath.Glob crée une slice de tous les chemins
-	pages, err := filepath.Glob("./ui/html/pages/*.tmpl.html")
+	pages, err := filepath.Glob("./ui/html/pages/*.html.gotpl")
 	if err != nil {
 		return nil, err
 	}
@@ -50,15 +55,15 @@ func newTemplateCache() (map[string]*template.Template, error) {
 		// sert à enregistrer le template.FuncMap
 		// et analyse le fichier
 		ts, err := template.New(name).Funcs(functions).
-			ParseFiles("./ui/html/base.tmpl.html")
+			ParseFiles("./ui/html/base.html.gotpl")
 		if err != nil {
 			return nil, err
 		}
 
-		ts, err = ts.ParseGlob("./ui/html/partials/*.tmpl.html")
-		if err != nil {
-			return nil, err
-		}
+		// ts, err = ts.ParseGlob("./ui/html/partials/*.html.gotpl")
+		// if err != nil {
+		// 	return nil, err
+		// }
 
 		ts, err = ts.ParseFiles(page)
 		if err != nil {

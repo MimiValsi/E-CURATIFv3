@@ -7,7 +7,7 @@ import (
 	"runtime/debug"
 )
 
-// Les status web sont gérés icin
+// Les status web sont gérés ici
 
 // Le serverError écrit les message d'erreur
 // puis envoi 500 Internal Server Error à l'utilisateur
@@ -33,6 +33,7 @@ func (app *application) notFound(w http.ResponseWriter) {
 // Vérifie si le template dérisé existe avant d´être envoyé
 // au http.ResponseWriter
 func (app *application) render(w http.ResponseWriter, status int, page string, data *templateData) {
+
 	// Récupère le template approprié du cache
 	ts, ok := app.templateCache[page]
 	if !ok {
