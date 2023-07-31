@@ -1,10 +1,10 @@
 package main
 
 import (
-	"bytes"
-	"fmt"
-	"net/http"
-	"runtime/debug"
+        "bytes"
+        "fmt"
+        "net/http"
+        "runtime/debug"
 )
 
 // Les status web sont gérés ici
@@ -12,9 +12,9 @@ import (
 // Le serverError écrit les message d'erreur
 // puis envoi 500 Internal Server Error à l'utilisateur
 func (app *application) serverError(w http.ResponseWriter, err error) {
-	trace := fmt.Sprintf("%s\n%s", err.Error(), debug.Stack())
+        trace := fmt.Sprintf("%s\n%s", err.Error(), debug.Stack())
 
-	app.errorLog.Print(trace)
+        app.errorLog.Print(trace)
 }
 
 // clientError envoi un status spécific et la déscription
