@@ -5,16 +5,19 @@ all: sass build start
 
 # Build sass file to css
 sass:
-	sass --no-source-map ui/static/sass/main.scss:ui/static/sass/main.css
+	@echo "Compiling css file"
+	@sass --no-source-map ui/static/sass/main.scss:ui/static/sass/main.css
 
 # Compile entirely the program
 build:
-	echo "Compiling program"
-	go build -o $(NAME) ./cmd/
+	@echo "Compiling program"
+	@go build -o $(NAME) ./cmd/
+	@echo "Start E-Curatif"
+	@make start
 
 # start program (if exists) else run make all
 start:
-	if [ -f ./$(NAME) ]; then \
+	@if [ -f ./$(NAME) ]; then \
 		./$(NAME) \
 	else \
 		make all; \
