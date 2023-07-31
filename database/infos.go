@@ -190,7 +190,7 @@ SELECT id, material, created,
        status, source_id, priority
   FROM info
  WHERE source_id = $1 AND
- status <> 'résolu' AND status <> 'archivé'
+ status <> 'archivé'
  ORDER BY priority ASC
 `
 	rows, err := conn.Query(ctx, query, id)
