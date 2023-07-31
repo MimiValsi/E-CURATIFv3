@@ -66,6 +66,30 @@ nav .fileSize {
  **************/
 
 /********
+ * HOME *
+ ********/
+
+.info-urgent {
+  display: inline-block;
+  animation: slide-left 60s linear infinite;
+  white-space: nowrap;
+}
+
+@keyframes slide-left {
+  0% {
+    transform: translateX(60%);
+  }
+
+  100% {
+    transform: translateX(-100%);
+  }
+}
+
+/************
+ * HOME END *
+ ************/
+
+/********
  * GRID *
  ********/
 .grid-container {
