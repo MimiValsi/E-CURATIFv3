@@ -55,7 +55,27 @@ func (app *application) home(w http.ResponseWriter, r *http.Request) {
 	data.Sources = sources
 	data.JSource = jData
 
-	app.render(w, http.StatusOK, "home.html.gotpl", data)
+	app.render(w, http.StatusOK, "home.gotpl.html", data)
+
+}
+
+func (app *application) priorityData(w http.ResponseWriter, r*http.Request) {
+        conn := app.dbConn(r.Context())
+        defer conn.Release()
+
+        infos, err := app.infos.PriorityInfos(conn)
+        if err != nil {
+                app.serverError(w, err)
+        }
+
+        jsonData, err := json.Marshal(infos)
+        if err != nil {
+                app.serverError(w, err)
+        }
+
+        w.WriteHeader(http.StatusOK)
+        w.Header().Set("Content-Type", "application/json")
+        w.Write(jsonData)
 
 }
 
@@ -73,9 +93,38 @@ func (app *application) jsonData(w http.ResponseWriter, r *http.Request) {
 		app.serverError(w, err)
 	}
 
-	w.WriteHeader(http.StatusCreated)
+	w.WriteHeader(http.StatusOK)
 	w.Header().Set("Content-Type", "application/json")
 	w.Write(jsonGraph)
+}
+
+func (app *application) charts(w http.ResponseWriter, r *http.Request) {
+        // conn := app.dbConn(r.Context())
+        // defer conn.Release()
+        //
+        // data := app.newTemplateData(r)
+
+        app.render(w, http.StatusOK, "charts.gotpl.html", nil)
+}
+
+
+func (app *application) curatifDone(w http.ResponseWriter, r *http.Request) {
+        conn := app.dbConn(r.Context())
+        defer conn.Release()
+
+        sources, err := app.sources.CuratifsDone(conn)
+        if err != nil {
+                app.serverError(w, err)
+        }
+
+        jsonGraph, err := json.Marshal(sources)
+        if err != nil {
+                app.serverError(w, err)
+        }
+
+        w.WriteHeader(http.StatusOK)
+        w.Header().Set("Content-Type", "application/json")
+        w.Write(jsonGraph)
 }
 
 //
@@ -129,7 +178,7 @@ func (app *application) sourceView(w http.ResponseWriter, r *http.Request) {
 	data.Source = source
 
 	// Génération de la page web
-	app.render(w, http.StatusOK, "sourceView.html.gotpl", data)
+	app.render(w, http.StatusOK, "sourceView.gotpl.html", data)
 
 }
 
@@ -142,7 +191,7 @@ func (app *application) sourceCreate(w http.ResponseWriter, r *http.Request) {
 	data := app.newTemplateData(r)
 	data.Form = sourceCreateForm{}
 
-	app.render(w, http.StatusOK, "sourceCreate.html.gotpl", data)
+	app.render(w, http.StatusOK, "sourceCreate.gotpl.html", data)
 }
 
 func (app *application) sourceCreatePost(w http.ResponseWriter, r *http.Request) {
@@ -172,7 +221,7 @@ func (app *application) sourceCreatePost(w http.ResponseWriter, r *http.Request)
 		data := app.newTemplateData(r)
 		data.Form = form
 		app.render(w, http.StatusUnprocessableEntity,
-			"sourceCreate.html.gotpl", data)
+			"sourceCreate.gotpl.html", data)
 		return
 	}
 
@@ -246,7 +295,7 @@ func (app *application) sourceUpdate(w http.ResponseWriter, r *http.Request) {
 	data := app.newTemplateData(r)
 	data.Source = source
 
-	app.render(w, http.StatusOK, "sourceUpdate.html.gotpl", data)
+	app.render(w, http.StatusOK, "sourceUpdate.gotpl.html", data)
 }
 
 // Une fois les changements faites, elles sont reenvoyés vers la BD
@@ -280,7 +329,7 @@ func (app *application) sourceUpdatePost(w http.ResponseWriter, r *http.Request)
 		data := app.newTemplateData(r)
 		data.Form = form
 		app.render(w, http.StatusUnprocessableEntity,
-			"sourceUpdate.html.gotpl", data)
+			"sourceUpdate.gotpl.html", data)
 		return
 	}
 
@@ -356,7 +405,7 @@ func (app *application) infoCreate(w http.ResponseWriter, r *http.Request) {
 	data.Form = infoCreateForm{}
 	data.Source = source
 
-	app.render(w, http.StatusOK, "infoCreate.html.gotpl", data)
+	app.render(w, http.StatusOK, "infoCreate.gotpl.html", data)
 }
 
 func (app *application) infoCreatePost(w http.ResponseWriter, r *http.Request) {
@@ -419,7 +468,7 @@ func (app *application) infoCreatePost(w http.ResponseWriter, r *http.Request) {
 		data := app.newTemplateData(r)
 		data.Form = form
 		app.render(w, http.StatusUnprocessableEntity,
-			"infoCreate.html.gotpl", data)
+			"infoCreate.gotpl.html", data)
 		return
 	}
 
@@ -479,7 +528,7 @@ func (app *application) infoView(w http.ResponseWriter, r *http.Request) {
 	data := app.newTemplateData(r)
 	data.Info = info
 
-	app.render(w, http.StatusOK, "infoView.html.gotpl", data)
+	app.render(w, http.StatusOK, "infoView.gotpl.html", data)
 }
 
 // HTML POST afin de supprimer le curatif(info)
@@ -544,7 +593,7 @@ func (app *application) infoUpdate(w http.ResponseWriter, r *http.Request) {
 	data := app.newTemplateData(r)
 	data.Info = info
 
-	app.render(w, http.StatusOK, "infoUpdate.html.gotpl", data)
+	app.render(w, http.StatusOK, "infoUpdate.gotpl.html", data)
 }
 
 func (app *application) infoUpdatePost(w http.ResponseWriter, r *http.Request) {
@@ -629,7 +678,7 @@ func (app *application) infoUpdatePost(w http.ResponseWriter, r *http.Request) {
 func (app *application) importCSV(w http.ResponseWriter, r *http.Request) {
 
 	data := app.newTemplateData(r)
-	app.render(w, http.StatusOK, "importCSV.html.gotpl", data)
+	app.render(w, http.StatusOK, "importCSV.gotpl.html", data)
 }
 
 func (app *application) importCSVPost(w http.ResponseWriter, r *http.Request) {
@@ -677,5 +726,5 @@ func (app *application) importCSVPost(w http.ResponseWriter, r *http.Request) {
 
 func (app *application) pageTest(w http.ResponseWriter, r *http.Request) {
 
-	app.render(w, http.StatusOK, "pageTest.html.gotpl", nil)
+	app.render(w, http.StatusOK, "pageTest.gotpl.html", nil)
 }
