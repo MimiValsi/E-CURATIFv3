@@ -39,7 +39,7 @@ func (src *Source) MenuSource(conn *pgxpool.Conn) ([]*Source, error) {
 SELECT s.id,
        s.name,
        s.code_GMAO,
-       COUNT(i.status) FILTER (WHERE i.status <> 'archivé')
+       COUNT(i.status) FILTER (WHERE i.status <> 'archivé' AND i.status <> 'résolu')
   FROM source AS s
        LEFT JOIN info AS i 
        ON i.source_id = s.id
@@ -72,6 +72,46 @@ SELECT s.id,
 	}
 
 	return sources, nil
+}
+
+func (src *Source) CuratifsDone(conn *pgxpool.Conn) ([]*Source, error) {
+        ctx := context.Background()
+        query := `
+SELECT s.id,
+       s.name,
+       s.code_GMAO,
+       COUNT(i.status) FILTER (WHERE i.status = 'résolu')
+  FROM source AS s
+       LEFT JOIN info AS i 
+       ON i.source_id = s.id
+ GROUP BY s.id
+ ORDER BY name ASC
+`
+
+        rows, err := conn.Query(ctx, query)
+        if err != nil {
+                return nil, err
+        }
+        defer rows.Close()
+
+        sources := []*Source{}
+
+        for rows.Next() {
+                sObj := &Source{}
+
+                err := rows.Scan(&sObj.ID, &sObj.Name, &sObj.CodeGMAO, &sObj.Curatifs)
+                if err != nil {
+                        return nil, err
+                }
+
+                sources = append(sources, sObj)
+        }
+
+        if err = rows.Err(); err != nil {
+                return nil, err
+        }
+
+        return sources, nil
 }
 
 // fonction d'obtention de donnée spécific source
