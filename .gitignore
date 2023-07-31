@@ -13,3 +13,5 @@ ui/static/img/vial-virus-solid.svg
 ui/static/sass/main.css
 ui/static/sass/main.css.map
 ui/static/sass/main.txt
+
+ui/html/pages/pageTest.gotpl.html
