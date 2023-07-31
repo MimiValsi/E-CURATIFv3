@@ -42,7 +42,7 @@ func newTemplateCache() (map[string]*template.Template, error) {
 	cache := map[string]*template.Template{}
 
 	// filepath.Glob crée une slice de tous les chemins
-	pages, err := filepath.Glob("./ui/html/pages/*.html.gotpl")
+	pages, err := filepath.Glob("./ui/html/pages/*.gotpl.html")
 	if err != nil {
 		return nil, err
 	}
@@ -55,7 +55,7 @@ func newTemplateCache() (map[string]*template.Template, error) {
 		// sert à enregistrer le template.FuncMap
 		// et analyse le fichier
 		ts, err := template.New(name).Funcs(functions).
-			ParseFiles("./ui/html/base.html.gotpl")
+			ParseFiles("./ui/html/base.gotpl.html")
 		if err != nil {
 			return nil, err
 		}
