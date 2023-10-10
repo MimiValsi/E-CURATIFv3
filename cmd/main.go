@@ -13,11 +13,11 @@ import (
 	"E-CURATIFv3/database"
 
 	// PostgreSQL driver
-	"github.com/jackc/pgx/v4/pgxpool"
+	"github.com/jackc/pgx/v5/pgxpool"
 )
 
 // Structure principale, toute structure doit être "connecté" à celle-ci
-// permet de vérifier les informations et communiquer avec PSQL
+// afin de permettre la vérif les informations et communiquer avec PSQL
 type application struct {
 	sources *database.Source
 	infos   *database.Info
@@ -27,8 +27,8 @@ type application struct {
 	errorLog *log.Logger
 	infoLog  *log.Logger
 
-	csvSource *database.CSVSource
-	csvInfo   *database.CSVInfo
+	// csvSource *database.CSVSource
+	csvData   *database.CSVData
 
 	DB *pgxpool.Pool
 
@@ -38,7 +38,8 @@ type application struct {
 // Ces 2 variables ne sont pas sensé être ni modifiés ni pour la prod
 const (
 	addr    = ":3001"
-	dataURL = "postgres://web:pass@localhost:5432/ecuratif"
+	dataURL = "postgres://ameps:pass@localhost:5432/ecuratif"
+	// dataURL = "postgres://ameps:pass@localhost:5432/ecuratifv2"
 )
 
 func main() {
@@ -73,11 +74,11 @@ func main() {
 		templateCache: templateCache,
 
 		// A reformuler
-		csvInfo: &database.CSVInfo{DB: db,
+		csvData: &database.CSVData{DB: db,
 			ErrorLog: errorLog, InfoLog: infoLog},
 		// A reformuler
-		csvSource: &database.CSVSource{DB: db,
-			Errorlog: errorLog, InfoLog: infoLog},
+		// csvSource: &database.CSVSource{DB: db,
+		// 	Errorlog: errorLog, InfoLog: infoLog},
 
 		infoLog:  infoLog,
 		errorLog: errorLog,
@@ -104,7 +105,7 @@ func main() {
 func openDB(dataURL string) (*pgxpool.Pool, error) {
 	ctx := context.Background()
 
-	db, err := pgxpool.Connect(ctx, dataURL)
+	db, err := pgxpool.New(ctx, dataURL)
 	if err != nil {
 		return nil, err
 	}

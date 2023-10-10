@@ -15,7 +15,8 @@ import (
 
 	// package pour les routers
 	"github.com/go-chi/chi/v5"
-	"github.com/jackc/pgx/v4/pgxpool"
+	// "github.com/jackc/pgx/v4/pgxpool"
+	"github.com/jackc/pgx/v5/pgxpool"
 )
 
 func (app *application) dbConn(ctx context.Context) *pgxpool.Conn {
@@ -59,23 +60,23 @@ func (app *application) home(w http.ResponseWriter, r *http.Request) {
 
 }
 
-func (app *application) priorityData(w http.ResponseWriter, r*http.Request) {
-        conn := app.dbConn(r.Context())
-        defer conn.Release()
+func (app *application) priorityData(w http.ResponseWriter, r *http.Request) {
+	conn := app.dbConn(r.Context())
+	defer conn.Release()
 
-        infos, err := app.infos.PriorityInfos(conn)
-        if err != nil {
-                app.serverError(w, err)
-        }
+	infos, err := app.infos.PriorityInfos(conn)
+	if err != nil {
+		app.serverError(w, err)
+	}
 
-        jsonData, err := json.Marshal(infos)
-        if err != nil {
-                app.serverError(w, err)
-        }
+	jsonData, err := json.Marshal(infos)
+	if err != nil {
+		app.serverError(w, err)
+	}
 
-        w.WriteHeader(http.StatusOK)
-        w.Header().Set("Content-Type", "application/json")
-        w.Write(jsonData)
+	w.WriteHeader(http.StatusOK)
+	w.Header().Set("Content-Type", "application/json")
+	w.Write(jsonData)
 
 }
 
@@ -99,32 +100,31 @@ func (app *application) jsonData(w http.ResponseWriter, r *http.Request) {
 }
 
 func (app *application) charts(w http.ResponseWriter, r *http.Request) {
-        // conn := app.dbConn(r.Context())
-        // defer conn.Release()
-        //
-        // data := app.newTemplateData(r)
+	// conn := app.dbConn(r.Context())
+	// defer conn.Release()
+	//
+	// data := app.newTemplateData(r)
 
-        app.render(w, http.StatusOK, "charts.gotpl.html", nil)
+	app.render(w, http.StatusOK, "charts.gotpl.html", nil)
 }
 
-
 func (app *application) curatifDone(w http.ResponseWriter, r *http.Request) {
-        conn := app.dbConn(r.Context())
-        defer conn.Release()
+	conn := app.dbConn(r.Context())
+	defer conn.Release()
 
-        sources, err := app.sources.CuratifsDone(conn)
-        if err != nil {
-                app.serverError(w, err)
-        }
+	sources, err := app.sources.CuratifsDone(conn)
+	if err != nil {
+		app.serverError(w, err)
+	}
 
-        jsonGraph, err := json.Marshal(sources)
-        if err != nil {
-                app.serverError(w, err)
-        }
+	jsonGraph, err := json.Marshal(sources)
+	if err != nil {
+		app.serverError(w, err)
+	}
 
-        w.WriteHeader(http.StatusOK)
-        w.Header().Set("Content-Type", "application/json")
-        w.Write(jsonGraph)
+	w.WriteHeader(http.StatusOK)
+	w.Header().Set("Content-Type", "application/json")
+	w.Write(jsonGraph)
 }
 
 //
@@ -697,9 +697,9 @@ func (app *application) importCSVPost(w http.ResponseWriter, r *http.Request) {
 	}
 
 	defer file.Close()
-	app.infoLog.Printf("Uploaded File: %+v\n", handler.Filename)
-	app.infoLog.Printf("File Size: %+v\n", handler.Size)
-	app.infoLog.Printf("MIME Header: %+v\n", handler.Header)
+	// app.infoLog.Printf("Uploaded File: %+v\n", handler.Filename)
+	// app.infoLog.Printf("File Size: %+v\n", handler.Size)
+	// app.infoLog.Printf("MIME Header: %+v\n", handler.Header)
 
 	// Creation du fichier
 	dst, err := os.Create("csvFiles/" + handler.Filename)
@@ -719,7 +719,7 @@ func (app *application) importCSVPost(w http.ResponseWriter, r *http.Request) {
 
 	// Lance la verification de l'extension et encodage du fichier,
 	// si concluant, les données seront transférées dans la BD
-	app.csvInfo.VerifyCSV("csvFiles/" + handler.Filename)
+	app.csvData.Import("csvFiles/" + handler.Filename)
 
 	http.Redirect(w, r, "/", http.StatusSeeOther)
 }

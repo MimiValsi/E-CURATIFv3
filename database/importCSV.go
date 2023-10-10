@@ -4,40 +4,16 @@ import (
 	"context"
 	"encoding/csv"
 	"errors"
+	// "fmt"
 	"log"
 	"os"
 
-	"github.com/jackc/pgx/v4"
-	"github.com/jackc/pgx/v4/pgxpool"
+	// "github.com/jackc/pgx/v4"
+	// "github.com/jackc/pgx/v4/pgxpool"
+	"github.com/jackc/pgx/v5"
+	"github.com/jackc/pgx/v5/pgxpool"
 )
 
-// TODO:
-// Put everything back to normal, test it.
-//
-
-// On commence par vérifier si le fichier fini par .csv
-// si vrai, alors on démarre EncodingCSV()
-//
-// Exemple:
-
-// file.csv
-// file.csv: text/csv; charset=iso-8859-1
-//                            ^
-//
-// D'abord on lance la commande avec Output() afin de choper le string
-// puis on la sépare avec "="
-//
-// On obtient:
-// str[0] = file.csv: text/csv; charset
-// str[1] = iso-8859-1
-//
-// Copie str[1] en majuscule dans une variable tmp
-// Comme on ne sait pas quelle encodage le fichier peut avoir
-// on le vérifie
-// Si ce n'est pas en UTF-8, on change
-
-// 2 structs sont créées afin de séparer chaque DB
-// pour une meilleure lisibilité
 type CSVData struct {
         ID       int
         Priority int
@@ -75,12 +51,12 @@ func (data *CSVData) Import(s string) {
         }
         defer file.Close()
 
-        lines, err := csv.NewReader(file).ReadAll()
-        // l := csv.NewReader(file)
-        //
-        // l.Comma = ';'
-        //
-        // lines, err := l.ReadAll()
+        // lines, err := csv.NewReader(file).ReadAll()
+        l := csv.NewReader(file)
+
+        l.Comma = ';'
+
+        lines, err := l.ReadAll()
         if err != nil {
                 data.ErrorLog.Println(err)
         }
@@ -89,18 +65,18 @@ func (data *CSVData) Import(s string) {
                 line := lines[i]
                 j := 0
 
-                data.fetchSourceID(line[j])
-                data.Material = line[j+1]
-                data.Detail = line[j+2]
-                data.Created = line[j+3]
-                data.Agent = line[j+4]
-                data.Entity = line[j+5]
-                data.Status = line[j+6]
-                data.DayDone = line[j+8]
-                data.Comment = line[j+9]
+                data.fetchSourceID(toUTF8([]byte(line[j])))
+                data.Material = toUTF8([]byte(line[j+1]))
+                data.Detail = toUTF8([]byte(line[j+2]))
+                data.Created = toUTF8([]byte(line[j+3]))
+                data.Agent = toUTF8([]byte(line[j+4]))
+                data.Entity = toUTF8([]byte(line[j+5]))
+                data.Status = toUTF8([]byte(line[j+6]))
+                data.DayDone = toUTF8([]byte(line[j+8]))
+                data.Comment = toUTF8([]byte(line[j+9]))
                 // fmt.Println(data)
-                // break;
                 data.insert()
+                // break
         }
 
 }
@@ -141,4 +117,13 @@ SELECT id
         }
         
         return data.srcID, nil
+}
+
+func toUTF8(iso []byte) string {
+        buf := make([]rune, len(iso))
+        for i, b := range iso {
+                buf[i] = rune(b)
+        }
+
+        return string(buf)
 }

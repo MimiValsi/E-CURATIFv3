@@ -1,10 +1,10 @@
 package main
 
 import (
-        "bytes"
-        "fmt"
-        "net/http"
-        "runtime/debug"
+	"bytes"
+	"fmt"
+	"net/http"
+	"runtime/debug"
 )
 
 // Les status web sont gérés ici
@@ -12,9 +12,9 @@ import (
 // Le serverError écrit les message d'erreur
 // puis envoi 500 Internal Server Error à l'utilisateur
 func (app *application) serverError(w http.ResponseWriter, err error) {
-        trace := fmt.Sprintf("%s\n%s", err.Error(), debug.Stack())
+	trace := fmt.Sprintf("%s\n%s", err.Error(), debug.Stack())
 
-        app.errorLog.Print(trace)
+	app.errorLog.Print(trace)
 }
 
 // clientError envoi un status spécific et la déscription
@@ -32,7 +32,8 @@ func (app *application) notFound(w http.ResponseWriter) {
 // Alloue de la mémoire pour qu'un template puisse être rendue
 // Vérifie si le template dérisé existe avant d´être envoyé
 // au http.ResponseWriter
-func (app *application) render(w http.ResponseWriter, status int, page string, data *templateData) {
+func (app *application) render(w http.ResponseWriter, status int, page string, 
+        data *templateData) {
 
 	// Récupère le template approprié du cache
 	ts, ok := app.templateCache[page]
@@ -54,7 +55,6 @@ func (app *application) render(w http.ResponseWriter, status int, page string, d
 	w.WriteHeader(status)
 
 	buf.WriteTo(w)
-
 }
 
 // newTemplateData retourne un pointeur vers templateData

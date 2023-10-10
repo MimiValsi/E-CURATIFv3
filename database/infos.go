@@ -5,19 +5,21 @@ import (
 	"errors"
 	"time"
 
-	"github.com/jackc/pgx/v4"
-	"github.com/jackc/pgx/v4/pgxpool"
+	// "github.com/jackc/pgx/v4"
+	// "github.com/jackc/pgx/v4/pgxpool"
+	"github.com/jackc/pgx/v5"
+	"github.com/jackc/pgx/v5/pgxpool"
 )
 
 type Info struct {
-        ID         int `json:"-"` // primary key
-        Priority   int `json:"priority,omitempty"`
-        SourceID   int `json:"-"` // foreign key en référence au PK de source
-        Counter    int `json:"counter,omitempty"`
-        Agent      string `json:"agent,omitempty"`
-        Material   string `json:"material,omitempty"`
-        Target     string `json:"target,omitempty"`
-        Rte        string `json:"rte,omitempty"`
+	ID         int    `json:"-"` // primary key
+	Priority   int    `json:"priority,omitempty"`
+	SourceID   int    `json:"-"` // foreign key en référence au PK de source
+	Counter    int    `json:"counter,omitempty"`
+	Agent      string `json:"agent,omitempty"`
+	Material   string `json:"material,omitempty"`
+	Target     string `json:"target,omitempty"`
+	Rte        string `json:"rte,omitempty"`
 	Detail     string `json:"detail,omitempty"`
 	Estimate   string `json:"estimate,omitempty"`
 	Brips      string `json:"brips,omitempty"`
@@ -38,9 +40,9 @@ type Info struct {
 
 // Gather all priority 1 infos
 func (i *Info) PriorityInfos(conn *pgxpool.Conn) ([]*Info, error) {
-        ctx := context.Background() 
+	ctx := context.Background()
 
-        query := `
+	query := `
 SELECT i.material, 
        i.detail 
   FROM info AS i
@@ -48,30 +50,30 @@ SELECT i.material,
        status <> 'archivé'
 `
 
-        rows, err := conn.Query(ctx, query)
-        if err != nil {
-                return nil, err
-        }
-        defer rows.Close()
+	rows, err := conn.Query(ctx, query)
+	if err != nil {
+		return nil, err
+	}
+	defer rows.Close()
 
-        infos := []*Info{}
+	infos := []*Info{}
 
-        for rows.Next() {
-                iObj := &Info{}
+	for rows.Next() {
+		iObj := &Info{}
 
-                err := rows.Scan(&iObj.Material, &iObj.Detail)
-                if err != nil {
-                        return nil, err
-                }
+		err := rows.Scan(&iObj.Material, &iObj.Detail)
+		if err != nil {
+			return nil, err
+		}
 
-                infos = append(infos, iObj)
-        }
+		infos = append(infos, iObj)
+	}
 
-        if err = rows.Err(); err != nil {
-                return nil, err
-        }
+	if err = rows.Err(); err != nil {
+		return nil, err
+	}
 
-        return infos, nil
+	return infos, nil
 }
 
 // Fonction de création donnée info
@@ -108,13 +110,11 @@ func (i *Info) InfoGet(id int, conn *pgxpool.Conn) (*Info, error) {
 SELECT id, agent, material, priority, 
        rte, detail, estimate, brips,
        oups, ameps, ais, source_id, 
-       created, updated, status, event, target, doneby
+       created, updated, status, event, doneby, target
   FROM info
- WHERE id = $1 AND 
- status <> 'résolu'
+ WHERE id = $1
 `
-	var rte, ameps, ais, brips, oups, estimate, target,
-		doneby, pilot, actionDate *string
+        var target, rte, ameps, ais, brips, oups, estimate, doneby *string
 	var updated *time.Time
 
 	iObj := &Info{}
@@ -122,7 +122,8 @@ SELECT id, agent, material, priority,
 		&iObj.Material, &iObj.Priority, &rte, &iObj.Detail,
 		&estimate, &brips, &oups, &ameps, &ais, &iObj.SourceID,
 		&iObj.Created, &updated, &iObj.Status, &iObj.Event,
-		&target, &iObj.Doneby)
+                &doneby, &target)
+
 	if err != nil {
 		if errors.Is(err, pgx.ErrNoRows) {
 			return nil, ErrNoRecord
@@ -170,14 +171,6 @@ SELECT id, agent, material, priority,
 		iObj.Doneby = *doneby
 	}
 
-	if pilot != nil {
-		iObj.Pilot = *pilot
-	}
-
-	if actionDate != nil {
-		iObj.ActionDate = *actionDate
-	}
-
 	return iObj, nil
 }
 
@@ -190,7 +183,8 @@ SELECT id, material, created,
        status, source_id, priority
   FROM info
  WHERE source_id = $1 AND
- status <> 'archivé'
+ status <> 'archivé' AND
+ status <> 'résolu'
  ORDER BY priority ASC
 `
 	rows, err := conn.Query(ctx, query, id)

@@ -6,8 +6,10 @@ import (
 	"errors"
 	"time"
 
-	"github.com/jackc/pgx/v4"
-	"github.com/jackc/pgx/v4/pgxpool"
+	// "github.com/jackc/pgx/v4"
+	// "github.com/jackc/pgx/v4/pgxpool"
+	"github.com/jackc/pgx/v5"
+	"github.com/jackc/pgx/v5/pgxpool"
 )
 
 type Source struct {
@@ -75,8 +77,8 @@ SELECT s.id,
 }
 
 func (src *Source) CuratifsDone(conn *pgxpool.Conn) ([]*Source, error) {
-        ctx := context.Background()
-        query := `
+	ctx := context.Background()
+	query := `
 SELECT s.id,
        s.name,
        s.code_GMAO,
@@ -88,30 +90,30 @@ SELECT s.id,
  ORDER BY name ASC
 `
 
-        rows, err := conn.Query(ctx, query)
-        if err != nil {
-                return nil, err
-        }
-        defer rows.Close()
+	rows, err := conn.Query(ctx, query)
+	if err != nil {
+		return nil, err
+	}
+	defer rows.Close()
 
-        sources := []*Source{}
+	sources := []*Source{}
 
-        for rows.Next() {
-                sObj := &Source{}
+	for rows.Next() {
+		sObj := &Source{}
 
-                err := rows.Scan(&sObj.ID, &sObj.Name, &sObj.CodeGMAO, &sObj.Curatifs)
-                if err != nil {
-                        return nil, err
-                }
+		err := rows.Scan(&sObj.ID, &sObj.Name, &sObj.CodeGMAO, &sObj.Curatifs)
+		if err != nil {
+			return nil, err
+		}
 
-                sources = append(sources, sObj)
-        }
+		sources = append(sources, sObj)
+	}
 
-        if err = rows.Err(); err != nil {
-                return nil, err
-        }
+	if err = rows.Err(); err != nil {
+		return nil, err
+	}
 
-        return sources, nil
+	return sources, nil
 }
 
 // fonction d'obtention de donnée spécific source
