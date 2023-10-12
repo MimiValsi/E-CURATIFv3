@@ -32,8 +32,8 @@ func (app *application) notFound(w http.ResponseWriter) {
 // Alloue de la mémoire pour qu'un template puisse être rendue
 // Vérifie si le template dérisé existe avant d´être envoyé
 // au http.ResponseWriter
-func (app *application) render(w http.ResponseWriter, status int, page string, 
-        data *templateData) {
+func (app *application) render(w http.ResponseWriter, status int, page string,
+	data *templateData) {
 
 	// Récupère le template approprié du cache
 	ts, ok := app.templateCache[page]

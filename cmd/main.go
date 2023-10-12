@@ -28,7 +28,7 @@ type application struct {
 	infoLog  *log.Logger
 
 	// csvSource *database.CSVSource
-	csvData   *database.CSVData
+	csvData *database.CSVData
 
 	DB *pgxpool.Pool
 

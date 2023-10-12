@@ -15,7 +15,8 @@ import (
 
 	// package pour les routers
 	"github.com/go-chi/chi/v5"
-	// "github.com/jackc/pgx/v4/pgxpool"
+
+        // pkg pour Psql driver
 	"github.com/jackc/pgx/v5/pgxpool"
 )
 
@@ -99,14 +100,9 @@ func (app *application) jsonData(w http.ResponseWriter, r *http.Request) {
 	w.Write(jsonGraph)
 }
 
-func (app *application) charts(w http.ResponseWriter, r *http.Request) {
-	// conn := app.dbConn(r.Context())
-	// defer conn.Release()
-	//
-	// data := app.newTemplateData(r)
-
-	app.render(w, http.StatusOK, "charts.gotpl.html", nil)
-}
+// func (app *application) charts(w http.ResponseWriter, r *http.Request) {
+// 	app.render(w, http.StatusOK, "charts.gotpl.html", nil)
+// }
 
 func (app *application) curatifDone(w http.ResponseWriter, r *http.Request) {
 	conn := app.dbConn(r.Context())
@@ -132,7 +128,8 @@ func (app *application) curatifDone(w http.ResponseWriter, r *http.Request) {
 //
 
 type sourceCreateForm struct {
-	Name string
+	Name     string
+	CodeGmao string
 
 	validator.Validator
 }
@@ -152,7 +149,7 @@ func (app *application) sourceView(w http.ResponseWriter, r *http.Request) {
 	// Fait appel à la fonctin dans database/sources.go
 	// On récupère le "id" du source dans le URL
 	// créé auparavant
-	source, err := app.sources.SourceGet(id, conn)
+	source, err := app.sources.Get(id, conn)
 	if err != nil {
 		if errors.Is(err, database.ErrNoRecord) {
 			app.notFound(w)
@@ -163,7 +160,7 @@ func (app *application) sourceView(w http.ResponseWriter, r *http.Request) {
 
 	// Fait appel à la fonction dans database/infos.go
 	// en prenant en compte le id du source
-	info, err := app.infos.InfoList(id, conn)
+	info, err := app.infos.List(id, conn)
 	if err != nil {
 		if errors.Is(err, database.ErrNoRecord) {
 			app.notFound(w)
@@ -172,7 +169,7 @@ func (app *application) sourceView(w http.ResponseWriter, r *http.Request) {
 		}
 	}
 
-	// Allocation de mémoire
+	// Allocation de mémoire pour création de template
 	data := app.newTemplateData(r)
 	data.Infos = info
 	data.Source = source
@@ -207,7 +204,8 @@ func (app *application) sourceCreatePost(w http.ResponseWriter, r *http.Request)
 	}
 
 	form := sourceCreateForm{
-		Name: r.PostForm.Get("name"),
+		Name:     r.PostForm.Get("name"),
+		CodeGmao: r.PostForm.Get("code_gmao"),
 	}
 
 	// Petite vérification que le champ ne soit pas vide.
@@ -216,6 +214,8 @@ func (app *application) sourceCreatePost(w http.ResponseWriter, r *http.Request)
 
 	form.CheckField(validator.NotBlank(form.Name),
 		"name", emptyField)
+	form.CheckField(validator.NotBlank(form.CodeGmao),
+		"code_gmao", emptyField)
 
 	if !form.Valid() {
 		data := app.newTemplateData(r)
@@ -226,7 +226,7 @@ func (app *application) sourceCreatePost(w http.ResponseWriter, r *http.Request)
 	}
 
 	// Si pas d'erreur, les données sont envoyés vers la BD
-	id, err := app.sources.SourceInsert(form.Name, conn)
+	id, err := app.sources.Insert(form.Name, form.CodeGmao, conn)
 	if err != nil {
 		app.serverError(w, err)
 		return
@@ -254,7 +254,7 @@ func (app *application) sourceDeletePost(w http.ResponseWriter, r *http.Request)
 		return
 	}
 
-	err = app.sources.SourceDelete(id, conn)
+	err = app.sources.Delete(id, conn)
 	if err != nil {
 		if errors.Is(err, database.ErrNoRecord) {
 			app.notFound(w)
@@ -282,7 +282,7 @@ func (app *application) sourceUpdate(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	source, err := app.sources.SourceGet(id, conn)
+	source, err := app.sources.Get(id, conn)
 	if err != nil {
 		if errors.Is(err, database.ErrNoRecord) {
 			app.notFound(w)
@@ -335,7 +335,7 @@ func (app *application) sourceUpdatePost(w http.ResponseWriter, r *http.Request)
 
 	app.sources.Name = form.Name
 
-	err = app.sources.SourceUpdate(id, conn)
+	err = app.sources.Update(id, conn)
 	if err != nil {
 		app.serverError(w, err)
 		return
@@ -351,23 +351,20 @@ func (app *application) sourceUpdatePost(w http.ResponseWriter, r *http.Request)
 //
 
 type infoCreateForm struct {
-	ID       int
-	Agent    string
-	Material string
-	Priority string
-	Target   string
-	Detail   string
-	Created  string
-	Updated  string
-	Status   string
-	Event    string
-	Rte      string
-	Estimate string
-	Brips    string
-	Ais      string
-	Oups     string
-	Ameps    string
-	Doneby   string
+	ID          int
+	Agent       string
+	Ouvrage     string
+	Priorite    string
+	DatePrevue  string
+	Detail      string
+	Created     string
+	Updated     string
+	Status      string
+	Evenement   string
+	Devis       string
+	// Oups        string
+	FaitPar     string
+	Commentaire string
 
 	validator.Validator
 }
@@ -391,7 +388,7 @@ func (app *application) infoCreate(w http.ResponseWriter, r *http.Request) {
 	}
 
 	// La fonction attend comme paramètre un "int" dont l'id Source
-	source, err := app.sources.SourceGet(id, conn)
+	source, err := app.sources.Get(id, conn)
 	if err != nil {
 		if errors.Is(err, database.ErrNoRecord) {
 			app.notFound(w)
@@ -429,20 +426,15 @@ func (app *application) infoCreatePost(w http.ResponseWriter, r *http.Request) {
 	// Les données récupérés depuis la page HTML sont envoyées
 	// vers la BD
 	form := infoCreateForm{
-		Agent:    r.PostForm.Get("agent"),
-		Material: r.PostForm.Get("material"),
-		Detail:   r.PostForm.Get("detail"),
-		Event:    r.PostForm.Get("event"),
-		Priority: r.PostForm.Get("priority"),
-		Oups:     r.PostForm.Get("oups"),
-		Ameps:    r.PostForm.Get("ameps"),
-		Brips:    r.PostForm.Get("brips"),
-		Rte:      r.PostForm.Get("rte"),
-		Ais:      r.PostForm.Get("ais"),
-		Estimate: r.PostForm.Get("estimate"),
-		Target:   r.PostForm.Get("target"),
-		Status:   r.PostForm.Get("status"),
-		Doneby:   r.PostForm.Get("doneby"),
+		Agent:      r.PostForm.Get("agent"),
+		Ouvrage:    r.PostForm.Get("ouvrage"),
+		Detail:     r.PostForm.Get("detail"),
+		Evenement:  r.PostForm.Get("evenement"),
+		Priorite:   r.PostForm.Get("priorite"),
+		Devis:      r.PostForm.Get("devis"),
+		DatePrevue: r.PostForm.Get("date_prevue"),
+		Status:     r.PostForm.Get("status"),
+		FaitPar:    r.PostForm.Get("fait_par"),
 	}
 
 	// Certains champs ne doivent pas être vides.
@@ -453,14 +445,14 @@ func (app *application) infoCreatePost(w http.ResponseWriter, r *http.Request) {
 
 	form.CheckField(validator.NotBlank(form.Agent),
 		"agent", emptyField)
-	form.CheckField(validator.NotBlank(form.Material),
-		"material", emptyField)
+	form.CheckField(validator.NotBlank(form.Ouvrage),
+		"ouvrage", emptyField)
 	form.CheckField(validator.NotBlank(form.Detail),
 		"detail", emptyField)
-	form.CheckField(validator.NotBlank(form.Event),
-		"event", emptyField)
-	form.CheckField(validator.NotBlank(form.Priority),
-		"priority", emptyField)
+	form.CheckField(validator.NotBlank(form.Evenement),
+		"evenement", emptyField)
+	form.CheckField(validator.NotBlank(form.Priorite),
+		"priorite", emptyField)
 	form.CheckField(validator.NotBlank(form.Status),
 		"status", emptyField)
 
@@ -473,19 +465,15 @@ func (app *application) infoCreatePost(w http.ResponseWriter, r *http.Request) {
 	}
 
 	app.infos.Agent = form.Agent
-	app.infos.Material = form.Material
+	app.infos.Ouvrage = form.Ouvrage
 	app.infos.Detail = form.Detail
-	app.infos.Event = form.Event
-	app.infos.Oups = form.Oups
-	app.infos.Ameps = form.Ameps
-	app.infos.Brips = form.Brips
-	app.infos.Rte = form.Rte
-	app.infos.Ais = form.Ais
-	app.infos.Estimate = form.Estimate
-	app.infos.Target = form.Target
+	app.infos.Evenement = form.Evenement
+	// app.infos.Oups = form.Oups
+	app.infos.Devis = form.Devis
+	app.infos.DatePrevue = form.DatePrevue
 	app.infos.Status = form.Status
-	app.infos.Doneby = form.Doneby
-	app.infos.Priority, err = strconv.Atoi(form.Priority)
+	app.infos.FaitPar = form.FaitPar
+	app.infos.Priorite, err = strconv.Atoi(form.Priorite)
 	if err != nil {
 		app.notFound(w)
 		return
@@ -515,7 +503,7 @@ func (app *application) infoView(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	info, err := app.infos.InfoGet(id, conn)
+	info, err := app.infos.Get(id, conn)
 	if err != nil {
 		if errors.Is(err, database.ErrNoRecord) {
 			app.notFound(w)
@@ -552,7 +540,7 @@ func (app *application) infoDeletePost(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	err = app.infos.InfoDelete(id, conn)
+	err = app.infos.Delete(id, conn)
 	if err != nil {
 		if errors.Is(err, database.ErrNoRecord) {
 			app.notFound(w)
@@ -580,7 +568,7 @@ func (app *application) infoUpdate(w http.ResponseWriter, r *http.Request) {
 	}
 
 	// id ~> Info id
-	info, err := app.infos.InfoGet(id, conn)
+	info, err := app.infos.Get(id, conn)
 	if err != nil {
 		if errors.Is(err, database.ErrNoRecord) {
 			app.notFound(w)
@@ -627,42 +615,34 @@ func (app *application) infoUpdatePost(w http.ResponseWriter, r *http.Request) {
 	// et on envoi ce qui a été modifié
 	// Ceci sera traîtré dans "database.go"
 	form := infoCreateForm{
-		Agent:    r.PostForm.Get("agent"),
-		Material: r.PostForm.Get("material"),
-		Detail:   r.PostForm.Get("detail"),
-		Event:    r.PostForm.Get("event"),
-		Priority: r.PostForm.Get("priority"),
-		Oups:     r.PostForm.Get("oups"),
-		Ameps:    r.PostForm.Get("ameps"),
-		Brips:    r.PostForm.Get("brips"),
-		Rte:      r.PostForm.Get("rte"),
-		Ais:      r.PostForm.Get("ais"),
-		Estimate: r.PostForm.Get("estimate"),
-		Target:   r.PostForm.Get("target"),
-		Status:   r.PostForm.Get("status"),
-		Doneby:   r.PostForm.Get("doneby"),
+		Agent:      r.PostForm.Get("agent"),
+		Ouvrage:    r.PostForm.Get("ouvrage"),
+		Detail:     r.PostForm.Get("detail"),
+		Evenement:  r.PostForm.Get("evenement"),
+		Priorite:   r.PostForm.Get("priorite"),
+		// Oups:       r.PostForm.Get("oups"),
+		Devis:      r.PostForm.Get("devis"),
+		DatePrevue: r.PostForm.Get("date_prevue"),
+		Status:     r.PostForm.Get("status"),
+		FaitPar:    r.PostForm.Get("fait_par"),
 	}
 
 	app.infos.Agent = form.Agent
-	app.infos.Material = form.Material
+	app.infos.Ouvrage = form.Ouvrage
 	app.infos.Detail = form.Detail
-	app.infos.Event = form.Event
-	app.infos.Oups = form.Oups
-	app.infos.Ameps = form.Ameps
-	app.infos.Brips = form.Brips
-	app.infos.Rte = form.Rte
-	app.infos.Ais = form.Ais
-	app.infos.Estimate = form.Estimate
-	app.infos.Target = form.Target
+	app.infos.Evenement = form.Evenement
+	// app.infos.Oups = form.Oups
+	app.infos.Devis = form.Devis
+	app.infos.DatePrevue = form.DatePrevue
 	app.infos.Status = form.Status
-	app.infos.Doneby = form.Doneby
-	app.infos.Priority, err = strconv.Atoi(form.Priority)
+	app.infos.FaitPar = form.FaitPar
+	app.infos.Priorite, err = strconv.Atoi(form.Priorite)
 	if err != nil {
 		app.notFound(w)
 		return
 	}
 
-	err = app.infos.InfoUpdate(iID, conn)
+	err = app.infos.Update(iID, conn)
 	if err != nil {
 		app.serverError(w, err)
 		return
@@ -686,7 +666,7 @@ func (app *application) importCSVPost(w http.ResponseWriter, r *http.Request) {
 	defer conn.Release()
 
 	// Taille max du fichier: 2MB
-	r.ParseMultipartForm(2 << 20)
+	r.ParseMultipartForm(2_000_000)
 
 	// Crée handler pour filename, size et headers
 	file, handler, err := r.FormFile("inpt")
@@ -697,9 +677,6 @@ func (app *application) importCSVPost(w http.ResponseWriter, r *http.Request) {
 	}
 
 	defer file.Close()
-	// app.infoLog.Printf("Uploaded File: %+v\n", handler.Filename)
-	// app.infoLog.Printf("File Size: %+v\n", handler.Size)
-	// app.infoLog.Printf("MIME Header: %+v\n", handler.Header)
 
 	// Creation du fichier
 	dst, err := os.Create("csvFiles/" + handler.Filename)
@@ -722,9 +699,4 @@ func (app *application) importCSVPost(w http.ResponseWriter, r *http.Request) {
 	app.csvData.Import("csvFiles/" + handler.Filename)
 
 	http.Redirect(w, r, "/", http.StatusSeeOther)
-}
-
-func (app *application) pageTest(w http.ResponseWriter, r *http.Request) {
-
-	app.render(w, http.StatusOK, "pageTest.gotpl.html", nil)
 }
