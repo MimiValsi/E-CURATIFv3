@@ -17,7 +17,6 @@
   </div>
   <form action="/source/{{ .Info.SourceID }}/info/delete/{{ .Info.ID }}"
       method="POST">
-  <!-- <button type="submit" id="wastebin">&#128465;</button> -->
   <button type="submit" class="delete-btn">
     <img class="delete-img" src="/static/img/icone_corbeille.png">
 </form>
@@ -35,7 +34,7 @@
 <div id="srcName">
   <table>
     <tr>
-      <th><strong>{{ .Material }}</strong></th>
+      <th><strong>{{ .Ouvrage }}</strong></th>
 
       <!-- Status Colors -->
       {{ if $att }}
@@ -70,7 +69,7 @@
     <tr>
       <td>{{ .Agent }}</td>
       <td></td>
-      <td class="right-text">{{ .Doneby }}</td>
+      <td class="right-text">{{ .FaitPar }}</td>
     </tr>
     <tr>
       <th class="center-text" colspan="3">Détail</th>
@@ -80,73 +79,56 @@
     </tr>
     <tr class="infoHeader">
       <th>Evénement</th>
-      <th class="center-text">Priorité</th>
-      <th class="right-text">OUPS</th>
+      <th colspan="2" class="right-text">Priorité</th>
+      <!-- <th class="right-text">OUPS</th> -->
     </tr>
     <tr>
-      {{ if .Event }}
-      <td>{{ .Event }}</td>
+      {{ if .Evenement }}
+      <td>{{ .Evenement }}</td>
       {{ else }}
       <td>-</td>
       {{ end }}
 
-      <td class="center-text">{{ .Priority }}</td>
+      <td></td>
 
-      {{ if .Oups }}
-      <td class="right-text">{{ .Oups }}</td>
-      {{ else }}
-      <td class="right-text">-</td>
-      {{ end }}
+      <td class="right-text">{{ .Priorite }}</td>
+
+      <!-- {{/* if .Oups */}} -->
+      <!-- <td class="right-text">{{ .Oups }}</td> -->
+      <!-- {{/* else */}} -->
+      <!-- <td class="right-text">-</td> -->
+      <!-- {{/* end */}} -->
     </tr>
     <tr>
-      <th>Action<br />AMEPS</th>
-      <th class="center-text">Action<br />BRIPS</th>
-      <th class="right-text">Action<br />RTE</th>
+      <th>Devis</th>
+      <th colspan="2" class="right-text">Date de Prévue</th>
     </tr>
     <tr>
-      {{ if .Ameps }}
-      <td>{{ .Ameps }}</td>
+      {{ if .Devis }}
+      <td>{{ .Devis }}</td>
       {{ else }}
       <td>-</td>
       {{ end }}
 
-      {{ if .Brips }}
-      <td class="center-text">{{ .Brips }}</td>
+      {{ if .DatePrevue }}
+      <td colspan="2" class="right-text">{{ .DatePrevue }}</td>
       {{ else }}
-      <td class="center-text">-</td>
-      {{ end }}
-
-      {{ if .Rte }}
-      <td class="right-text">{{ .Rte }}</td>
-      {{ else }}
-      <td class="right-text">-</td>
+      <td colspan="2" class="right-text">Pas de date de prévue</td>
       {{ end }}
     </tr>
+
     <tr>
-      <th>Action<br />AIS</th>
-      <th class="center-text">Devis</th>
-      <th class="right-text">Date de Prévue</th>
+      <th colspan="3" class="center-text">Commentaire</th>
     </tr>
+    {{ if .Commentaire }}
     <tr>
-      {{ if .Ais }}
-      <td>{{ .Ais }}</td>
-      {{ else }}
-      <td>-</td>
-      {{ end }}
-
-      {{ if .Estimate }}
-      <td class="center-text">{{ .Estimate }}</td>
-      {{ else }}
-      <Td class="center-text">-</td>
-      {{ end }}
-
-      {{ if .Target}}
-      <td class="right-text">{{ .Target }}</td>
-      {{ else }}
-      <td class="right-text">Pas de date de prévue</td>
-      {{ end }}
+      <td colspan="3" class="center-text">{{ .Commentaire }}</td>
     </tr>
-
+    {{ else }}
+    <tr>
+      <td colspan="3">-</td>
+    </tr>
+    {{ end }}
 
     <tr>
       {{ if eq .Updated .ZeroTime }}

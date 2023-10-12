@@ -17,15 +17,6 @@
 
     return jpCD;
   }
-  // const prioJson = async () => {
-  //   const response = await fetch("http://localhost:3001/prioData");
-  //
-  //   const data = await response.json();
-  //   const js = JSON.stringify(data);
-  //   const jp = await JSON.parse(js);
-  //
-  //   return jp;
-  // };
 
   // Fetch every active 'Curatif'
   const jsData = await getJson();
