@@ -4,6 +4,7 @@ import (
 	"context"
 	"encoding/json"
 	"errors"
+	"strings"
 	"time"
 
 	// "github.com/jackc/pgx/v4"
@@ -117,7 +118,7 @@ SELECT s.id,
 }
 
 // fonction d'obtention de donnée spécific source
-func (src *Source) SourceGet(id int, conn *pgxpool.Conn) (*Source, error) {
+func (src *Source) Get(id int, conn *pgxpool.Conn) (*Source, error) {
 	ctx := context.Background()
 	query := `
 SELECT id, name, created
@@ -139,14 +140,15 @@ SELECT id, name, created
 }
 
 // fonction de création donnée source
-func (src *Source) SourceInsert(name string, conn *pgxpool.Conn) (int, error) {
+func (src *Source) Insert(name string, codeGmao string, conn *pgxpool.Conn) (int, error) {
 	ctx := context.Background()
 	query := `
-INSERT INTO source (name, created)
-VALUES ($1, $2)
+INSERT INTO source (name, code_gmao, created)
+VALUES ($1, $2, $3)
   RETURNING id
 `
-	err := conn.QueryRow(ctx, query, name,
+	tmp := strings.ToUpper(codeGmao)
+	err := conn.QueryRow(ctx, query, name, tmp,
 		time.Now().UTC()).Scan(&src.ID)
 	if err != nil {
 		return 0, nil
@@ -156,7 +158,7 @@ VALUES ($1, $2)
 }
 
 // fonction de suppréssion source
-func (src *Source) SourceDelete(id int, conn *pgxpool.Conn) error {
+func (src *Source) Delete(id int, conn *pgxpool.Conn) error {
 	ctx := context.Background()
 	query := `
 DELETE FROM source
@@ -171,14 +173,16 @@ DELETE FROM source
 }
 
 // Fonction de MaJ source
-func (src *Source) SourceUpdate(id int, conn *pgxpool.Conn) error {
+func (src *Source) Update(id int, conn *pgxpool.Conn) error {
 	ctx := context.Background()
 	query := `
 UPDATE source
-   SET name = $1
- WHERE id = $2
+   SET name = $1,
+       code_gmao = $2
+ WHERE id = $3
 `
-	_, err := conn.Exec(ctx, query, src.Name, id)
+	tmp := strings.ToUpper(src.CodeGMAO)
+	_, err := conn.Exec(ctx, query, src.Name, tmp, id)
 	if err != nil {
 		return err
 	}

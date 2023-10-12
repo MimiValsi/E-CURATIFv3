@@ -5,45 +5,38 @@ import (
 	"errors"
 	"time"
 
-	// "github.com/jackc/pgx/v4"
-	// "github.com/jackc/pgx/v4/pgxpool"
 	"github.com/jackc/pgx/v5"
 	"github.com/jackc/pgx/v5/pgxpool"
 )
 
 type Info struct {
-	ID         int    `json:"-"` // primary key
-	Priority   int    `json:"priority,omitempty"`
-	SourceID   int    `json:"-"` // foreign key en référence au PK de source
-	Counter    int    `json:"counter,omitempty"`
-	Agent      string `json:"agent,omitempty"`
-	Material   string `json:"material,omitempty"`
-	Target     string `json:"target,omitempty"`
-	Rte        string `json:"rte,omitempty"`
-	Detail     string `json:"detail,omitempty"`
-	Estimate   string `json:"estimate,omitempty"`
-	Brips      string `json:"brips,omitempty"`
-	Oups       string `json:"oups,omitempty"`
-	Ameps      string `json:"ameps,omitempty"`
-	Ais        string `json:"ais,omitempty"`
-	Status     string `json:"status,omitempty"`
-	Event      string `json:"event,omitempty"`
-	Doneby     string `json:"doneby,omitempty"`
-	Pilot      string `json:"pilot,omitempty"`
-	ActionDate string `json:"actionDate,omitempty"`
-	DayDone    string `json:"dayDone,omitempty"`
+	ID          int    `json:"-"` // primary key
+	Priorite    int    `json:"priorite,omitempty"`
+	SourceID    int    `json:"-"` // foreign key en référence au PK de source
+	Counteur    int    `json:"counteur,omitempty"`
+	Agent       string `json:"agent,omitempty"`
+	Ouvrage     string `json:"ouvrage,omitempty"`
+	DatePrevue  string `json:"date_prevue,omitempty"`
+	Detail      string `json:"detail,omitempty"`
+	Devis       string `json:"devis,omitempty"`
+	// Oups        string `json:"oups,omitempty"`
+	Status      string `json:"status,omitempty"`
+	Evenement   string `json:"evenement,omitempty"`
+	FaitPar     string `json:"fait_par,omitempty"`
+	Pilote      string `json:"pilote,omitempty"`
+	Commentaire string `json:"commentaire,omitempty"`
 
 	ZeroTime time.Time `json:"-"`
 	Created  time.Time `json:"-"`
 	Updated  time.Time `json:"-"`
 }
 
-// Gather all priority 1 infos
+// Gather all priorite 1 infos
 func (i *Info) PriorityInfos(conn *pgxpool.Conn) ([]*Info, error) {
 	ctx := context.Background()
 
 	query := `
-SELECT i.material, 
+SELECT i.ouvrage, 
        i.detail 
   FROM info AS i
  WHERE status <> 'résolu' AND 
@@ -61,7 +54,7 @@ SELECT i.material,
 	for rows.Next() {
 		iObj := &Info{}
 
-		err := rows.Scan(&iObj.Material, &iObj.Detail)
+		err := rows.Scan(&iObj.Ouvrage, &iObj.Detail)
 		if err != nil {
 			return nil, err
 		}
@@ -80,21 +73,19 @@ SELECT i.material,
 func (i *Info) Insert(id int, conn *pgxpool.Conn) (int, error) {
 	ctx := context.Background()
 	query := `
-INSERT INTO info (source_id, agent, material, detail, 
-	   	  event, priority, oups, ameps,
-       		  brips, rte, ais, estimate, 
-		  target, status, doneby, created)
+INSERT INTO info (source_id, agent, ouvrage, detail, 
+	   	  evenement, priorite, oups, 
+       		  devis, date_prevue, status, fait_par, 
+                  commentaire, created)
 VALUES ($1,  $2,  $3,  $4, 
 	$5,  $6,  $7,  $8, 
-	$9,  $10, $11, $12, 
-	$13, $14, $15, $16)
+	$9,  $10, $11, $12, $13)
   RETURNING id;
 `
 	err := conn.QueryRow(ctx, query, id, i.Agent,
-		i.Material, i.Detail, i.Event, i.Priority,
-		i.Oups, i.Ameps, i.Brips, i.Rte, i.Ais,
-		i.Estimate, i.Target, i.Status,
-		i.Doneby,
+		i.Ouvrage, i.Detail, i.Evenement, i.Priorite,
+		i.Oups, i.Devis, i.DatePrevue, i.Status,
+		i.FaitPar, i.Commentaire,
 		time.Now().UTC()).Scan(&i.ID)
 	if err != nil {
 		return 0, err
@@ -104,25 +95,25 @@ VALUES ($1,  $2,  $3,  $4,
 }
 
 // Fonction d'obtention de donnée spécific
-func (i *Info) InfoGet(id int, conn *pgxpool.Conn) (*Info, error) {
+func (i *Info) Get(id int, conn *pgxpool.Conn) (*Info, error) {
 	ctx := context.Background()
 	query := `
-SELECT id, agent, material, priority, 
-       rte, detail, estimate, brips,
-       oups, ameps, ais, source_id, 
-       created, updated, status, event, doneby, target
+SELECT id, agent, ouvrage, priorite, 
+       detail, devis, oups, source_id, 
+       created, updated, status, evenement, fait_par, date_prevue,
+       commentaire
   FROM info
  WHERE id = $1
 `
-        var target, rte, ameps, ais, brips, oups, estimate, doneby *string
+	var date_prevue, oups, devis, fait_par, commentaire *string
 	var updated *time.Time
 
 	iObj := &Info{}
 	err := conn.QueryRow(ctx, query, id).Scan(&iObj.ID, &iObj.Agent,
-		&iObj.Material, &iObj.Priority, &rte, &iObj.Detail,
-		&estimate, &brips, &oups, &ameps, &ais, &iObj.SourceID,
-		&iObj.Created, &updated, &iObj.Status, &iObj.Event,
-                &doneby, &target)
+		&iObj.Ouvrage, &iObj.Priorite, &iObj.Detail,
+		&devis, &oups, &iObj.SourceID,
+		&iObj.Created, &updated, &iObj.Status, &iObj.Evenement,
+		&fait_par, &date_prevue, &commentaire)
 
 	if err != nil {
 		if errors.Is(err, pgx.ErrNoRows) {
@@ -135,24 +126,8 @@ SELECT id, agent, material, priority,
 	iObj.ZeroTime = time.Date(0001, time.January,
 		1, 0, 0, 0, 0, time.UTC)
 
-	if target != nil {
-		iObj.Target = *target
-	}
-
-	if rte != nil {
-		iObj.Rte = *rte
-	}
-
-	if ameps != nil {
-		iObj.Ameps = *ameps
-	}
-
-	if ais != nil {
-		iObj.Ais = *ais
-	}
-
-	if brips != nil {
-		iObj.Brips = *brips
+	if date_prevue != nil {
+		iObj.DatePrevue = *date_prevue
 	}
 
 	if oups != nil {
@@ -163,12 +138,16 @@ SELECT id, agent, material, priority,
 		iObj.Updated = *updated
 	}
 
-	if estimate != nil {
-		iObj.Estimate = *estimate
+	if devis != nil {
+		iObj.Devis = *devis
 	}
 
-	if doneby != nil {
-		iObj.Doneby = *doneby
+	if fait_par != nil {
+		iObj.FaitPar = *fait_par
+	}
+
+	if commentaire != nil {
+		iObj.Commentaire = *commentaire
 	}
 
 	return iObj, nil
@@ -176,15 +155,15 @@ SELECT id, agent, material, priority,
 
 // Fonction afin de choper plusieurs données et la transférer
 // dans un slice
-func (i *Info) InfoList(id int, conn *pgxpool.Conn) ([]*Info, error) {
+func (i *Info) List(id int, conn *pgxpool.Conn) ([]*Info, error) {
 	ctx := context.Background()
 	query := `
-SELECT id, material, created, 
-       status, source_id, priority
+SELECT id, ouvrage, created, 
+       status, source_id, priorite
   FROM info
  WHERE source_id = $1 AND
  status <> 'archivé'
- ORDER BY priority ASC
+ ORDER BY priorite ASC
 `
 	rows, err := conn.Query(ctx, query, id)
 	if err != nil {
@@ -197,9 +176,9 @@ SELECT id, material, created,
 	for rows.Next() {
 		iObj := &Info{}
 
-		err = rows.Scan(&iObj.ID, &iObj.Material,
+		err = rows.Scan(&iObj.ID, &iObj.Ouvrage,
 			&iObj.Created, &iObj.Status,
-			&iObj.SourceID, &iObj.Priority)
+			&iObj.SourceID, &iObj.Priorite)
 		if err != nil {
 			return nil, err
 		}
@@ -214,7 +193,7 @@ SELECT id, material, created,
 	return infos, nil
 }
 
-func (i *Info) InfoDelete(id int, conn *pgxpool.Conn) error {
+func (i *Info) Delete(id int, conn *pgxpool.Conn) error {
 	ctx := context.Background()
 	query := `
 DELETE FROM info
@@ -229,19 +208,21 @@ DELETE FROM info
 }
 
 // Fonction de mise à jour donnée
-func (i *Info) InfoUpdate(id int, conn *pgxpool.Conn) error {
+func (i *Info) Update(id int, conn *pgxpool.Conn) error {
 	ctx := context.Background()
 	query := `
 UPDATE info
-   SET agent = $1, material = $2, priority = $3, target = $4, rte = $5,
-       detail = $6, estimate = $7, brips = $8, oups = $9, ameps = $10,
-       ais = $11, updated = $12, status = $13, event = $14, doneby = $15
- WHERE id = $16
+   SET agent = $1, ouvrage = $2, priorite = $3, date_prevue = $4,
+       detail = $5, devis = $6,oups = $7,
+       updated = $8, status = $9, evenement = $10, fait_par = $11,
+       commentaire = $12
+ WHERE id = $13
 `
-	_, err := conn.Exec(ctx, query, i.Agent, i.Material,
-		i.Priority, i.Target, i.Rte, i.Detail, i.Estimate,
-		i.Brips, i.Oups, i.Ameps, i.Ais, time.Now().UTC(),
-		i.Status, i.Event, i.Doneby, id)
+	_, err := conn.Exec(ctx, query, i.Agent, i.Ouvrage, i.Priorite,
+		i.DatePrevue, i.Detail, i.Devis,
+		i.Oups, time.Now().UTC(),
+		i.Status, i.Evenement, i.FaitPar,
+		i.Commentaire, id)
 	if err != nil {
 		return err
 	}
@@ -254,10 +235,10 @@ func (i *Info) InfoUp(id int, conn *pgxpool.Conn) error {
 	ctx := context.Background()
 	query := `
 UPDATE info
-   SET material = $1, updated = $2
+   SET ouvrage = $1, updated = $2
  WHERE id = $3
 `
-	_, err := conn.Exec(ctx, query, i.Material,
+	_, err := conn.Exec(ctx, query, i.Ouvrage,
 		time.Now().UTC(), id)
 	if err != nil {
 		return err
