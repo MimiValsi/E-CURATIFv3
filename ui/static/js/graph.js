@@ -9,13 +9,14 @@
     return jp;
   };
 
+
   const getJsonCD = async () => {
     const curatifDone = await fetch("http://localhost:3001/curatifDone");
-    const dataCD = await curatifDone.json();
-    const jsCD = JSON.stringify(dataCD);
-    const jpCD = await JSON.parse(jsCD);
+    const data = await curatifDone.json();
+    const js = JSON.stringify(data);
+    const jp = await JSON.parse(js);
 
-    return jpCD;
+    return jp;
   }
 
   // Fetch every active 'Curatif'

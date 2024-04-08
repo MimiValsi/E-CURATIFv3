@@ -8,15 +8,11 @@ import (
 	"os"
 	"time"
 
-	// Database regroupe toutes les fonctions pour communiquer
-	// avec PSQL
-	"E-CURATIFv3/database"
+	"github.com/jackc/pgx/v5/pgxpool" // PostgreSQL driver
 
-	// PostgreSQL driver
-	"github.com/jackc/pgx/v5/pgxpool"
+	"E-CURATIFv3/database" // Database regroupe toutes les fonctions pour communiquer avec PSQL
 )
 
-// Structure principale, toute structure doit être "connecté" à celle-ci
 // afin de permettre la vérif les informations et communiquer avec PSQL
 type application struct {
 	sources *database.Source
@@ -29,6 +25,7 @@ type application struct {
 
 	// csvSource *database.CSVSource
 	csvData *database.CSVData
+	// csvInfo *database.CSVInfo
 
 	DB *pgxpool.Pool
 
@@ -39,7 +36,6 @@ type application struct {
 const (
 	addr    = ":3001"
 	dataURL = "postgres://ameps:pass@localhost:5432/ecuratif"
-	// dataURL = "postgres://ameps:pass@localhost:5432/ecuratifv2"
 )
 
 func main() {
@@ -72,10 +68,13 @@ func main() {
 		infos:   &database.Info{},
 
 		templateCache: templateCache,
+		csvData:       &database.CSVData{InfoLog: infoLog, ErrorLog: errorLog},
 
 		// A reformuler
-		csvData: &database.CSVData{DB: db,
-			ErrorLog: errorLog, InfoLog: infoLog},
+		// csvData: &database.CSVData{
+		// 	DB:       db,
+		// 	ErrorLog: errorLog, InfoLog: infoLog,
+		// },
 		// A reformuler
 		// csvSource: &database.CSVSource{DB: db,
 		// 	Errorlog: errorLog, InfoLog: infoLog},
@@ -95,10 +94,12 @@ func main() {
 		WriteTimeout: 10 * time.Second,
 	}
 
+	// test
+	// app.csvData.ConvertToCsv()
+
 	infoLog.Printf("Starting server on %s", addr)
 	err = srv.ListenAndServe()
 	errorLog.Fatal(err)
-
 }
 
 // Fonction qui permet la connection avec PSQL via pgx.pgxpool

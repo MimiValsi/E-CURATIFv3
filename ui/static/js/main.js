@@ -43,7 +43,6 @@ function searchPS() {
   tr = table.getElementsByTagName("tr");
 
   for (i = 1; i < tr.length; i++) {
-
     td = tr[i].getElementsByTagName("td")[0];
 
     if (td) {
@@ -69,7 +68,7 @@ function searchPS() {
 //   }
 // }
 
-document.addEventListener("DOMContentLoaded", function() {
+document.addEventListener("DOMContentLoaded", function () {
   let elements = document.getElementsByTagName("INPUT");
   let srcName = document.getElementById("name");
 
@@ -80,34 +79,33 @@ document.addEventListener("DOMContentLoaded", function() {
   let infoPriority = document.getElementById("priority");
 
   for (let i = 0; i < elements.length; i++) {
-    elements[i].oninvalid = function(e) {
+    elements[i].oninvalid = function (e) {
       e.target.setCustomValidity("");
       if (!e.target.validity.valid) {
         e.target.setCustomValidity("Ce champ ne doit pas être vide");
         if (srcName != null) {
-          srcName.classList.add('inptAlert');
+          srcName.classList.add("inptAlert");
         }
 
         if (infoAgent != null) {
-          infoAgent.classList.add('inptAlert');
+          infoAgent.classList.add("inptAlert");
         }
         if (infoMaterial != null) {
-          infoMaterial.classList.add('inptAlert');
+          infoMaterial.classList.add("inptAlert");
         }
         if (infoDetail != null) {
-          infoDetail.classList.add('inptAlert');
+          infoDetail.classList.add("inptAlert");
         }
         if (infoEvent != null) {
-          infoEvent.classList.add('inptAlert');
+          infoEvent.classList.add("inptAlert");
         }
         if (infoPriority != null) {
-          infoPriority.classList.add('inptAlert');
+          infoPriority.classList.add("inptAlert");
         }
-
       }
     };
-    elements[i].oninput = function(e) {
+    elements[i].oninput = function (e) {
       e.target.setCustomValidity("");
     };
   }
-})
+});

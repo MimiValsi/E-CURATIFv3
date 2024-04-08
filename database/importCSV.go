@@ -4,109 +4,142 @@ import (
 	"context"
 	"encoding/csv"
 	"errors"
-	// "fmt"
+	"fmt"
 	"log"
 	"os"
+	"os/exec"
+	"strconv"
+	"strings"
 
-	// "github.com/jackc/pgx/v4"
-	// "github.com/jackc/pgx/v4/pgxpool"
 	"github.com/jackc/pgx/v5"
 	"github.com/jackc/pgx/v5/pgxpool"
 )
 
 type CSVData struct {
-	ID       int
-	Priority int
-	SourceID int
-	Agent    string
-	Event    string
-	Created  string // Cast to date with PSQL
-	Material string
-	Pilot    string
-	Detail   string
-	Target   string
-	DayDone  string
-	Estimate string
-	Oups     string
-	Brips    string
-	Ameps    string
-	Status   string
-	Entity   string
-	Comment  string
+	ID        int
+	Priorite  int
+	SourceID  int
+	Agent     string
+	Evenement string
+	Created   string // Cast to date with PSQL
+	Ouvrage   string
+	Detail    string
+	Target    string
+	Devis     string
+	Ameps     string
+	Status    string
+	DB        *pgxpool.Pool
+	ErrorLog  *log.Logger
+	InfoLog   *log.Logger
 
-	DB *pgxpool.Pool
-
-	ErrorLog *log.Logger
-	InfoLog  *log.Logger
-
-	srcID   int
-	srcName string
+	SourceName string
 }
 
-func (data *CSVData) Import(s string) {
+func (data *CSVData) VerifyCSV(s string, conn *pgxpool.Conn) {
+	file := strings.Split(s, ".")
+	length := len(file)
+
+	if file[length-1] != "csv" {
+		data.ErrorLog.Println("Wrong type of file")
+	} else {
+		data.encodingCSV(s, conn)
+	}
+}
+
+func (data *CSVData) encodingCSV(s string, conn *pgxpool.Conn) {
+	cmd, err := exec.Command("file", "-i", s).Output()
+	if err != nil {
+		data.ErrorLog.Println(err)
+	}
+
+	strSplit := []string{}
+	tmp := strings.Split(string(cmd), "=")
+	strSplit = append(strSplit, tmp...)
+
+	tmp2 := strings.ToUpper(strSplit[1])
+
+	// Vérif si encodage est en UTF-8
+	// si faux, on lance la commande de changement
+	if tmp2 != "UTF-8\n" {
+		cmd := exec.Command("iconv", "-f", tmp2,
+			"-t", "UTF-8", s, "-o", s)
+		iconvErr := cmd.Run()
+		data.ErrorLog.Println(iconvErr)
+	}
+
+	data.dataCSV(s, conn)
+}
+
+func (data *CSVData) dataCSV(s string, conn *pgxpool.Conn) {
 	file, err := os.Open(s)
 	if err != nil {
 		data.ErrorLog.Println(err)
 	}
 	defer file.Close()
 
-	// lines, err := csv.NewReader(file).ReadAll()
-	l := csv.NewReader(file)
-
-	l.Comma = ';'
-
-	lines, err := l.ReadAll()
+	lines, err := csv.NewReader(file).ReadAll()
 	if err != nil {
 		data.ErrorLog.Println(err)
 	}
 
-	for i := 1; i < len(lines); i++ {
-		line := lines[i]
-		j := 0
-
-		data.fetchSourceID(toUTF8([]byte(line[j])))
-		data.Material = toUTF8([]byte(line[j+1]))
-		data.Detail = toUTF8([]byte(line[j+2]))
-		data.Created = toUTF8([]byte(line[j+3]))
-		data.Agent = toUTF8([]byte(line[j+4]))
-		data.Entity = toUTF8([]byte(line[j+5]))
-		data.Status = toUTF8([]byte(line[j+6]))
-		data.DayDone = toUTF8([]byte(line[j+8]))
-		data.Comment = toUTF8([]byte(line[j+9]))
-		// fmt.Println(data)
-		data.insert()
-		// break
+	// Le fichier attendue a en première ligne et colonne
+	// le nom du poste source.
+	// Ce positionnement ne doit pas être changé!
+	source, err := data.SourceNumber(lines[0][0], conn)
+	if err != nil {
+		data.ErrorLog.Println(err)
 	}
 
+	// i = 0 -> Nom du poste
+	// i = 1 -> Nom des colonnes
+	for i, j := 2, 0; i < len(lines); i++ {
+		line := lines[i]
+
+		data.Agent = line[j]
+		data.Evenement = line[j+1]
+		data.Created = line[j+2]
+		data.Ouvrage = line[j+3]
+		data.Detail = line[j+4]
+		data.Priorite, _ = strconv.Atoi(line[j+5])
+		data.Devis = line[j+6]
+		data.SourceID = source
+		data.Status = "en attente"
+
+		data.insertDB(conn)
+	}
 }
 
-func (data *CSVData) insert() {
+func (data *CSVData) insertDB(conn *pgxpool.Conn) {
 	ctx := context.Background()
+
 	query := `
 INSERT INTO info
-  (source_id, agent, material, detail, created, entity, status, day_done, comment, priority, event)
-       VALUES
-        ($1, $2, $3, $4, (to_date($5, 'DD-MM-YYYY')), $6, $7, $8, $9, $10, $11)
+  (source_id, agent, evenement, ouvrage, 
+    detail, priorite, status, created)
+      VALUES
+	($1, $2, $3, $4, $5, $6, $7,
+	  (to_date($8, 'DD/MM/YYYY')))
 `
-	args := []any{data.srcID, data.Agent, data.Material,
-		data.Detail, data.Created, data.Entity,
-		data.Status, data.DayDone, data.Comment, 3, "test"}
-
-	_, err := data.DB.Exec(ctx, query, args...)
+	_, err := conn.Exec(ctx, query, data.SourceID, data.Agent,
+		data.Evenement, data.Ouvrage, data.Detail,
+		data.Priorite, data.Status, data.Created)
 	if err != nil {
 		data.ErrorLog.Println(err)
+	} else {
+		data.InfoLog.Println("data sent")
 	}
 }
 
-func (data *CSVData) fetchSourceID(s string) (int, error) {
+func (data *CSVData) SourceNumber(s string, conn *pgxpool.Conn) (int, error) {
 	ctx := context.Background()
 	query := `
-SELECT id 
-  FROM source 
- WHERE name = $1
+SELECT id
+  FROM source
+    WHERE name = $1
 `
 
-	err := data.DB.QueryRow(ctx, query, s).Scan(&data.srcID)
+	var id int
+	err := conn.QueryRow(ctx, query, s).Scan(&id)
 	if err != nil {
 		if errors.Is(err, pgx.ErrNoRows) {
 			return -1, ErrNoRecord
@@ -115,14 +148,7 @@ SELECT id
 		}
 	}
 
-	return data.srcID, nil
-}
+	fmt.Printf("@ sourceNumber: id > %v \n\n", id)
 
-func toUTF8(iso []byte) string {
-	buf := make([]rune, len(iso))
-	for i, b := range iso {
-		buf[i] = rune(b)
-	}
-
-	return string(buf)
+	return id, nil
 }

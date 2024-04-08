@@ -10,13 +10,15 @@ import (
 	"os"
 	"strconv"
 
+	// "time"
+
 	"E-CURATIFv3/database"
 	"E-CURATIFv3/internal/validator"
 
 	// package pour les routers
 	"github.com/go-chi/chi/v5"
 
-        // pkg pour Psql driver
+	// pkg pour Psql driver
 	"github.com/jackc/pgx/v5/pgxpool"
 )
 
@@ -35,7 +37,6 @@ func (app *application) dbConn(ctx context.Context) *pgxpool.Conn {
 //
 
 func (app *application) home(w http.ResponseWriter, r *http.Request) {
-
 	conn := app.dbConn(r.Context())
 	defer conn.Release()
 
@@ -53,12 +54,11 @@ func (app *application) home(w http.ResponseWriter, r *http.Request) {
 	}
 
 	// newTemplateData @ cmd/templates.go
-	data := app.newTemplateData(r)
+	data := app.newTemplateData()
 	data.Sources = sources
 	data.JSource = jData
 
 	app.render(w, http.StatusOK, "home.gotpl.html", data)
-
 }
 
 func (app *application) priorityData(w http.ResponseWriter, r *http.Request) {
@@ -78,7 +78,6 @@ func (app *application) priorityData(w http.ResponseWriter, r *http.Request) {
 	w.WriteHeader(http.StatusOK)
 	w.Header().Set("Content-Type", "application/json")
 	w.Write(jsonData)
-
 }
 
 func (app *application) jsonData(w http.ResponseWriter, r *http.Request) {
@@ -170,13 +169,12 @@ func (app *application) sourceView(w http.ResponseWriter, r *http.Request) {
 	}
 
 	// Allocation de mémoire pour création de template
-	data := app.newTemplateData(r)
+	data := app.newTemplateData()
 	data.Infos = info
 	data.Source = source
 
 	// Génération de la page web
 	app.render(w, http.StatusOK, "sourceView.gotpl.html", data)
-
 }
 
 // Génération de la page de création de source
@@ -184,15 +182,13 @@ func (app *application) sourceView(w http.ResponseWriter, r *http.Request) {
 // La première est une GET, une fois le nom du source choisi
 // la fonction sourceCreatePost prend le relais
 func (app *application) sourceCreate(w http.ResponseWriter, r *http.Request) {
-
-	data := app.newTemplateData(r)
+	data := app.newTemplateData()
 	data.Form = sourceCreateForm{}
 
 	app.render(w, http.StatusOK, "sourceCreate.gotpl.html", data)
 }
 
 func (app *application) sourceCreatePost(w http.ResponseWriter, r *http.Request) {
-
 	conn := app.dbConn(r.Context())
 	defer conn.Release()
 
@@ -218,7 +214,7 @@ func (app *application) sourceCreatePost(w http.ResponseWriter, r *http.Request)
 		"code_gmao", emptyField)
 
 	if !form.Valid() {
-		data := app.newTemplateData(r)
+		data := app.newTemplateData()
 		data.Form = form
 		app.render(w, http.StatusUnprocessableEntity,
 			"sourceCreate.gotpl.html", data)
@@ -242,7 +238,6 @@ func (app *application) sourceCreatePost(w http.ResponseWriter, r *http.Request)
 // vérifi son existance par acquit de conscience.
 // Une fois fini, on redirect vers la page d'accueil
 func (app *application) sourceDeletePost(w http.ResponseWriter, r *http.Request) {
-
 	conn := app.dbConn(r.Context())
 	defer conn.Release()
 
@@ -265,7 +260,6 @@ func (app *application) sourceDeletePost(w http.ResponseWriter, r *http.Request)
 	}
 
 	http.Redirect(w, r, "/", http.StatusSeeOther)
-
 }
 
 // Même foncionnement que la création et suppréssion de Source.
@@ -292,7 +286,7 @@ func (app *application) sourceUpdate(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	data := app.newTemplateData(r)
+	data := app.newTemplateData()
 	data.Source = source
 
 	app.render(w, http.StatusOK, "sourceUpdate.gotpl.html", data)
@@ -300,7 +294,6 @@ func (app *application) sourceUpdate(w http.ResponseWriter, r *http.Request) {
 
 // Une fois les changements faites, elles sont reenvoyés vers la BD
 func (app *application) sourceUpdatePost(w http.ResponseWriter, r *http.Request) {
-
 	conn := app.dbConn(r.Context())
 	defer conn.Release()
 
@@ -326,7 +319,7 @@ func (app *application) sourceUpdatePost(w http.ResponseWriter, r *http.Request)
 		"name", emptyField)
 
 	if !form.Valid() {
-		data := app.newTemplateData(r)
+		data := app.newTemplateData()
 		data.Form = form
 		app.render(w, http.StatusUnprocessableEntity,
 			"sourceUpdate.gotpl.html", data)
@@ -343,7 +336,6 @@ func (app *application) sourceUpdatePost(w http.ResponseWriter, r *http.Request)
 
 	http.Redirect(w, r, fmt.Sprintf("/source/view/%d", id),
 		http.StatusSeeOther)
-
 }
 
 //
@@ -351,17 +343,17 @@ func (app *application) sourceUpdatePost(w http.ResponseWriter, r *http.Request)
 //
 
 type infoCreateForm struct {
-	ID          int
-	Agent       string
-	Ouvrage     string
-	Priorite    string
-	DatePrevue  string
-	Detail      string
-	Created     string
-	Updated     string
-	Status      string
-	Evenement   string
-	Devis       string
+	ID         int
+	Agent      string
+	Ouvrage    string
+	Priorite   string
+	DatePrevue string
+	Detail     string
+	Created    string
+	Updated    string
+	Status     string
+	Evenement  string
+	Devis      string
 	// Oups        string
 	FaitPar     string
 	Commentaire string
@@ -374,7 +366,6 @@ type infoCreateForm struct {
 //
 // Dans la tableau "Infos" de la BD, source_id = FK de id (Source)
 func (app *application) infoCreate(w http.ResponseWriter, r *http.Request) {
-
 	conn := app.dbConn(r.Context())
 	defer conn.Release()
 
@@ -398,7 +389,7 @@ func (app *application) infoCreate(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	data := app.newTemplateData(r)
+	data := app.newTemplateData()
 	data.Form = infoCreateForm{}
 	data.Source = source
 
@@ -406,7 +397,6 @@ func (app *application) infoCreate(w http.ResponseWriter, r *http.Request) {
 }
 
 func (app *application) infoCreatePost(w http.ResponseWriter, r *http.Request) {
-
 	conn := app.dbConn(r.Context())
 	defer conn.Release()
 
@@ -434,7 +424,7 @@ func (app *application) infoCreatePost(w http.ResponseWriter, r *http.Request) {
 		Devis:      r.PostForm.Get("devis"),
 		DatePrevue: r.PostForm.Get("date_prevue"),
 		Status:     r.PostForm.Get("status"),
-		FaitPar:    r.PostForm.Get("fait_par"),
+		// FaitPar:    r.PostForm.Get("fait_par"),
 	}
 
 	// Certains champs ne doivent pas être vides.
@@ -457,7 +447,7 @@ func (app *application) infoCreatePost(w http.ResponseWriter, r *http.Request) {
 		"status", emptyField)
 
 	if !form.Valid() {
-		data := app.newTemplateData(r)
+		data := app.newTemplateData()
 		data.Form = form
 		app.render(w, http.StatusUnprocessableEntity,
 			"infoCreate.gotpl.html", data)
@@ -468,7 +458,6 @@ func (app *application) infoCreatePost(w http.ResponseWriter, r *http.Request) {
 	app.infos.Ouvrage = form.Ouvrage
 	app.infos.Detail = form.Detail
 	app.infos.Evenement = form.Evenement
-	// app.infos.Oups = form.Oups
 	app.infos.Devis = form.Devis
 	app.infos.DatePrevue = form.DatePrevue
 	app.infos.Status = form.Status
@@ -479,14 +468,14 @@ func (app *application) infoCreatePost(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	_, err = app.infos.Insert(sID, conn)
+	iid, err := app.infos.Insert(sID, conn)
 	if err != nil {
 		app.serverError(w, err)
 		return
 	}
 
-	http.Redirect(w, r, fmt.Sprintf("/source/%d/info/create",
-		sID), http.StatusSeeOther)
+	http.Redirect(w, r, fmt.Sprintf("/source/%d/info/view/%d",
+		sID, iid), http.StatusSeeOther)
 }
 
 // Page permettant de visualiser en détails la fiche curatif
@@ -513,7 +502,7 @@ func (app *application) infoView(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	data := app.newTemplateData(r)
+	data := app.newTemplateData()
 	data.Info = info
 
 	app.render(w, http.StatusOK, "infoView.gotpl.html", data)
@@ -521,7 +510,6 @@ func (app *application) infoView(w http.ResponseWriter, r *http.Request) {
 
 // HTML POST afin de supprimer le curatif(info)
 func (app *application) infoDeletePost(w http.ResponseWriter, r *http.Request) {
-
 	conn := app.dbConn(r.Context())
 	defer conn.Release()
 
@@ -552,7 +540,6 @@ func (app *application) infoDeletePost(w http.ResponseWriter, r *http.Request) {
 
 	http.Redirect(w, r, fmt.Sprintf("/source/view/%d", sID),
 		http.StatusSeeOther)
-
 }
 
 // Même fonctionnement que "sourceUpdate"
@@ -578,14 +565,13 @@ func (app *application) infoUpdate(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	data := app.newTemplateData(r)
+	data := app.newTemplateData()
 	data.Info = info
 
 	app.render(w, http.StatusOK, "infoUpdate.gotpl.html", data)
 }
 
 func (app *application) infoUpdatePost(w http.ResponseWriter, r *http.Request) {
-
 	conn := app.dbConn(r.Context())
 	defer conn.Release()
 
@@ -615,11 +601,11 @@ func (app *application) infoUpdatePost(w http.ResponseWriter, r *http.Request) {
 	// et on envoi ce qui a été modifié
 	// Ceci sera traîtré dans "database.go"
 	form := infoCreateForm{
-		Agent:      r.PostForm.Get("agent"),
-		Ouvrage:    r.PostForm.Get("ouvrage"),
-		Detail:     r.PostForm.Get("detail"),
-		Evenement:  r.PostForm.Get("evenement"),
-		Priorite:   r.PostForm.Get("priorite"),
+		Agent:     r.PostForm.Get("agent"),
+		Ouvrage:   r.PostForm.Get("ouvrage"),
+		Detail:    r.PostForm.Get("detail"),
+		Evenement: r.PostForm.Get("evenement"),
+		Priorite:  r.PostForm.Get("priorite"),
 		// Oups:       r.PostForm.Get("oups"),
 		Devis:      r.PostForm.Get("devis"),
 		DatePrevue: r.PostForm.Get("date_prevue"),
@@ -656,8 +642,7 @@ func (app *application) infoUpdatePost(w http.ResponseWriter, r *http.Request) {
 // en soit permet de d'ouvrir et lire des fichiers .csv
 // A l'heure actuelle les données ne sont pas importés correctement
 func (app *application) importCSV(w http.ResponseWriter, r *http.Request) {
-
-	data := app.newTemplateData(r)
+	data := app.newTemplateData()
 	app.render(w, http.StatusOK, "importCSV.gotpl.html", data)
 }
 
@@ -696,7 +681,26 @@ func (app *application) importCSVPost(w http.ResponseWriter, r *http.Request) {
 
 	// Lance la verification de l'extension et encodage du fichier,
 	// si concluant, les données seront transférées dans la BD
-	app.csvData.Import("csvFiles/" + handler.Filename)
+	app.csvData.VerifyCSV("csvFiles/"+handler.Filename, conn)
 
 	http.Redirect(w, r, "/", http.StatusSeeOther)
 }
+
+// func (app *application) pageTest(w http.ResponseWriter, r *http.Request) {
+// 	conn := app.dbConn(r.Context())
+// 	defer conn.Release()
+//
+// 	csv, err := app.csvData.Export(conn)
+// 	if err != nil {
+// 		app.serverError(w, err)
+// 	}
+//
+// 	jsonData, err := json.Marshal(csv)
+// 	if err != nil {
+// 		app.serverError(w, err)
+// 	}
+//
+// 	w.WriteHeader(http.StatusOK)
+// 	w.Header().Set("Content-Type", "application/json")
+// 	w.Write(jsonData)
+// }

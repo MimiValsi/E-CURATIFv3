@@ -16,8 +16,8 @@ func (app *application) routes() http.Handler {
 	r.Get("/", app.home)
 	r.Get("/jsonGraph", app.jsonData)
 	r.Get("/prioData", app.priorityData)
-	r.Get("/charts", app.charts)
-	r.Get("/pageTest", app.pageTest)
+	// r.Get("/charts", app.charts)
+	// r.Get("/pageTest", app.pageTest)
 	r.Get("/curatifDone", app.curatifDone)
 
 	// Pages Source
@@ -42,7 +42,7 @@ func (app *application) routes() http.Handler {
 	r.Post("/importCSV", app.importCSVPost)
 
 	// Page de test
-	r.Get("/pageTest", app.pageTest)
+	// r.Get("/pageTest", app.pageTest)
 
 	// Fichiers statiques
 	fileServer := http.FileServer(http.Dir("./ui/static/"))

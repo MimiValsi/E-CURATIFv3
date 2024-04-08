@@ -2,36 +2,22 @@ package database
 
 import (
 	"context"
-	"encoding/json"
 	"errors"
 	"strings"
 	"time"
 
-	// "github.com/jackc/pgx/v4"
-	// "github.com/jackc/pgx/v4/pgxpool"
 	"github.com/jackc/pgx/v5"
 	"github.com/jackc/pgx/v5/pgxpool"
 )
 
 type Source struct {
-	ID       int    `json:"-"`        // Source ID (PK)
-	Name     string `json:"name"`     // Source name
-	Curatifs int    `json:"curatifs"` // Info ouvrage
-	CodeGMAO string `json:"code_GMAO"`
+	ID       int    `json:"-"`                 // Source ID (PK)
+	Name     string `json:"name,omitempy"`     // Source name
+	Curatifs int    `json:"curatifs,omitempy"` // Info ouvrage
+	CodeGMAO string `json:"code_GMAO,omitempy"`
 	SID      int    `json:"-"` // Infos source_id (FK)
 
 	Created time.Time `json:"-"`
-}
-
-func (jsrc *Source) JSource() ([]byte, error) {
-	js := []*Source{}
-
-	jsonData, err := json.Marshal(js)
-	if err != nil {
-		return nil, err
-	}
-
-	return jsonData, nil
 }
 
 // fonction afin de choper tous les postes sources
@@ -62,7 +48,7 @@ SELECT s.id,
 	for rows.Next() {
 		sObj := &Source{}
 
-		err := rows.Scan(&sObj.ID, &sObj.Name, &sObj.CodeGMAO, &sObj.Curatifs)
+		err = rows.Scan(&sObj.ID, &sObj.Name, &sObj.CodeGMAO, &sObj.Curatifs)
 		if err != nil {
 			return nil, err
 		}
@@ -102,7 +88,7 @@ SELECT s.id,
 	for rows.Next() {
 		sObj := &Source{}
 
-		err := rows.Scan(&sObj.ID, &sObj.Name, &sObj.CodeGMAO, &sObj.Curatifs)
+		err = rows.Scan(&sObj.ID, &sObj.Name, &sObj.CodeGMAO, &sObj.Curatifs)
 		if err != nil {
 			return nil, err
 		}

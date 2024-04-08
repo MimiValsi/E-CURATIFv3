@@ -5,6 +5,8 @@ go 1.19
 require (
 	github.com/go-chi/chi/v5 v5.0.10
 	github.com/jackc/pgx/v5 v5.4.3
+	github.com/joho/sqltocsv v0.0.0-20210428211105-a6d6801d59df
+	github.com/lib/pq v1.10.9
 )
 
 require (

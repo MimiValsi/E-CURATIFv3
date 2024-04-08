@@ -14,6 +14,5 @@ ui/static/img/wall_1a.png
 ui/static/img/vial-virus-solid.svg
 ui/static/img/chart-simple-solid.svg
 ui/static/img/petit_icone.png
-ui/html/pages/pageTest.gotpl.html
+# ui/html/pages/pageTest.gotpl.html
 ui/html/pages/charts.gotpl.html
-database/csv.go

@@ -33,8 +33,8 @@ func (app *application) notFound(w http.ResponseWriter) {
 // Vérifie si le template dérisé existe avant d´être envoyé
 // au http.ResponseWriter
 func (app *application) render(w http.ResponseWriter, status int, page string,
-	data *templateData) {
-
+	data *templateData,
+) {
 	// Récupère le template approprié du cache
 	ts, ok := app.templateCache[page]
 	if !ok {
@@ -60,6 +60,6 @@ func (app *application) render(w http.ResponseWriter, status int, page string,
 // newTemplateData retourne un pointeur vers templateData
 // non initializé et est utilisé par toutes les fonctions dans
 // Handler. Permer une meilleur lisibilité du code
-func (app *application) newTemplateData(r *http.Request) *templateData {
+func (app *application) newTemplateData() *templateData {
 	return &templateData{}
 }

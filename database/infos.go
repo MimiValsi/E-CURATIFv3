@@ -13,13 +13,12 @@ type Info struct {
 	ID          int    `json:"-"` // primary key
 	Priorite    int    `json:"priorite,omitempty"`
 	SourceID    int    `json:"-"` // foreign key en référence au PK de source
-	Counteur    int    `json:"counteur,omitempty"`
+	Compteur    int    `json:"compteur,omitempty"`
 	Agent       string `json:"agent,omitempty"`
 	Ouvrage     string `json:"ouvrage,omitempty"`
 	DatePrevue  string `json:"date_prevue,omitempty"`
 	Detail      string `json:"detail,omitempty"`
 	Devis       string `json:"devis,omitempty"`
-	// Oups        string `json:"oups,omitempty"`
 	Status      string `json:"status,omitempty"`
 	Evenement   string `json:"evenement,omitempty"`
 	FaitPar     string `json:"fait_par,omitempty"`
@@ -54,7 +53,7 @@ SELECT i.ouvrage,
 	for rows.Next() {
 		iObj := &Info{}
 
-		err := rows.Scan(&iObj.Ouvrage, &iObj.Detail)
+		err = rows.Scan(&iObj.Ouvrage, &iObj.Detail)
 		if err != nil {
 			return nil, err
 		}
@@ -74,19 +73,22 @@ func (i *Info) Insert(id int, conn *pgxpool.Conn) (int, error) {
 	ctx := context.Background()
 	query := `
 INSERT INTO info (source_id, agent, ouvrage, detail, 
-	   	  evenement, priorite, oups, 
-       		  devis, date_prevue, status, fait_par, 
-                  commentaire, created)
+	   	  priorite, devis, date_prevue, status, 
+		  evenement, created)
 VALUES ($1,  $2,  $3,  $4, 
 	$5,  $6,  $7,  $8, 
-	$9,  $10, $11, $12, $13)
+	$9, $10)
   RETURNING id;
 `
+	if i.Created == i.ZeroTime {
+		i.Created = time.Now().UTC()
+	}
+
 	err := conn.QueryRow(ctx, query, id, i.Agent,
-		i.Ouvrage, i.Detail, i.Evenement, i.Priorite,
-		i.Oups, i.Devis, i.DatePrevue, i.Status,
-		i.FaitPar, i.Commentaire,
-		time.Now().UTC()).Scan(&i.ID)
+		i.Ouvrage, i.Detail, i.Priorite,
+		i.Devis, i.DatePrevue, i.Status,
+		i.Evenement,
+		i.Created).Scan(&i.ID)
 	if err != nil {
 		return 0, err
 	}
@@ -99,22 +101,21 @@ func (i *Info) Get(id int, conn *pgxpool.Conn) (*Info, error) {
 	ctx := context.Background()
 	query := `
 SELECT id, agent, ouvrage, priorite, 
-       detail, devis, oups, source_id, 
+       detail, devis, source_id, 
        created, updated, status, evenement, fait_par, date_prevue,
        commentaire
   FROM info
  WHERE id = $1
 `
-	var date_prevue, oups, devis, fait_par, commentaire *string
+	var date_prevue, devis, fait_par, commentaire *string
 	var updated *time.Time
 
 	iObj := &Info{}
 	err := conn.QueryRow(ctx, query, id).Scan(&iObj.ID, &iObj.Agent,
 		&iObj.Ouvrage, &iObj.Priorite, &iObj.Detail,
-		&devis, &oups, &iObj.SourceID,
+		&devis, &iObj.SourceID,
 		&iObj.Created, &updated, &iObj.Status, &iObj.Evenement,
 		&fait_par, &date_prevue, &commentaire)
-
 	if err != nil {
 		if errors.Is(err, pgx.ErrNoRows) {
 			return nil, ErrNoRecord
@@ -123,15 +124,11 @@ SELECT id, agent, ouvrage, priorite,
 		}
 	}
 
-	iObj.ZeroTime = time.Date(0001, time.January,
+	iObj.ZeroTime = time.Date(0o001, time.January,
 		1, 0, 0, 0, 0, time.UTC)
 
 	if date_prevue != nil {
 		iObj.DatePrevue = *date_prevue
-	}
-
-	if oups != nil {
-		iObj.Oups = *oups
 	}
 
 	if updated != nil {
@@ -213,14 +210,14 @@ func (i *Info) Update(id int, conn *pgxpool.Conn) error {
 	query := `
 UPDATE info
    SET agent = $1, ouvrage = $2, priorite = $3, date_prevue = $4,
-       detail = $5, devis = $6,oups = $7,
-       updated = $8, status = $9, evenement = $10, fait_par = $11,
-       commentaire = $12
- WHERE id = $13
+       detail = $5, devis = $6,
+       updated = $7, status = $8, evenement = $9, fait_par = $10,
+       commentaire = $11
+ WHERE id = $12
 `
 	_, err := conn.Exec(ctx, query, i.Agent, i.Ouvrage, i.Priorite,
 		i.DatePrevue, i.Detail, i.Devis,
-		i.Oups, time.Now().UTC(),
+		time.Now().UTC(),
 		i.Status, i.Evenement, i.FaitPar,
 		i.Commentaire, id)
 	if err != nil {
