@@ -3,6 +3,7 @@ package database
 import (
 	"context"
 	"errors"
+	"strconv"
 	"time"
 
 	"github.com/jackc/pgx/v5"
@@ -13,16 +14,12 @@ type Info struct {
 	ID          int    `json:"-"` // primary key
 	Priorite    int    `json:"priorite,omitempty"`
 	SourceID    int    `json:"-"` // foreign key en référence au PK de source
-	Compteur    int    `json:"compteur,omitempty"`
 	Agent       string `json:"agent,omitempty"`
 	Ouvrage     string `json:"ouvrage,omitempty"`
-	DatePrevue  string `json:"date_prevue,omitempty"`
+	Echeance    string `json:"echeance,omitempty"`
 	Detail      string `json:"detail,omitempty"`
-	Devis       string `json:"devis,omitempty"`
 	Status      string `json:"status,omitempty"`
 	Evenement   string `json:"evenement,omitempty"`
-	FaitPar     string `json:"fait_par,omitempty"`
-	Pilote      string `json:"pilote,omitempty"`
 	Commentaire string `json:"commentaire,omitempty"`
 
 	ZeroTime time.Time `json:"-"`
@@ -73,11 +70,9 @@ func (i *Info) Insert(id int, conn *pgxpool.Conn) (int, error) {
 	ctx := context.Background()
 	query := `
 INSERT INTO info (source_id, agent, ouvrage, detail, 
-	   	  priorite, devis, date_prevue, status, 
-		  evenement, created)
+	   	  priorite, status, evenement, created)
 VALUES ($1,  $2,  $3,  $4, 
-	$5,  $6,  $7,  $8, 
-	$9, $10)
+	$5,  $6,  $7,  $8)
   RETURNING id;
 `
 	if i.Created == i.ZeroTime {
@@ -86,8 +81,7 @@ VALUES ($1,  $2,  $3,  $4,
 
 	err := conn.QueryRow(ctx, query, id, i.Agent,
 		i.Ouvrage, i.Detail, i.Priorite,
-		i.Devis, i.DatePrevue, i.Status,
-		i.Evenement,
+		i.Echeance, i.Status, i.Evenement,
 		i.Created).Scan(&i.ID)
 	if err != nil {
 		return 0, err
@@ -100,22 +94,20 @@ VALUES ($1,  $2,  $3,  $4,
 func (i *Info) Get(id int, conn *pgxpool.Conn) (*Info, error) {
 	ctx := context.Background()
 	query := `
-SELECT id, agent, ouvrage, priorite, 
-       detail, devis, source_id, 
-       created, updated, status, evenement, fait_par, date_prevue,
+SELECT id, ouvrage, priorite, 
+       detail, source_id, 
+       created, updated, status, evenement, echeance,
        commentaire
   FROM info
  WHERE id = $1
 `
-	var date_prevue, devis, fait_par, commentaire *string
+	var ouvrage, priorite, detail, status, evenement, echeance, commentaire *string
 	var updated *time.Time
 
 	iObj := &Info{}
-	err := conn.QueryRow(ctx, query, id).Scan(&iObj.ID, &iObj.Agent,
-		&iObj.Ouvrage, &iObj.Priorite, &iObj.Detail,
-		&devis, &iObj.SourceID,
-		&iObj.Created, &updated, &iObj.Status, &iObj.Evenement,
-		&fait_par, &date_prevue, &commentaire)
+	err := conn.QueryRow(ctx, query, id).Scan(&iObj.ID, &ouvrage,
+		&priorite, &detail, &iObj.SourceID, &iObj.Created, &updated, &status,
+		&evenement, &echeance, &commentaire)
 	if err != nil {
 		if errors.Is(err, pgx.ErrNoRows) {
 			return nil, ErrNoRecord
@@ -127,20 +119,31 @@ SELECT id, agent, ouvrage, priorite,
 	iObj.ZeroTime = time.Date(0o001, time.January,
 		1, 0, 0, 0, 0, time.UTC)
 
-	if date_prevue != nil {
-		iObj.DatePrevue = *date_prevue
+	if ouvrage != nil {
+		iObj.Ouvrage = *ouvrage
+	}
+
+	if priorite != nil {
+		iObj.Priorite, _ = strconv.Atoi(*priorite)
+	}
+	if detail != nil {
+		iObj.Detail = *detail
+	}
+
+	if status != nil {
+		iObj.Status = *status
+	}
+
+	if evenement != nil {
+		iObj.Evenement = *evenement
+	}
+
+	if echeance != nil {
+		iObj.Echeance = *echeance
 	}
 
 	if updated != nil {
 		iObj.Updated = *updated
-	}
-
-	if devis != nil {
-		iObj.Devis = *devis
-	}
-
-	if fait_par != nil {
-		iObj.FaitPar = *fait_par
 	}
 
 	if commentaire != nil {
@@ -209,17 +212,13 @@ func (i *Info) Update(id int, conn *pgxpool.Conn) error {
 	ctx := context.Background()
 	query := `
 UPDATE info
-   SET agent = $1, ouvrage = $2, priorite = $3, date_prevue = $4,
-       detail = $5, devis = $6,
-       updated = $7, status = $8, evenement = $9, fait_par = $10,
-       commentaire = $11
- WHERE id = $12
+   SET agent = $1, ouvrage = $2, priorite = $3, echeance = $4,
+       detail = $5, updated = $6, status = $7, evenement = $8, commentaire = $9
+ WHERE id = $10
 `
 	_, err := conn.Exec(ctx, query, i.Agent, i.Ouvrage, i.Priorite,
-		i.DatePrevue, i.Detail, i.Devis,
-		time.Now().UTC(),
-		i.Status, i.Evenement, i.FaitPar,
-		i.Commentaire, id)
+		i.Echeance, i.Detail,
+		time.Now().UTC(), i.Status, i.Evenement, i.Commentaire, id)
 	if err != nil {
 		return err
 	}

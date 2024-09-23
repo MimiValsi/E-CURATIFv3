@@ -44,9 +44,9 @@
     <!-- Infos table -->
     {{ range .Infos }}
 
-    {{ $att := eq .Status "en attente" }}
-    {{ $aff := eq .Status "affecté" }}
-    {{ $res := eq .Status "résolu" }}
+    {{ $aRealiser := eq .Status "A réaliser" }}
+    {{ $enCours := eq .Status "En cours" }}
+    {{ $res := eq .Status "Réalisée" }}
     {{ $arch := eq .Status "archivé" }}
 
     <tr>
@@ -55,11 +55,11 @@
       <!-- <td class="centerAlign">{{ humanDate .Created }}</td> -->
       <td class="center-text">{{ .Priorite }}</td>
 
-      {{ if $att }}
+      {{ if $aRealiser }}
       <td class="right-text statusWait">{{ .Status }}</td>
       {{ end }}
 
-      {{ if $aff }}
+      {{ if $enCours }}
       <td class="right-text statusAffected">{{ .Status }}</td>
       {{ end }}
 

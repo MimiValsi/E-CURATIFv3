@@ -26,10 +26,12 @@
 {{ define "main" }}
 {{ with .Info }}
 
-{{ $att := eq .Status "en attente" }}
-{{ $aff := eq .Status "affecté" }}
-{{ $res := eq .Status "résolu"}}
-{{ $arch := eq .Status "archivé"}}
+{{ $aRealiser := eq .Status "A réaliser" }}
+{{ $enCours := eq .Status "En Cours" }}
+{{ $rese := eq .Status "Réalisée" }}
+{{ $rese := eq .Status "Réalisé"}}
+{{ $arche := eq .Status "archivée" }}
+{{ $arch := eq .Status "archivé" }}
 
 <div id="srcName">
   <table>
@@ -37,22 +39,22 @@
       <th><strong>{{ .Ouvrage }}</strong></th>
 
       <!-- Status Colors -->
-      {{ if $att }}
+      {{ if $aRealiser }}
       <th colspan="2" id="statusWait" class="statusWait">
         <strong>Status: </strong>{{ .Status }}</th>
       {{ end }}
 
-      {{ if $aff }}
+      {{ if $enCours }}
       <th colspan="2" id="statusAffected" class="statusAffected">
         <strong>Status: </strong>{{ .Status }}</th>
       {{ end }}
 
-      {{ if $res }}
+      {{ if $rese }}
       <th colspan="2" id="statusDone" class="statusDone">
         <strong>Status: </strong>{{ .Status }}</th>
       {{ end }}
 
-      {{ if $arch }}
+      {{ if $arche }}
       <th colspan="2" id="statusArchived" class="statusArchived">
         <strong>Status: </strong>{{ .Status }}</th>
       {{ end }}
@@ -62,16 +64,6 @@
     <!-- </table> -->
   <!-- <table class="infoData"> -->
     <tr>
-      <th>Agent</th>
-      <th></th>
-      <th class="right-text">Réparé par</th>
-    </tr>
-    <tr>
-      <td>{{ .Agent }}</td>
-      <td></td>
-      <td class="right-text">{{ .FaitPar }}</td>
-    </tr>
-    <tr>
       <th class="center-text" colspan="3">Détail</th>
     </tr>
     <tr>
@@ -79,8 +71,8 @@
     </tr>
     <tr class="infoHeader">
       <th>Evénement</th>
-      <th colspan="2" class="right-text">Priorité</th>
-      <!-- <th class="right-text">OUPS</th> -->
+      <th class="center-text">Priorité</th>
+      <th class="right-text">Echéance</th>
     </tr>
     <tr>
       {{ if .Evenement }}
@@ -89,28 +81,13 @@
       <td>-</td>
       {{ end }}
 
-      <td></td>
+      <td class="center-text">P{{ .Priorite }}</td>
 
-      <td class="right-text">{{ .Priorite }}</td>
-
-    </tr>
-    <tr>
-      <th>Devis</th>
-      <th colspan="2" class="right-text">Date de Prévue</th>
-    </tr>
-    <tr>
-      {{ if .Devis }}
-      <td>{{ .Devis }}</td>
+      {{ if .Echeance }}
+      <td class="right-text">{{ .Echeance }}</td>
       {{ else }}
-      <td>-</td>
+      <td class="right-text">Pas de date de prévue</td>
       {{ end }}
-
-      {{ if .DatePrevue }}
-      <td colspan="2" class="right-text">{{ .DatePrevue }}</td>
-      {{ else }}
-      <td colspan="2" class="right-text">Pas de date de prévue</td>
-      {{ end }}
-    </tr>
 
     <tr>
       <th colspan="3" class="center-text">Commentaire</th>
@@ -144,8 +121,4 @@
   </table>
 </div>
 {{ end }}
-
-
-
-
 {{ end }}

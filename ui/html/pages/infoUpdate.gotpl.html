@@ -21,29 +21,10 @@
     <table>
       <tr>
         <th>
-          Demandeur<span style="color: red">*</span>
-        </th>
-        <th colspan="2" class="right-text">Réparé par</th>
-      </tr>
-
-      <tr>
-        <td>
-          <input value="{{ .Info.Agent }}" class="input"
-            type="text" name="agent" autofocus required>
-        </td>
-        <td></td>
-        <td>
-          <input value="{{ .Info.FaitPar }}"
-            class="input" type="text" name="fait_par">
-        </td>
-      </tr>
-
-      <tr>
-        <th>
-          Ouvrage<span style="color: red">*</span>
+          Ouvrage
         </th>
         <th colspan="2" class="right-text">
-          Détail<span style="color: red">*</span>
+          Détail
         </th>
       </tr>
 
@@ -60,13 +41,9 @@
       </tr>
 
       <tr>
-        <th>
-          Evénement<span style="color: red">*</span>
-        </th>
-        <th colspan="2" class="right-text">
-          Priorité<span style="color: red">*</span>
-        </th>
-        <!-- <th class="right-text">OUPS</th> -->
+        <th class="left-text">Evénement</th>
+        <th class="center-text">Priorité</th>
+        <th class="right-text">Echéance</th>
       </tr>
 
       <tr>
@@ -74,33 +51,22 @@
           <input class="input" value="{{ .Info.Evenement }}"
             type="text" name="evenement" required>
         </td>
-        <td></td>
         <td>
           <input class="input" value="{{ .Info.Priorite }}"
             type="text" name="priorite" required>
         </td>
-        <!-- <td> -->
-        <!--   <input class="input" value="{{/* .Info.Oups */}}" -->
-        <!--     type="text" name="oups"> -->
-        <!-- </td> -->
-      </tr>
-
-      <tr>
-        <th class="center-text">Devis</th>
-        <th colspan="2" class="right-text">Date de Prévue</th>
-      </tr>
-
-      <tr>
-        <td>
-          <input class="input" value="{{ .Info.Devis }}"
-            type="text" name="devis">
-        </td>
-        <td></td>
         <td>
           <input class="input" placeholder="jj/mm/aaaa"
-            value="{{ .Info.DatePrevue }}"
-            type="text" name="data_prevue">
+          value="{{ .Info.Echeance }}"
+          type="text" name="echeance">
         </td>
+      </tr>
+
+      <tr>
+      </tr>
+
+      <tr>
+        <td></td>
       </tr>
 
       <tr>
@@ -112,7 +78,7 @@
           .Info.Commentaire }}</textarea>
       <tr>
         <th colspan="3">
-          <label>Status<span style="color: red">*</span></label>
+          <label>Status</span></label>
         </th>
       </tr>
 
@@ -120,24 +86,24 @@
         <td colspan="3" class="control">
           <label class="radio">
             <input type="radio" name="status"
-              value="en attente" checked>
-              en attente
+              value="A réaliser" checked>
+              A réaliser
           </label>
 
           <label class="radio">
             <input type="radio" name="status"
-              value="affecté">
-              affecté
+              value="En cours">
+              En cours
           </label>
           <label class="radio">
             <input type="radio" name="status"
-              value="résolu">
-              résolu
+              value="Réalisée">
+              Réalisée
           </label>
           <label class="radio">
             <input type="radio" name="status"
-              value="archivé">
-              archivé
+              value="archivée">
+              archivée
           </label>
         </td>
       </tr>
@@ -145,8 +111,6 @@
       <th id="btnpad" colspan="3">
         <button type="submit" class="button is-primary is-light is-medium blockmargin">Soumettre</button>
       </th>
-
-      <span style="color: red">*</span>Infos obligatoires
     </table>
   </form>
 </div>

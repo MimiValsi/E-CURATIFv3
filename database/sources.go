@@ -16,8 +16,6 @@ type Source struct {
 	Curatifs int    `json:"curatifs,omitempy"` // Info ouvrage
 	CodeGMAO string `json:"code_GMAO,omitempy"`
 	SID      int    `json:"-"` // Infos source_id (FK)
-
-	Created time.Time `json:"-"`
 }
 
 // fonction afin de choper tous les postes sources
@@ -107,13 +105,12 @@ SELECT s.id,
 func (src *Source) Get(id int, conn *pgxpool.Conn) (*Source, error) {
 	ctx := context.Background()
 	query := `
-SELECT id, name, created
+SELECT id, name
   FROM source
  WHERE id = $1
 `
 	sObj := &Source{}
-	err := conn.QueryRow(ctx, query, id).Scan(&sObj.ID, &sObj.Name,
-		&sObj.Created)
+	err := conn.QueryRow(ctx, query, id).Scan(&sObj.ID, &sObj.Name)
 	if err != nil {
 		if errors.Is(err, pgx.ErrNoRows) {
 			return nil, ErrNoRecord
@@ -129,8 +126,8 @@ SELECT id, name, created
 func (src *Source) Insert(name string, codeGmao string, conn *pgxpool.Conn) (int, error) {
 	ctx := context.Background()
 	query := `
-INSERT INTO source (name, code_gmao, created)
-VALUES ($1, $2, $3)
+INSERT INTO source (name, code_gmao)
+VALUES ($1, $2)
   RETURNING id
 `
 	tmp := strings.ToUpper(codeGmao)

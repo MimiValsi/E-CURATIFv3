@@ -343,17 +343,17 @@ func (app *application) sourceUpdatePost(w http.ResponseWriter, r *http.Request)
 //
 
 type infoCreateForm struct {
-	ID         int
-	Agent      string
-	Ouvrage    string
-	Priorite   string
-	DatePrevue string
-	Detail     string
-	Created    string
-	Updated    string
-	Status     string
-	Evenement  string
-	Devis      string
+	ID        int
+	Agent     string
+	Ouvrage   string
+	Priorite  string
+	Echeance  string
+	Detail    string
+	Created   string
+	Updated   string
+	Status    string
+	Evenement string
+	Devis     string
 	// Oups        string
 	FaitPar     string
 	Commentaire string
@@ -416,14 +416,14 @@ func (app *application) infoCreatePost(w http.ResponseWriter, r *http.Request) {
 	// Les données récupérés depuis la page HTML sont envoyées
 	// vers la BD
 	form := infoCreateForm{
-		Agent:      r.PostForm.Get("agent"),
-		Ouvrage:    r.PostForm.Get("ouvrage"),
-		Detail:     r.PostForm.Get("detail"),
-		Evenement:  r.PostForm.Get("evenement"),
-		Priorite:   r.PostForm.Get("priorite"),
-		Devis:      r.PostForm.Get("devis"),
-		DatePrevue: r.PostForm.Get("date_prevue"),
-		Status:     r.PostForm.Get("status"),
+		Agent:     r.PostForm.Get("agent"),
+		Ouvrage:   r.PostForm.Get("ouvrage"),
+		Detail:    r.PostForm.Get("detail"),
+		Evenement: r.PostForm.Get("evenement"),
+		Priorite:  r.PostForm.Get("priorite"),
+		Devis:     r.PostForm.Get("devis"),
+		Echeance:  r.PostForm.Get("echeance"),
+		Status:    r.PostForm.Get("status"),
 		// FaitPar:    r.PostForm.Get("fait_par"),
 	}
 
@@ -458,10 +458,8 @@ func (app *application) infoCreatePost(w http.ResponseWriter, r *http.Request) {
 	app.infos.Ouvrage = form.Ouvrage
 	app.infos.Detail = form.Detail
 	app.infos.Evenement = form.Evenement
-	app.infos.Devis = form.Devis
-	app.infos.DatePrevue = form.DatePrevue
+	app.infos.Echeance = form.Echeance
 	app.infos.Status = form.Status
-	app.infos.FaitPar = form.FaitPar
 	app.infos.Priorite, err = strconv.Atoi(form.Priorite)
 	if err != nil {
 		app.notFound(w)
@@ -606,22 +604,16 @@ func (app *application) infoUpdatePost(w http.ResponseWriter, r *http.Request) {
 		Detail:    r.PostForm.Get("detail"),
 		Evenement: r.PostForm.Get("evenement"),
 		Priorite:  r.PostForm.Get("priorite"),
-		// Oups:       r.PostForm.Get("oups"),
-		Devis:      r.PostForm.Get("devis"),
-		DatePrevue: r.PostForm.Get("date_prevue"),
-		Status:     r.PostForm.Get("status"),
-		FaitPar:    r.PostForm.Get("fait_par"),
+		Echeance:  r.PostForm.Get("echeance"),
+		Status:    r.PostForm.Get("status"),
 	}
 
 	app.infos.Agent = form.Agent
 	app.infos.Ouvrage = form.Ouvrage
 	app.infos.Detail = form.Detail
 	app.infos.Evenement = form.Evenement
-	// app.infos.Oups = form.Oups
-	app.infos.Devis = form.Devis
-	app.infos.DatePrevue = form.DatePrevue
+	app.infos.Echeance = form.Echeance
 	app.infos.Status = form.Status
-	app.infos.FaitPar = form.FaitPar
 	app.infos.Priorite, err = strconv.Atoi(form.Priorite)
 	if err != nil {
 		app.notFound(w)

@@ -5,7 +5,7 @@ function searchStatus() {
   input = document.getElementById("searchStatus");
   filter = input.value.toUpperCase(); // It simplifies the research
   table = document.getElementById("myTable");
-  tr = table.getElementsByTagName("tr"); // Fetch every <tr> inside table
+    tr = table.getElementsByTagName("tr"); // Fetch every <tr> inside table
 
   /* Inside "sourceView" <table id="myTable"> there's 2 <tr>
    * tr[1] contains 2 <td>. We're going to look inside td[1]

@@ -8,7 +8,7 @@
     </a>
   </div>
   <div>
-    <!-- <a href="/source/view/{{/* .Source.ID */}}"> -->
+    <a href="/source/view/{{/* .Source.ID */}}">
       <img class="iconeWidth" src="/static/img/icone_fleche.png">
     </a>
   </div>
@@ -18,86 +18,49 @@
 {{ define "main" }}
 <div id="srcName">
 
-  <div class="center-text">
-    <span style="color: red">*</span>Infos obligatoires
-  </div>
-
   <form method="POST" name="infoInpt">
     <table>
       <tr>
-        <th>
-          Pilote<span style="color: red">*</span>
-        </th>
-        <th colspan="2" class="right-text">Action ajouté le</th>
+        <th class="center-text">Ouvrage</th>
+        <th></th>
+        <th class="center-text">Date de création</th>
       </tr>
       <tr>
-        <td>
-          <input placeholder="..." class="input" type="text"
-                 name="agent" id="agent" autofocus required>
+        <td colspan="2">
+            <input placeholder="..." class="input" type="text" name="ouvrage" id="ouvrage">
         </td>
-        <td></td>
         <td>
-          <input placeholder="..." class="input" type="text"
-                 name="created">
+          <input placeholder="..." class="input" type="text" name="created">
         </td>
       </tr>
       <tr>
-        <th>
-          Ouvrage<span style="color: red">*</span>
-        </th>
-        <th colspan="2" class="center-text">
-          Action<span style="color: red">*</span>
-        </th>
+        <th class="center-text">Evénement</th>
+        <th colspan="2" class="center-text">Détail</th>
       </tr>
       <tr>
         <td>
-          <div>
-            <input placeholder="..." class="input" type="text"
-                   name="ouvrage" id="ouvrage" required>
-          </div>
+          <textarea class="textarea" name="evenement" id="evenement" placeholder="..."></textarea>
         </td>
         <td colspan="2">
-          <textarea class="textarea" name="evenement" id="evenement" placeholder="..." required></textarea>
-          <textarea class="textarea" name="detail" id="detail" placeholder="..." required></textarea>
+          <textarea class="textarea" name="detail" id="detail" placeholder="..." ></textarea>
         </td>
       </tr>
       <tr>
-        <th>
-          Entité<span style="color: red">*</span>
-        </th>
-        <th colspan="2" class="right-text">
-          Priorité<span style="color: red">*</span>
-        </th>
-        <!-- <th class="right-text">OUPS</th> -->
+        <th class="center-text">Entité</th>
+        <th class="center-text">Priorité</th>
+        <th class="center-text">Echéance</th>
       </tr>
       <tr>
         <td>
           <input placeholder="..." class="input" type="text"
-                 name="entite" id="entite" required>
+                 name="entite" id="entite" >
         </td>
-        <td></td>
         <td>
           <input placeholder="..." class="input" type="text"
-                 name="priorite" id="priorite" required>
+                 name="priorite" id="priorite" >
         </td>
-        <!-- <td> -->
-        <!--   <input placeholder="..." class="input" type="text" -->
-        <!--          name="oups"> -->
-        <!-- </td> -->
-      </tr>
-      <tr>
-        <th>Devis</th>
-        <th colspan="2" class="right-text">Date de Prévue</th>
-      </tr>
-      <tr>
         <td>
-          <input placeholder="..." class="input" type="text"
-                 name="devis">
-        </td>
-        <td></td>
-        <td>
-          <input placeholder="..." class="input" type="text"
-                 name="date_prevue">
+          <input placeholder="..." class="input" type="text" name="echeance">
         </td>
       </tr>
       <tr>
@@ -109,8 +72,8 @@
         </td>
       </tr>
       <tr>
-        <th colspan="3">
-          <label>Etat<span style="color: red">*</span></label>
+        <th class="center-text" colspan="3">
+          <label>Etat</label>
         </th>
       </tr>
       <tr>
@@ -133,7 +96,7 @@
           </label>
           <label class="radio">
             <input type="radio" name="status"
-                   value="archivé">
+                   value="archivée">
             archivé
           </label>
         </td>
