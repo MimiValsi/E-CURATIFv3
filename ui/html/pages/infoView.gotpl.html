@@ -27,35 +27,34 @@
 {{ with .Info }}
 
 {{ $aRealiser := eq .Status "A réaliser" }}
-{{ $enCours := eq .Status "En Cours" }}
+{{ $enCours := eq .Status "En cours" }}
 {{ $rese := eq .Status "Réalisée" }}
-{{ $rese := eq .Status "Réalisé"}}
-{{ $arche := eq .Status "archivée" }}
-{{ $arch := eq .Status "archivé" }}
+{{ $arche := eq .Status "Archivée" }}
 
 <div id="srcName">
   <table>
     <tr>
       <th><strong>{{ .Ouvrage }}</strong></th>
+      <th></th>
 
       <!-- Status Colors -->
       {{ if $aRealiser }}
-      <th colspan="2" id="statusWait" class="statusWait">
+      <th id="statusWait" class="statusWait">
         <strong>Status: </strong>{{ .Status }}</th>
       {{ end }}
 
       {{ if $enCours }}
-      <th colspan="2" id="statusAffected" class="statusAffected">
+      <th id="statusAffected" class="statusAffected">
         <strong>Status: </strong>{{ .Status }}</th>
       {{ end }}
 
       {{ if $rese }}
-      <th colspan="2" id="statusDone" class="statusDone">
+      <th id="statusDone" class="statusDone">
         <strong>Status: </strong>{{ .Status }}</th>
       {{ end }}
 
       {{ if $arche }}
-      <th colspan="2" id="statusArchived" class="statusArchived">
+      <th id="statusArchived" class="statusArchived">
         <strong>Status: </strong>{{ .Status }}</th>
       {{ end }}
       <!-- End Status Colors -->
@@ -72,7 +71,7 @@
     <tr class="infoHeader">
       <th>Evénement</th>
       <th class="center-text">Priorité</th>
-      <th class="right-text">Echéance</th>
+      <th class="center-text">Echéance</th>
     </tr>
     <tr>
       {{ if .Evenement }}
@@ -84,9 +83,9 @@
       <td class="center-text">P{{ .Priorite }}</td>
 
       {{ if .Echeance }}
-      <td class="right-text">{{ .Echeance }}</td>
+      <td class="center-text">{{ .Echeance }}</td>
       {{ else }}
-      <td class="right-text">Pas de date de prévue</td>
+      <td class="center-text">Pas de date de prévue</td>
       {{ end }}
 
     <tr>
@@ -112,7 +111,7 @@
         <time>Créé le: {{ humanDate .Created }}</time>
       </td>
         <!-- TODO: Find a better solution -->
-      <td class="right-text">
+      <td class="center-text">
         <time>
           Mis à jour le: {{ humanDate .Updated }}</time>
         {{ end }}

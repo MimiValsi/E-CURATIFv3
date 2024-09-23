@@ -86,7 +86,7 @@ func (data *CSVData) sendData(s string, conn *pgxpool.Conn) {
 	data.ZeroTime = time.Date(0o001, time.January,
 		1, 0, 0, 0, 0, time.UTC)
 
-	log.Println("Données en cours de transfert")
+	log.Println("Transfert des données en cours")
 
 	dateTmp := ""
 	for i, j := 1, 0; i < len(lines); i++ {
