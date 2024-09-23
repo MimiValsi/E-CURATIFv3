@@ -1,19 +1,19 @@
 package main
 
 import (
+	"E-CURATIFv3/database"
+	"E-CURATIFv3/internal/validator"
+
 	"context"
 	"encoding/json"
 	"errors"
 	"fmt"
 	"io"
+	"log"
 	"net/http"
 	"os"
 	"strconv"
-
-	// "time"
-
-	"E-CURATIFv3/database"
-	"E-CURATIFv3/internal/validator"
+	"time"
 
 	// package pour les routers
 	"github.com/go-chi/chi/v5"
@@ -343,20 +343,18 @@ func (app *application) sourceUpdatePost(w http.ResponseWriter, r *http.Request)
 //
 
 type infoCreateForm struct {
-	ID        int
-	Agent     string
-	Ouvrage   string
-	Priorite  string
-	Echeance  string
-	Detail    string
-	Created   string
-	Updated   string
-	Status    string
-	Evenement string
-	Devis     string
-	// Oups        string
-	FaitPar     string
+	ID          int
+	Agent       string
+	Ouvrage     string
+	Priorite    string
+	Echeance    string
+	Detail      string
+	Created     string
+	Updated     string
+	Status      string
+	Evenement   string
 	Commentaire string
+	Entite      string
 
 	validator.Validator
 }
@@ -416,54 +414,66 @@ func (app *application) infoCreatePost(w http.ResponseWriter, r *http.Request) {
 	// Les données récupérés depuis la page HTML sont envoyées
 	// vers la BD
 	form := infoCreateForm{
-		Agent:     r.PostForm.Get("agent"),
-		Ouvrage:   r.PostForm.Get("ouvrage"),
-		Detail:    r.PostForm.Get("detail"),
-		Evenement: r.PostForm.Get("evenement"),
-		Priorite:  r.PostForm.Get("priorite"),
-		Devis:     r.PostForm.Get("devis"),
-		Echeance:  r.PostForm.Get("echeance"),
-		Status:    r.PostForm.Get("status"),
-		// FaitPar:    r.PostForm.Get("fait_par"),
+		Ouvrage:     r.PostForm.Get("ouvrage"),
+		Detail:      r.PostForm.Get("detail"),
+		Evenement:   r.PostForm.Get("evenement"),
+		Priorite:    r.PostForm.Get("priorite"),
+		Echeance:    r.PostForm.Get("echeance"),
+		Status:      r.PostForm.Get("status"),
+		Entite:      r.PostForm.Get("entite"),
+		Commentaire: r.PostForm.Get("commentaire"),
+		Created:     r.PostForm.Get("created"),
 	}
 
 	// Certains champs ne doivent pas être vides.
 	// Afin de ne pas recevoir une erreur venant de la BD
 	// On la vérifie en avance.
 	// Ceci sera fait en JS en amont en plus
-	emptyField := "Ce champ ne doit pas être vide"
+	// emptyField := "Ce champ ne doit pas être vide"
 
-	form.CheckField(validator.NotBlank(form.Agent),
-		"agent", emptyField)
-	form.CheckField(validator.NotBlank(form.Ouvrage),
-		"ouvrage", emptyField)
-	form.CheckField(validator.NotBlank(form.Detail),
-		"detail", emptyField)
-	form.CheckField(validator.NotBlank(form.Evenement),
-		"evenement", emptyField)
-	form.CheckField(validator.NotBlank(form.Priorite),
-		"priorite", emptyField)
-	form.CheckField(validator.NotBlank(form.Status),
-		"status", emptyField)
+	// form.CheckField(validator.NotBlank(form.Agent),
+	// 	"agent", emptyField)
+	// form.CheckField(validator.NotBlank(form.Ouvrage),
+	// 	"ouvrage", emptyField)
+	// form.CheckField(validator.NotBlank(form.Detail),
+	// 	"detail", emptyField)
+	// form.CheckField(validator.NotBlank(form.Evenement),
+	// 	"evenement", emptyField)
+	// form.CheckField(validator.NotBlank(form.Priorite),
+	// 	"priorite", emptyField)
+	// form.CheckField(validator.NotBlank(form.Status),
+	// 	"status", emptyField)
 
-	if !form.Valid() {
-		data := app.newTemplateData()
-		data.Form = form
-		app.render(w, http.StatusUnprocessableEntity,
-			"infoCreate.gotpl.html", data)
-		return
-	}
+	// if !form.Valid() {
+	// 	data := app.newTemplateData()
+	// 	data.Form = form
+	// 	app.render(w, http.StatusUnprocessableEntity,
+	// 		"infoCreate.gotpl.html", data)
+	// 	return
+	// }
 
-	app.infos.Agent = form.Agent
 	app.infos.Ouvrage = form.Ouvrage
 	app.infos.Detail = form.Detail
 	app.infos.Evenement = form.Evenement
-	app.infos.Echeance = form.Echeance
-	app.infos.Status = form.Status
 	app.infos.Priorite, err = strconv.Atoi(form.Priorite)
 	if err != nil {
 		app.notFound(w)
 		return
+	}
+	app.infos.Echeance = form.Echeance
+	app.infos.Status = form.Status
+	app.infos.Entite = form.Entite
+	app.infos.Commentaire = form.Commentaire
+
+	if form.Created == "" {
+		app.infos.Created = time.Now().UTC()
+	} else {
+		app.infos.Created, err = time.Parse("02/01/2006", form.Created)
+		if err != nil {
+			log.Printf("Format de date invalide: %v", form.Created)
+			log.Println(err)
+			return
+		}
 	}
 
 	iid, err := app.infos.Insert(sID, conn)

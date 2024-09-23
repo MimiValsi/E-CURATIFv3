@@ -54,7 +54,7 @@
       },
       columns: [
         ["Curatifs en cours", ...nbCuratifs],
-        ["Curatifs résolus", ...nbCuratifsDone],
+        ["Curatifs réalisées", ...nbCuratifsDone],
       ],
       type: "bar",
     },

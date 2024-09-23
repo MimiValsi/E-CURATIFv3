@@ -21,6 +21,7 @@ type Info struct {
 	Status      string `json:"status,omitempty"`
 	Evenement   string `json:"evenement,omitempty"`
 	Commentaire string `json:"commentaire,omitempty"`
+	Entite      string `json:"entite,omitempty"`
 
 	ZeroTime time.Time `json:"-"`
 	Created  time.Time `json:"-"`
@@ -32,11 +33,11 @@ func (i *Info) PriorityInfos(conn *pgxpool.Conn) ([]*Info, error) {
 	ctx := context.Background()
 
 	query := `
-SELECT i.ouvrage, 
-       i.detail 
+SELECT i.ouvrage,
+       i.detail
   FROM info AS i
- WHERE status <> 'résolu' AND 
-       status <> 'archivé'
+ WHERE status <> 'Réalisée' AND 
+       status <> 'Archivée'
 `
 
 	rows, err := conn.Query(ctx, query)
@@ -69,20 +70,17 @@ SELECT i.ouvrage,
 func (i *Info) Insert(id int, conn *pgxpool.Conn) (int, error) {
 	ctx := context.Background()
 	query := `
-INSERT INTO info (source_id, agent, ouvrage, detail, 
-	   	  priorite, status, evenement, created)
-VALUES ($1,  $2,  $3,  $4, 
-	$5,  $6,  $7,  $8)
+INSERT INTO info (source_id, ouvrage, detail, 
+		  evenement, priorite, echeance, status,
+		  created, entite, commentaire)
+VALUES ($1,  $2,  $3,  $4, $5,
+	$6,  $7,  $8, $9, $10)
   RETURNING id;
 `
-	if i.Created == i.ZeroTime {
-		i.Created = time.Now().UTC()
-	}
-
-	err := conn.QueryRow(ctx, query, id, i.Agent,
-		i.Ouvrage, i.Detail, i.Priorite,
-		i.Echeance, i.Status, i.Evenement,
-		i.Created).Scan(&i.ID)
+	err := conn.QueryRow(ctx, query, id,
+		i.Ouvrage, i.Detail, i.Evenement, i.Priorite,
+		i.Echeance, i.Status, i.Created,
+		i.Entite, i.Commentaire).Scan(&i.ID)
 	if err != nil {
 		return 0, err
 	}
@@ -146,6 +144,10 @@ SELECT id, ouvrage, priorite,
 		iObj.Updated = *updated
 	}
 
+	// if created != nil {
+	// 	iObj.Updated = *updated
+	// }
+
 	if commentaire != nil {
 		iObj.Commentaire = *commentaire
 	}
@@ -162,7 +164,7 @@ SELECT id, ouvrage, created,
        status, source_id, priorite
   FROM info
  WHERE source_id = $1 AND
- status <> 'archivé'
+ status <> 'Archivé' AND status <> 'Réalisée'
  ORDER BY priorite ASC
 `
 	rows, err := conn.Query(ctx, query, id)
@@ -212,13 +214,13 @@ func (i *Info) Update(id int, conn *pgxpool.Conn) error {
 	ctx := context.Background()
 	query := `
 UPDATE info
-   SET agent = $1, ouvrage = $2, priorite = $3, echeance = $4,
-       detail = $5, updated = $6, status = $7, evenement = $8, commentaire = $9
+   SET ouvrage = $1, detail = $2, evenement = $3, priorite = $4, 
+     echeance = $5, status = $6, updated = $7, entite = $8, commentaire = $9
  WHERE id = $10
 `
-	_, err := conn.Exec(ctx, query, i.Agent, i.Ouvrage, i.Priorite,
-		i.Echeance, i.Detail,
-		time.Now().UTC(), i.Status, i.Evenement, i.Commentaire, id)
+	_, err := conn.Exec(ctx, query, i.Ouvrage, i.Detail, i.Evenement,
+		i.Priorite, i.Echeance, i.Status, time.Now().UTC(),
+		i.Entite, i.Commentaire, id)
 	if err != nil {
 		return err
 	}

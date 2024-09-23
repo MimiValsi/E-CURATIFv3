@@ -4,22 +4,14 @@ import (
 	"context"
 	"encoding/csv"
 	"errors"
-	"fmt"
-	"time"
-
 	"github.com/jackc/pgx/v5"
 	"github.com/jackc/pgx/v5/pgxpool"
 	"golang.org/x/text/encoding/charmap"
-
 	"log"
 	"os"
-
-	// "os/exec"
-	// "bufio"
-	// "golang.org/x/text/encoding/charmap"
-	// "golang.org/x/text/transform"
 	"strconv"
 	"strings"
+	"time"
 )
 
 type CSVData struct {
@@ -94,6 +86,8 @@ func (data *CSVData) sendData(s string, conn *pgxpool.Conn) {
 	data.ZeroTime = time.Date(0o001, time.January,
 		1, 0, 0, 0, 0, time.UTC)
 
+	log.Println("Données en cours de transfert")
+
 	dateTmp := ""
 	for i, j := 1, 0; i < len(lines); i++ {
 		line := lines[i]
@@ -106,6 +100,11 @@ func (data *CSVData) sendData(s string, conn *pgxpool.Conn) {
 			data.Created = time.Now().UTC()
 		} else {
 			data.Created, err = time.Parse("02/01/2006", dateTmp)
+			if err != nil {
+				log.Printf("Format de date invalide: %v", data.Created)
+				log.Println(err)
+				return
+			}
 		}
 
 		data.Ouvrage = line[j+3]
@@ -136,9 +135,10 @@ INSERT INTO info
 		data.Echeance, data.Entite)
 	if err != nil {
 		data.ErrorLog.Println(err)
-	} else {
-		data.InfoLog.Println("data sent")
 	}
+	// } else {
+	// 	data.InfoLog.Println("data sent")
+	// }
 }
 
 func (data *CSVData) SourceNumber(s string, conn *pgxpool.Conn) (int, error) {
@@ -159,7 +159,7 @@ SELECT id
 		}
 	}
 
-	fmt.Printf("%v sourceNumber: id > %v \n\n", s, id)
+	// fmt.Printf("%v sourceNumber: id > %v \n\n", s, id)
 
 	return id, nil
 }

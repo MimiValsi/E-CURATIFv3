@@ -4,7 +4,7 @@ import (
 	"context"
 	"errors"
 	"strings"
-	"time"
+	// "time"
 
 	"github.com/jackc/pgx/v5"
 	"github.com/jackc/pgx/v5/pgxpool"
@@ -26,7 +26,7 @@ func (src *Source) MenuSource(conn *pgxpool.Conn) ([]*Source, error) {
 SELECT s.id,
        s.name,
        s.code_GMAO,
-       COUNT(i.status) FILTER (WHERE i.status <> 'archivé' AND i.status <> 'résolu')
+       COUNT(i.status) FILTER (WHERE i.status <> 'Archivés' AND i.status <> 'Réalisée')
   FROM source AS s
        LEFT JOIN info AS i 
        ON i.source_id = s.id
@@ -67,7 +67,7 @@ func (src *Source) CuratifsDone(conn *pgxpool.Conn) ([]*Source, error) {
 SELECT s.id,
        s.name,
        s.code_GMAO,
-       COUNT(i.status) FILTER (WHERE i.status = 'résolu')
+       COUNT(i.status) FILTER (WHERE i.status = 'Réalisée')
   FROM source AS s
        LEFT JOIN info AS i 
        ON i.source_id = s.id
@@ -130,9 +130,7 @@ INSERT INTO source (name, code_gmao)
 VALUES ($1, $2)
   RETURNING id
 `
-	tmp := strings.ToUpper(codeGmao)
-	err := conn.QueryRow(ctx, query, name, tmp,
-		time.Now().UTC()).Scan(&src.ID)
+	err := conn.QueryRow(ctx, query, strings.ToUpper(name), strings.ToUpper(codeGmao)).Scan(&src.ID)
 	if err != nil {
 		return 0, nil
 	}
