@@ -45,8 +45,14 @@
     {{ range .Infos }}
 
     {{ $aRealiser := eq .Status "A réaliser" }}
+    {{ $enAttente := eq .Status "en attente" }}
+
     {{ $enCours := eq .Status "En cours" }}
+    {{ $aff := eq .Status "affécté" }}
+
     {{ $res := eq .Status "Réalisée" }}
+    {{ $reso := eq .Status "résolu" }}
+
     {{ $arch := eq .Status "archivé" }}
 
     <tr>
@@ -57,13 +63,19 @@
 
       {{ if $aRealiser }}
       <td class="right-text statusWait">{{ .Status }}</td>
+      {{ else if $enAttnte}}
+      <td class="right-text statusWait">{{ .Status }}</td>
       {{ end }}
 
       {{ if $enCours }}
       <td class="right-text statusAffected">{{ .Status }}</td>
+      {{ if $aff }}
+      <td class="right-text statusAffected">{{ .Status }}</td>
       {{ end }}
 
       {{ if $res }}
+      <td class="right-text statusDone">{{ .Status }}</td>
+      {{ if $reso }}
       <td class="right-text statusDone">{{ .Status }}</td>
       {{ end }}
 
