@@ -36,6 +36,7 @@ type application struct {
 const (
 	addr    = ":3001"
 	dataURL = "postgres://ameps:pass@localhost:5432/ecuratif"
+	// dataURL = "postgres://ameps:pass@localhost:5432/test"
 )
 
 func main() {

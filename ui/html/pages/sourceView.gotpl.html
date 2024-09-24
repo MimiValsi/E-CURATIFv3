@@ -56,8 +56,13 @@
     {{ $arch := eq .Status "archivé" }}
 
     <tr>
+      {{ if .Ouvrage }}
       <td class="left-text"><a href="/source/{{ .SourceID }}/info/view/{{ .ID }}">{{ .Ouvrage }}</a></td>
       <td class="center-text">{{ .Priorite }}</td>
+      {{ else }}
+      <td class="left-text"><a href="/source/{{ .SourceID }}/info/view/{{ .ID }}">{{ .ID }}</a></td>
+      <td class="center-text">{{ .Priorite }}</td>
+      {{ end }}
 
       {{ if $aRealiser }}
       <td class="right-text statusWait">{{ .Status }}</td>
