@@ -164,7 +164,7 @@ SELECT id, ouvrage, created,
        status, source_id, priorite
   FROM info
  WHERE source_id = $1 AND
- status <> 'Archivé' AND status <> 'Réalisée'
+ status <> 'Archivé' OR status <> 'Réalisée' OR status <> 'résolu'
  ORDER BY priorite ASC
 `
 	rows, err := conn.Query(ctx, query, id)
