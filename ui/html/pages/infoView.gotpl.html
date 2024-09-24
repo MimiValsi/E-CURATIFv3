@@ -27,9 +27,16 @@
 {{ with .Info }}
 
 {{ $aRealiser := eq .Status "A réaliser" }}
+{{ $enAttente := eq .Status "en attente" }}
+
 {{ $enCours := eq .Status "En cours" }}
+{{ $aff := eq .Status "affécté" }}
+
 {{ $rese := eq .Status "Réalisée" }}
+{{ $reso := eq .Status "résolu" }}
+
 {{ $arche := eq .Status "Archivée" }}
+
 
 <div id="srcName">
   <table>
@@ -40,22 +47,38 @@
       <!-- Status Colors -->
       {{ if $aRealiser }}
       <th id="statusWait" class="statusWait">
-        <strong>Status: </strong>{{ .Status }}</th>
+        <strong>Status: </strong>{{ .Status }}
+      </th>
+      {{ else if $enAttente}}
+      <th id="statusWait" class="statusWait">
+        <strong>Status: </strong>{{ .Status }}
+      </th>
       {{ end }}
 
       {{ if $enCours }}
       <th id="statusAffected" class="statusAffected">
-        <strong>Status: </strong>{{ .Status }}</th>
+        <strong>Status: </strong>{{ .Status }}
+      </th>
+      {{ else if $aff }}
+      <th id="statusAffected" class="statusAffected">
+        <strong>Status: </strong>{{ .Status }}
+      </th>
       {{ end }}
 
       {{ if $rese }}
       <th id="statusDone" class="statusDone">
-        <strong>Status: </strong>{{ .Status }}</th>
+        <strong>Status: </strong>{{ .Status }}
+      </th>
+      {{ else if $reso }}
+      <th id="statusDone" class="statusDone">
+        <strong>Status: </strong>{{ .Status }}
+      </th>
       {{ end }}
 
       {{ if $arche }}
       <th id="statusArchived" class="statusArchived">
-        <strong>Status: </strong>{{ .Status }}</th>
+        <strong>Status: </strong>{{ .Status }}
+      </th>
       {{ end }}
       <!-- End Status Colors -->
 
