@@ -56,26 +56,24 @@
     {{ $arch := eq .Status "archivé" }}
 
     <tr>
-      <td class="left-text"><a href="/source/{{ .SourceID }}/info/view/{{ .ID }}">
-          {{ .Ouvrage }}</a></td>
-      <!-- <td class="centerAlign">{{ humanDate .Created }}</td> -->
+      <td class="left-text"><a href="/source/{{ .SourceID }}/info/view/{{ .ID }}">{{ .Ouvrage }}</a></td>
       <td class="center-text">{{ .Priorite }}</td>
 
       {{ if $aRealiser }}
       <td class="right-text statusWait">{{ .Status }}</td>
-      {{ else if $enAttnte}}
+      {{ else if $enAttente }}
       <td class="right-text statusWait">{{ .Status }}</td>
       {{ end }}
 
       {{ if $enCours }}
       <td class="right-text statusAffected">{{ .Status }}</td>
-      {{ if $aff }}
+      {{ else if $aff }}
       <td class="right-text statusAffected">{{ .Status }}</td>
       {{ end }}
 
       {{ if $res }}
       <td class="right-text statusDone">{{ .Status }}</td>
-      {{ if $reso }}
+      {{ else if $reso }}
       <td class="right-text statusDone">{{ .Status }}</td>
       {{ end }}
 
@@ -107,3 +105,4 @@
   {{ end }}
 </div>
 {{ end }}
+
