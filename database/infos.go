@@ -36,7 +36,7 @@ func (i *Info) PriorityInfos(conn *pgxpool.Conn) ([]*Info, error) {
 SELECT i.ouvrage,
        i.detail
   FROM info AS i
- WHERE status <> 'Réalisée' AND 
+ WHERE status <> 'Réalisée' AND status <> 'résolu' AND 
        status <> 'Archivée'
 `
 
