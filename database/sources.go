@@ -26,7 +26,7 @@ func (src *Source) MenuSource(conn *pgxpool.Conn) ([]*Source, error) {
 SELECT s.id,
        s.name,
        s.code_GMAO,
-       COUNT(i.status) FILTER (WHERE i.status <> 'Archivés' OR i.status <> 'Réalisée' OR i.status <> 'résolu')
+       COUNT(i.status) FILTER (WHERE i.status <> 'Archivés' AND i.status <> 'Réalisée' AND i.status <> 'résolu')
   FROM source AS s
        LEFT JOIN info AS i 
        ON i.source_id = s.id
@@ -67,7 +67,7 @@ func (src *Source) CuratifsDone(conn *pgxpool.Conn) ([]*Source, error) {
 SELECT s.id,
        s.name,
        s.code_GMAO,
-       COUNT(i.status) FILTER (WHERE i.status = 'Réalisée' OR i.status = 'résolu')
+       COUNT(i.status) FILTER (WHERE i.status = 'Réalisée' AND i.status = 'résolu')
   FROM source AS s
        LEFT JOIN info AS i 
        ON i.source_id = s.id
