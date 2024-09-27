@@ -21,27 +21,39 @@
 
   // Fetch every active 'Curatif'
   const jsData = await getJson();
-
-  let nbCuratifs = [];
-  for (let i = 0; i < jsData.length; i++) {
-    nbCuratifs.push(jsData[i].curatifs);
-  }
+  let jsonLen = jsData.length;
 
   let nomSources = [];
-  for (let i = 0; i < jsData.length; i++) {
-    nomSources.push(jsData[i].name);
-  }
-
   let codeGMAO = []
-  for (let i = 0; i < jsData.length; i++) {
-    codeGMAO.push(jsData[i].code_GMAO)
-  }
+  let aRealiser = [];
+  let enCours = [];
+  let done = [];
 
-  // Fetch only already done 'Curatif'
-  const jsDataCD = await getJsonCD();
-  let nbCuratifsDone = [];
-  for (let i = 0; i < jsDataCD.length; i++) {
-    nbCuratifsDone.push(jsDataCD[i].curatifs);
+  for (let i = 0; i < jsonLen; i++) {
+    let jec = jsData[i].en_cours;
+    let jar = jsData[i].a_realiser;
+    let jd = jsData[i].done;
+
+    nomSources.push(jsData[i].name);
+    codeGMAO.push(jsData[i].code_GMAO);
+
+    if (typeof jar == 'undefined') {
+      aRealiser.push(0);
+    } else {
+      aRealiser.push(jsData[i].a_realiser);
+    }
+
+    if (typeof jec == 'undefined') {
+      enCours.push(0);
+    } else {
+      enCours.push(jsData[i].en_cours);
+    }
+
+    if (typeof jd == 'undefined') {
+      done.push(0);
+    } else {
+      done.push(jsData[i].done);
+    }
   }
 
   var chart = bb.generate({
@@ -53,10 +65,15 @@
         data2: "Sources"
       },
       columns: [
-        ["Curatifs en cours", ...nbCuratifs],
-        ["Curatifs réalisées", ...nbCuratifsDone],
+        ["Curatifs à réaliser", ...aRealiser],
+        ["Curatifs en cours", ...enCours],
+        ["Curatifs réalisées", ...done],
       ],
       type: "bar",
+    },
+
+    color: {
+      pattern: ['#ff0000', '#0000ff', '#00ff00']
     },
 
     axis: {
