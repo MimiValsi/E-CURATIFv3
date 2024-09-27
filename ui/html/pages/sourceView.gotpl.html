@@ -3,8 +3,7 @@
 {{ define "nav" }}
 <nav id="navHome">
   <div>
-    <a href="/"><img class="iconeWidth"
-                     src="/static/img/icone_maison.png">
+    <a href="/"><img class="iconeWidth" src="/static/img/icone_maison.png">
     </a>
   </div>
   <div>
@@ -24,78 +23,82 @@
 
     {{ if .Infos }}
     <div>
-      <input class="search-info top-margin" id="searchStatus" onkeyup="searchStatus()" placeholder="Chercher des status...">
+      <input class="search-info top-margin" id="searchStatus" onkeyup="searchStatus()"
+        placeholder="Chercher des status...">
     </div>
     <div>
-    <form action="/source/{{ .Source.ID }}/info/create">
-      <button name="createInfo" class="button is-info is-light">Créer Curatif</button>
-    </form>
-  </div>
+      <form action="/source/{{ .Source.ID }}/info/create">
+        <button name="createInfo" class="button is-info is-light">Créer Curatif</button>
+      </form>
+    </div>
 
     <table id="myTable">
-    <!-- id @ "Home Page section" border-bottom -->
+      <!-- id @ "Home Page section" border-bottom -->
 
 
-    <tr>
-      <th class="left-text"><strong>Ouvrage</strong></th>
-      <th class="center-text"><strong>Priorité</strong></th>
-      <th class="right-text"><strong>Status</strong></th>
-    </tr>
-    <!-- Infos table -->
-    {{ range .Infos }}
+      <tr>
+        <th class="left-text"><strong>Ouvrage</strong></th>
+        <th class="center-text"><strong>Détail</strong></th>
+        <th class="center-text"><strong>Priorité</strong></th>
+        <th class="right-text"><strong>Status</strong></th>
+      </tr>
+      <!-- Infos table -->
+      {{ range .Infos }}
 
-    {{ $aRealiser := eq .Status "A réaliser" }}
-    {{ $enAttente := eq .Status "en attente" }}
+      {{ $aRealiser := eq .Status "A réaliser" }}
+      {{ $enAttente := eq .Status "en attente" }}
 
-    {{ $enCours := eq .Status "En cours" }}
-    {{ $aff := eq .Status "affécté" }}
+      {{ $enCours := eq .Status "En cours" }}
+      {{ $aff := eq .Status "affécté" }}
 
-    {{ $res := eq .Status "Réalisée" }}
-    {{ $reso := eq .Status "résolu" }}
+      {{ $res := eq .Status "Réalisée" }}
+      {{ $reso := eq .Status "résolu" }}
 
-    {{ $arch := eq .Status "archivé" }}
+      {{ $arch := eq .Status "archivé" }}
 
-    <tr>
-      {{ if .Ouvrage }}
-      <td class="left-text"><a href="/source/{{ .SourceID }}/info/view/{{ .ID }}">{{ .Ouvrage }}</a></td>
-      <td class="center-text">{{ .Priorite }}</td>
+      <tr>
+        {{ if .Ouvrage }}
+        <td class="left-text"><a href="/source/{{ .SourceID }}/info/view/{{ .ID }}">{{ .Ouvrage }}</a></td>
+        {{ else }}
+        <td class="left-text"><a href="/source/{{ .SourceID }}/info/view/{{ .ID }}">{{ .ID }}</a></td>
+        {{ end }}
+
+        <td class="center-text">{{ .Detail }}</td>
+
+        <td class="center-text">{{ .Priorite }}</td>
+
+        {{ if $aRealiser }}
+        <td class="right-text statusWait">{{ .Status }}</td>
+        {{ else if $enAttente }}
+        <td class="right-text statusWait">{{ .Status }}</td>
+        {{ end }}
+
+        {{ if $enCours }}
+        <td class="right-text statusAffected">{{ .Status }}</td>
+        {{ else if $aff }}
+        <td class="right-text statusAffected">{{ .Status }}</td>
+        {{ end }}
+
+        {{ if $res }}
+        <td class="right-text statusDone">{{ .Status }}</td>
+        {{ else if $reso }}
+        <td class="right-text statusDone">{{ .Status }}</td>
+        {{ end }}
+
+        {{ if $arch }}
+        <td class="right-text statusArchived">{{ .Status }}</td>
+        {{ end }}
+      </tr>
+      {{ end }}
+      <!-- End Infos table -->
       {{ else }}
-      <td class="left-text"><a href="/source/{{ .SourceID }}/info/view/{{ .ID }}">{{ .ID }}</a></td>
-      <td class="center-text">{{ .Priorite }}</td>
-      {{ end }}
+      <p>Poste Source Prope...</p>
 
-      {{ if $aRealiser }}
-      <td class="right-text statusWait">{{ .Status }}</td>
-      {{ else if $enAttente }}
-      <td class="right-text statusWait">{{ .Status }}</td>
+      <form action="/source/{{ .Source.ID }}/info/create">
+        <button name="createInfo" class="button is-info is-light">Créer Curatif</button>
+      </form>
       {{ end }}
-
-      {{ if $enCours }}
-      <td class="right-text statusAffected">{{ .Status }}</td>
-      {{ else if $aff }}
-      <td class="right-text statusAffected">{{ .Status }}</td>
-      {{ end }}
-
-      {{ if $res }}
-      <td class="right-text statusDone">{{ .Status }}</td>
-      {{ else if $reso }}
-      <td class="right-text statusDone">{{ .Status }}</td>
-      {{ end }}
-
-      {{ if $arch }}
-      <td class="right-text statusArchived">{{ .Status }}</td>
-      {{ end }}
-    </tr>
-    {{ end }}
-    <!-- End Infos table -->
-    {{ else }}
-    <p>Poste Source Prope...</p>
-
-    <form action="/source/{{ .Source.ID }}/info/create">
-      <button name="createInfo" class="button is-info is-light">Créer Curatif</button>
-    </form>
-    {{ end }}
-  </table>
+    </table>
   </div>
 
 </div>
@@ -110,4 +113,3 @@
   {{ end }}
 </div>
 {{ end }}
-
