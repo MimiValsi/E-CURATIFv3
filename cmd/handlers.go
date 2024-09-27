@@ -99,10 +99,6 @@ func (app *application) jsonData(w http.ResponseWriter, r *http.Request) {
 	w.Write(jsonGraph)
 }
 
-// func (app *application) charts(w http.ResponseWriter, r *http.Request) {
-// 	app.render(w, http.StatusOK, "charts.gotpl.html", nil)
-// }
-
 func (app *application) curatifDone(w http.ResponseWriter, r *http.Request) {
 	conn := app.dbConn(r.Context())
 	defer conn.Release()
@@ -640,9 +636,9 @@ func (app *application) infoUpdatePost(w http.ResponseWriter, r *http.Request) {
 		sID, iID), http.StatusSeeOther)
 }
 
-// Page HTML en cours de création
-// en soit permet de d'ouvrir et lire des fichiers .csv
-// A l'heure actuelle les données ne sont pas importés correctement
+// Import CSV data functionality
+// Copy the file content, check it's encoding
+// and send data to DB
 func (app *application) importCSV(w http.ResponseWriter, r *http.Request) {
 	data := app.newTemplateData()
 	app.render(w, http.StatusOK, "importCSV.gotpl.html", data)
@@ -652,10 +648,10 @@ func (app *application) importCSVPost(w http.ResponseWriter, r *http.Request) {
 	conn := app.dbConn(r.Context())
 	defer conn.Release()
 
-	// Taille max du fichier: 2MB
+	// Max file size: 2MB
 	r.ParseMultipartForm(2_000_000)
 
-	// Crée handler pour filename, size et headers
+	// Create handler for file name, size and headers
 	file, handler, err := r.FormFile("inpt")
 	if err != nil {
 		app.errorLog.Println("Error Retrieving the File")
@@ -665,7 +661,7 @@ func (app *application) importCSVPost(w http.ResponseWriter, r *http.Request) {
 
 	defer file.Close()
 
-	// Creation du fichier
+	// Create file
 	dst, err := os.Create("csvFiles/" + handler.Filename)
 	if err != nil {
 		app.errorLog.Println(w, err.Error(),
@@ -674,35 +670,16 @@ func (app *application) importCSVPost(w http.ResponseWriter, r *http.Request) {
 	}
 	defer dst.Close()
 
-	// Copie le fichier transféré dans le système
+	// Copy transfered file to the system
 	if _, err := io.Copy(dst, file); err != nil {
 		app.errorLog.Println(w, err.Error(),
 			http.StatusInternalServerError)
 		return
 	}
 
-	// Lance la verification de l'extension et encodage du fichier,
-	// si concluant, les données seront transférées dans la BD
+	// Start the file encoding verification and if all good
+	// send data to DB
 	app.csvData.VerifyCSV("csvFiles/"+handler.Filename, conn)
 
 	http.Redirect(w, r, "/", http.StatusSeeOther)
 }
-
-// func (app *application) pageTest(w http.ResponseWriter, r *http.Request) {
-// 	conn := app.dbConn(r.Context())
-// 	defer conn.Release()
-//
-// 	csv, err := app.csvData.Export(conn)
-// 	if err != nil {
-// 		app.serverError(w, err)
-// 	}
-//
-// 	jsonData, err := json.Marshal(csv)
-// 	if err != nil {
-// 		app.serverError(w, err)
-// 	}
-//
-// 	w.WriteHeader(http.StatusOK)
-// 	w.Header().Set("Content-Type", "application/json")
-// 	w.Write(jsonData)
-// }
