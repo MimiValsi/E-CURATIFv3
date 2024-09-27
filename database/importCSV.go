@@ -48,14 +48,14 @@ func (data *CSVData) VerifyCSV(s string, conn *pgxpool.Conn) {
 func (data *CSVData) encoding_to_UTF8(s string, conn *pgxpool.Conn) {
 	file, err := os.ReadFile(s)
 	if err != nil {
-		log.Printf("Fichier n'existe pas: %v", s)
+		log.Printf("File does not exist: %v", s)
 		log.Println(err)
 		return
 	}
 
 	tr, err := charmap.Windows1252.NewDecoder().Bytes(file)
 	if err != nil {
-		log.Printf("Peut pas décoder fichier", file)
+		log.Printf("Bad encoded file", file)
 		log.Println(err)
 		return
 	}
@@ -63,11 +63,10 @@ func (data *CSVData) encoding_to_UTF8(s string, conn *pgxpool.Conn) {
 	new_file := "new_utf8.csv"
 	err = os.WriteFile(new_file, tr, 0666)
 	if err != nil {
-		log.Println("Peux pas écrire vers nouveau fichier")
+		log.Println("Cannot write to file")
 		return
 	}
 
-	// log.Printf("new_file: %v", new_file)
 	data.sendData(new_file, conn)
 }
 
@@ -129,16 +128,12 @@ INSERT INTO info
         VALUES
 	  ($1, $2, $3, $4, $5, $6, $7, $8 ,$9)
 `
-	// (to_date($8, 'DD/MM/YYYY'))
 	_, err := conn.Exec(ctx, query, data.SourceID, data.Evenement,
 		data.Ouvrage, data.Detail, data.Priorite, data.Status, data.Created,
 		data.Echeance, data.Entite)
 	if err != nil {
 		data.ErrorLog.Println(err)
 	}
-	// } else {
-	// 	data.InfoLog.Println("data sent")
-	// }
 }
 
 func (data *CSVData) SourceNumber(s string, conn *pgxpool.Conn) (int, error) {
@@ -158,8 +153,6 @@ SELECT id
 			return -1, err
 		}
 	}
-
-	// fmt.Printf("%v sourceNumber: id > %v \n\n", s, id)
 
 	return id, nil
 }
