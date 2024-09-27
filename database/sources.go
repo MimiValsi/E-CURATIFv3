@@ -4,18 +4,21 @@ import (
 	"context"
 	"errors"
 	"strings"
-	// "time"
 
 	"github.com/jackc/pgx/v5"
 	"github.com/jackc/pgx/v5/pgxpool"
 )
 
 type Source struct {
-	ID       int    `json:"-"`                 // Source ID (PK)
-	Name     string `json:"name,omitempy"`     // Source name
-	Curatifs int    `json:"curatifs,omitempy"` // Info ouvrage
-	CodeGMAO string `json:"code_GMAO,omitempy"`
-	SID      int    `json:"-"` // Infos source_id (FK)
+	ID        int    `json:"-"`                    // Source ID (PK)
+	SID       int    `json:"-"`                    // Infos source_id (FK)
+	Average   int    `json:"average,omitempty"`    // Average 'Réalisée/résolu'
+	ARealiser int    `json:"a_realiser,omitempty"` // Curatifs 'a réaliser'
+	EnCours   int    `json:"en_cours,omitempty"`   // Curatifs 'en cours/affecté'
+	Done      int    `json:"done,omitempty"`       // Curatifs 'Réalisée/résolu'
+	Curatifs  int    `json:"curatifs,omitempty"`   // Info ouvrage
+	Name      string `json:"name,omitempty"`       // Source name
+	CodeGMAO  string `json:"code_GMAO,omitempty"`
 }
 
 // fonction afin de choper tous les postes sources
@@ -26,13 +29,17 @@ func (src *Source) MenuSource(conn *pgxpool.Conn) ([]*Source, error) {
 SELECT s.id,
        s.name,
        s.code_GMAO,
-       COUNT(i.status) FILTER (WHERE i.status <> 'Archivés' AND i.status <> 'Réalisée' AND i.status <> 'résolu')
+       COUNT(i.status) FILTER (WHERE i.status = 'A réaliser' OR i.status = 'en attente') as a_realiser,
+       COUNT(i.status) FILTER (WHERE i.status = 'En cours' OR i.status = 'affecté') as en_cours,
+       COUNT(i.status) FILTER (WHERE i.status = 'Réalisée' OR i.status = 'résolu') as done,
+       COUNT(i.status) as all
   FROM source AS s
        LEFT JOIN info AS i 
        ON i.source_id = s.id
  GROUP BY s.id
  ORDER BY name ASC
 `
+	// AVG((status = 'Réalisée' OR status = 'résolu')::int)::numeric(2,2)*100 as average,
 
 	rows, err := conn.Query(ctx, query)
 	if err != nil {
@@ -46,9 +53,19 @@ SELECT s.id,
 	for rows.Next() {
 		sObj := &Source{}
 
-		err = rows.Scan(&sObj.ID, &sObj.Name, &sObj.CodeGMAO, &sObj.Curatifs)
+		var all *int
+		err = rows.Scan(&sObj.ID, &sObj.Name, &sObj.CodeGMAO,
+			&sObj.ARealiser, &sObj.EnCours, &sObj.Done, &all)
+
 		if err != nil {
 			return nil, err
+		}
+
+		if *all > 0 {
+			tmp := float64(sObj.Done) / float64(*all)
+			sObj.Average = int(tmp * 100)
+		} else {
+			sObj.Average = 100
 		}
 
 		sources = append(sources, sObj)
