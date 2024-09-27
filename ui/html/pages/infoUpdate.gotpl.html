@@ -3,8 +3,7 @@
 {{ define "nav" }}
 <nav id="navHome">
   <div>
-    <a href="/"><img class="iconeWidth"
-      src="/static/img/icone_maison.png"></a>
+    <a href="/"><img class="iconeWidth" src="/static/img/icone_maison.png"></a>
   </div>
   <div>
     <a href="/source/{{ .Info.SourceID}}/info/view/{{ .Info.ID }}">
@@ -16,8 +15,7 @@
 
 {{ define "main" }}
 <div id="srcName">
-  <form action="/source/{{ .Info.SourceID }}/info/update/{{ .Info.ID }}"
-    method="POST">
+  <form action="/source/{{ .Info.SourceID }}/info/update/{{ .Info.ID }}" method="POST">
     <table>
       <tr>
         <th>
@@ -31,12 +29,11 @@
       <tr>
         <td>
           <div>
-            <input class="input" value="{{ .Info.Ouvrage }}"
-              type="text" name="ouvrage" required>
+            <input class="input" value="{{ .Info.Ouvrage }}" type="text" name="ouvrage">
           </div>
         </td>
         <td colspan="2">
-          <textarea class="textarea" type="text" name="detail" required>{{ .Info.Detail }}</textarea>
+          <textarea class="textarea" type="text" name="detail">{{ .Info.Detail }}</textarea>
         </td>
       </tr>
 
@@ -48,65 +45,50 @@
 
       <tr>
         <td>
-          <input class="input" value="{{ .Info.Evenement }}"
-            type="text" name="evenement" required>
+          <input class="input" value="{{ .Info.Evenement }}" type="text" name="evenement">
         </td>
         <td>
-          <input class="input" value="{{ .Info.Priorite }}"
-            type="text" name="priorite" required>
+          <input class="input" value="{{ .Info.Priorite }}" type="text" name="priorite">
         </td>
         <td>
-          <input class="input" placeholder="jj/mm/aaaa"
-          value="{{ .Info.Echeance }}"
-          type="text" name="echeance">
+          <input class="input" placeholder="jj/mm/aaaa" value="{{ .Info.Echeance }}" type="text" name="echeance">
         </td>
-      </tr>
-
-      <tr>
-      </tr>
-
-      <tr>
-        <td></td>
       </tr>
 
       <tr>
         <th colspan="3" class="center-text">Commentaire</th>
       </tr>
       <tr></tr>
-        <td colspan="3">
-          <textarea class="textarea" type="text" name="commentaire">{{
+      <td colspan="3">
+        <textarea class="textarea" type="text" name="commentaire">{{
           .Info.Commentaire }}</textarea>
-      <tr>
-        <th colspan="3">
-          <label>Status</span></label>
-        </th>
-      </tr>
+        <tr>
+          <th colspan="3">
+            <label>Status</span></label>
+          </th>
+        </tr>
 
-      <tr>
-        <td colspan="3" class="control">
-          <label class="radio">
-            <input type="radio" name="status"
-              value="A réaliser" checked>
+        <tr>
+          <td colspan="3" class="control">
+            <label class="radio">
+              <input type="radio" name="status" value="A réaliser" checked>
               A réaliser
-          </label>
+            </label>
 
-          <label class="radio">
-            <input type="radio" name="status"
-              value="En cours">
+            <label class="radio">
+              <input type="radio" name="status" value="En cours">
               En cours
-          </label>
-          <label class="radio">
-            <input type="radio" name="status"
-              value="Réalisée">
+            </label>
+            <label class="radio">
+              <input type="radio" name="status" value="Réalisée">
               Réalisée
-          </label>
-          <label class="radio">
-            <input type="radio" name="status"
-              value="archivée">
+            </label>
+            <label class="radio">
+              <input type="radio" name="status" value="archivée">
               archivée
-          </label>
-        </td>
-      </tr>
+            </label>
+          </td>
+        </tr>
 
       <th id="btnpad" colspan="3">
         <button type="submit" class="button is-primary is-light is-medium blockmargin">Soumettre</button>
