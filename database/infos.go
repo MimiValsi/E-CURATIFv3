@@ -160,7 +160,7 @@ SELECT id, ouvrage, priorite,
 func (i *Info) List(id int, conn *pgxpool.Conn) ([]*Info, error) {
 	ctx := context.Background()
 	query := `
-SELECT id, ouvrage, created, 
+SELECT id, ouvrage, detail, 
        status, source_id, priorite
   FROM info
  WHERE source_id = $1 AND
@@ -179,7 +179,7 @@ SELECT id, ouvrage, created,
 		iObj := &Info{}
 
 		err = rows.Scan(&iObj.ID, &iObj.Ouvrage,
-			&iObj.Created, &iObj.Status,
+			&iObj.Detail, &iObj.Status,
 			&iObj.SourceID, &iObj.Priorite)
 		if err != nil {
 			return nil, err
