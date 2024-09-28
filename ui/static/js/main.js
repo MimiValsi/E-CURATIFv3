@@ -1,3 +1,5 @@
+const { window } = require("d3-selection");
+
 function searchStatus() {
   let input, filter, table, tr, td, i, txtValue;
 
@@ -33,9 +35,14 @@ function searchStatus() {
   }
 }
 
-document.getElementById("file-input").onchange = function() {
-  document.getElementById("form").submit();
-}
+// function submitFile() {
+//   let inpt = document.getElementById('inpt');
+//   
+// }
+
+// document.getElementById('inpt').onchange = function {
+//   alert("file here");
+// }
 
 // fetch('http://www.localhost:3001')
 //   .then((response) => {
