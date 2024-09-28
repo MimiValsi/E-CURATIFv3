@@ -4,7 +4,7 @@ Dockerfile
 launch
 main
 source.json
-TODO
+foo.txt
 ui/static/sass/main.css
 ui/static/sass/main.css.map
 ui/static/img/wall_dark_mode.png
