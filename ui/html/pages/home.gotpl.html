@@ -5,33 +5,14 @@
   </div>
   <div>
     <a href="/source/create"><img class="iconeWidth" src="/static/img/icone_ps.png" /></a>
-    <!-- <img class="iconeWidth" src="/static/img/icone_export.png"> -->
-    <!-- <input type="file" accept=".csv"><img class="iconeWidth" src="/static/img/icone_import.png" /></a>  -->
-    <!-- <form class="csv-upload" id="form"> -->
-    <!-- <input id="file-input" type="file" accept=".csv" /> -->
-    <!-- <img src="/static/img/icone_import.png" class="iconeWidth csv-hover" /> -->
-    <!-- </form> -->
+
+    <form enctype="multipart/form-data" action="http://localhost:3001/importCSV" method="post">
+      <label class="custom-file-button">
+        <input type="file" accept=".csv" name="inpt" onchange="form.submit()">
+        <img class="iconeWidth" src="/static/img/icone_import.png">
+      </label>
+    </form>
   </div>
-  <!-- <div> -->
-  <!-- </div> -->
-  <form enctype="multipart/form-data" action="http://localhost:3001/importCSV" method="post">
-    <div class="file is-right fileSize">
-      <label class="file-label">
-        <input class="file-input" type="file" name="inpt" />
-        <span class="file-cta">
-          <span class="file-label"> Importer curatifs... </span>
-        </span>
-      </label>
-      <label class="file-label">
-        <input class="file-input" type="submit" />
-        <span class="file-cta">
-          <span class="mdi mdi-file-import-outline upload-icon-size">
-            <i class="fas fa-upload"></i>
-          </span>
-        </span>
-      </label>
-    </div>
-  </form>
 
 </nav>
 {{ end }}
@@ -58,7 +39,6 @@
         <button name="{{ .Curatifs }}" class="button is-large is-danger">
           <span class="is-size-5">
             {{ .Name }}
-            {{/* .Average */}}
           </span>
         </button>
 
@@ -66,7 +46,6 @@
         <button name="{{ .Curatifs }}" class="button is-large orange-btn">
           <span class="is-size-5">
             {{ .Name }}
-            {{/* .Average */}}
           </span>
         </button>
 
@@ -74,7 +53,6 @@
         <button name="{{ .Curatifs }}" class="button is-large yellow-btn">
           <span class="is-size-5">
             {{ .Name }}
-            {{/* .Average */}}
           </span>
         </button>
 
@@ -82,7 +60,6 @@
         <button name="{{ .Curatifs }}" class="button is-large is-info">
           <span class="is-size-5">
             {{ .Name }}
-            {{/* .Average */}}
           </span>
         </button>
 
@@ -90,7 +67,6 @@
         <button name="{{ .Curatifs }}" class="button is-large is-link">
           <span class="is-size-5">
             {{ .Name }}
-            {{/* .Average */}}
           </span>
         </button>
 
@@ -98,7 +74,6 @@
         <button name="{{ .Curatifs }}" class="button is-large green-btn">
           <span class="is-size-5">
             {{ .Name }}
-            {{/* .Average */}}
           </span>
         </button>
         {{ end }}
