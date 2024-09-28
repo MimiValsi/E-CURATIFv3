@@ -26,7 +26,7 @@ $file-cta-background-color: none;
  *******/
 #navHome {
     display: grid;
-    grid-template-columns: repeat(3, auto);
+    grid-template-columns: repeat(4, auto);
 }
 
 .upload-icon-size {
@@ -56,6 +56,22 @@ nav .fileSize {
 
 .csv-hover {
     cursor: pointer;
+}
+
+// .inpt-img {
+//   background-image: url("../img/icone_import.png");
+//   background-repeat: no-repeat;
+// }
+
+input[type="file"] {
+  display: none;
+}
+
+.custom-file-button {
+  // border: 1px solid black;
+  // display: inline-block;
+  // background-image: url("../img/icone_import.png");
+  cursor: pointer;
 }
 /***********
  * NAV END *
