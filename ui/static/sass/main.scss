@@ -49,6 +49,14 @@ nav .iconeWidth {
 nav .fileSize {
     font-size: 1.35rem;
 }
+
+.csv-upload>input {
+    display: none;
+}
+
+.csv-hover {
+    cursor: pointer;
+}
 /***********
  * NAV END *
  ***********/
