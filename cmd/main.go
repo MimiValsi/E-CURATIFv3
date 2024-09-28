@@ -24,8 +24,8 @@ type application struct {
 	infoLog  *log.Logger
 
 	// csvSource *database.CSVSource
-	csvData *database.CSVData
-	// csvInfo *database.CSVInfo
+	csvImport *database.Import
+	csvExport *database.Export
 
 	DB *pgxpool.Pool
 
@@ -69,22 +69,16 @@ func main() {
 		infos:   &database.Info{},
 
 		templateCache: templateCache,
-		csvData:       &database.CSVData{InfoLog: infoLog, ErrorLog: errorLog},
-
-		// A reformuler
-		// csvData: &database.CSVData{
-		// 	DB:       db,
-		// 	ErrorLog: errorLog, InfoLog: infoLog,
-		// },
-		// A reformuler
-		// csvSource: &database.CSVSource{DB: db,
-		// 	Errorlog: errorLog, InfoLog: infoLog},
+		csvImport:     &database.Import{InfoLog: infoLog, ErrorLog: errorLog},
+		csvExport:     &database.Export{InfoLog: infoLog, ErrorLog: errorLog},
 
 		infoLog:  infoLog,
 		errorLog: errorLog,
 
 		// jSource: &database.JsonSource{DB: db},
 	}
+
+	// app.csvExport.Decode_from_UTF8("./csvFiles/export_actions.csv")
 
 	// Default parameters values to routes
 	// See routers.go
@@ -94,9 +88,6 @@ func main() {
 		ReadTimeout:  10 * time.Second,
 		WriteTimeout: 10 * time.Second,
 	}
-
-	// test
-	// app.csvData.ConvertToCsv()
 
 	infoLog.Printf("Starting server on %s", addr)
 	err = srv.ListenAndServe()

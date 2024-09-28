@@ -14,7 +14,7 @@ import (
 	"time"
 )
 
-type CSVData struct {
+type Import struct {
 	ID        int
 	Priorite  int
 	SourceID  int
@@ -34,7 +34,7 @@ type CSVData struct {
 	SourceName string
 }
 
-func (data *CSVData) VerifyCSV(s string, conn *pgxpool.Conn) {
+func (data *Import) VerifyCSV(s string, conn *pgxpool.Conn) {
 	file := strings.Split(s, ".")
 	length := len(file)
 
@@ -45,7 +45,7 @@ func (data *CSVData) VerifyCSV(s string, conn *pgxpool.Conn) {
 	}
 }
 
-func (data *CSVData) encoding_to_UTF8(s string, conn *pgxpool.Conn) {
+func (data *Import) encoding_to_UTF8(s string, conn *pgxpool.Conn) {
 	file, err := os.ReadFile(s)
 	if err != nil {
 		log.Printf("File does not exist: %v", s)
@@ -70,7 +70,7 @@ func (data *CSVData) encoding_to_UTF8(s string, conn *pgxpool.Conn) {
 	data.sendData(new_file, conn)
 }
 
-func (data *CSVData) sendData(s string, conn *pgxpool.Conn) {
+func (data *Import) sendData(s string, conn *pgxpool.Conn) {
 	file, err := os.Open(s)
 	if err != nil {
 		data.ErrorLog.Println(err)
@@ -117,7 +117,7 @@ func (data *CSVData) sendData(s string, conn *pgxpool.Conn) {
 	}
 }
 
-func (data *CSVData) insertDB(conn *pgxpool.Conn) {
+func (data *Import) insertDB(conn *pgxpool.Conn) {
 	ctx := context.Background()
 
 	query := `
@@ -136,7 +136,7 @@ INSERT INTO info
 	}
 }
 
-func (data *CSVData) SourceNumber(s string, conn *pgxpool.Conn) (int, error) {
+func (data *Import) SourceNumber(s string, conn *pgxpool.Conn) (int, error) {
 	ctx := context.Background()
 	query := `
 SELECT id

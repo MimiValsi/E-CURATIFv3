@@ -679,7 +679,7 @@ func (app *application) importCSVPost(w http.ResponseWriter, r *http.Request) {
 
 	// Start the file encoding verification and if all good
 	// send data to DB
-	app.csvData.VerifyCSV("csvFiles/"+handler.Filename, conn)
+	app.csvImport.VerifyCSV("csvFiles/"+handler.Filename, conn)
 
 	http.Redirect(w, r, "/", http.StatusSeeOther)
 }
