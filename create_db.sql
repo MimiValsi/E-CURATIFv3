@@ -1,6 +1,6 @@
-CREATE DATABASE test;
+CREATE DATABASE IF NOT EXISTS ecuratif;
 
-\c test
+\c ecuratif
 
 CREATE TABLE IF NOT EXISTS source (
 	id serial PRIMARY KEY NOT NULL,
