@@ -4,14 +4,15 @@ import (
 	"context"
 	"encoding/csv"
 	"errors"
-	"github.com/jackc/pgx/v5"
-	"github.com/jackc/pgx/v5/pgxpool"
-	"golang.org/x/text/encoding/charmap"
 	"log"
 	"os"
 	"strconv"
 	"strings"
 	"time"
+
+	"github.com/jackc/pgx/v5"
+	"github.com/jackc/pgx/v5/pgxpool"
+	"golang.org/x/text/encoding/charmap"
 )
 
 type Import struct {
@@ -60,8 +61,8 @@ func (data *Import) encoding_to_UTF8(s string, conn *pgxpool.Conn) {
 		return
 	}
 
-	new_file := "new_utf8.csv"
-	err = os.WriteFile(new_file, tr, 0666)
+	new_file := "./csvFiles/new_utf8.csv"
+	err = os.WriteFile(new_file, tr, 0o666)
 	if err != nil {
 		log.Println("Cannot write to file")
 		return
