@@ -1,0 +1,34 @@
+LIST DES CURATIFS:
+
+ - Rajouter détail	OK
+ - trier par priorité	DEJA SUR PLACE
+ - Nom des status: 
+ - Changer couleurs Billboard
+ - Code couleurs par poste, calculer le nombre total de fait / total curatifs * 100
+ - Code couleurs: Vert -> Turquoise -> Bleu -> Jaune -> Orange -> Rouge clignotant
+
+Anciens status:
+ - en attente
+ - affecté
+ - résolu
+
+ Rajouter rougle alerte en cas de trop de diff entre a realiser et total
+ petit rouge a la place
+
+ Ajouter update dans DB
+
+ ---- export query ----
+
+\copy (SELECT
+s.name AS "Poste Source",
+i.evenement AS "Evènement",
+i.created AS "Date de détection",
+i.ouvrage AS "Ouvrage",
+i.detail AS "Détail",
+i.priorite AS "Priorité",
+i.status AS "Etat",
+i.echeance AS "Échéance",
+i.entite AS "Entité"
+FROM info AS i
+LEFT JOIN source AS s
+ON i.source_id = s.id) TO '~/Projects/E-CURATIFv3/csvFiles/export_actions.csv' DELIMITER ',' CSV HEADER
