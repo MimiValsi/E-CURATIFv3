@@ -37,10 +37,10 @@
 
 
       <tr>
-        <th class="left-text"><strong>Ouvrage</strong></th>
-        <th class="center-text"><strong>Détail</strong></th>
-        <th class="center-text"><strong>Priorité</strong></th>
-        <th class="right-text"><strong>Status</strong></th>
+        <th class="left-text narrow-width"><strong>Ouvrage</strong></th>
+        <th class="center-text large-width"><strong>Détail</strong></th>
+        <th class="center-text narrow-width"><strong>Priorité</strong></th>
+        <th class="right-text narrow-width"><strong>Status</strong></th>
       </tr>
       <!-- Infos table -->
       {{ range .Infos }}
@@ -58,35 +58,35 @@
 
       <tr>
         {{ if .Ouvrage }}
-        <td class="left-text"><a href="/source/{{ .SourceID }}/info/view/{{ .ID }}">{{ .Ouvrage }}</a></td>
+        <td class="left-text narrow-width"><a href="/source/{{ .SourceID }}/info/view/{{ .ID }}">{{ .Ouvrage }}</a></td>
         {{ else }}
-        <td class="left-text"><a href="/source/{{ .SourceID }}/info/view/{{ .ID }}">{{ .ID }}</a></td>
+        <td class="left-text narrow-width"><a href="/source/{{ .SourceID }}/info/view/{{ .ID }}">{{ .ID }}</a></td>
         {{ end }}
 
-        <td class="center-text">{{ .Detail }}</td>
+        <td class="center-text large-width">{{ .Detail }}</td>
 
-        <td class="center-text">{{ .Priorite }}</td>
+        <td class="center-text large-width">{{ .Priorite }}</td>
 
         {{ if $aRealiser }}
-        <td class="right-text statusWait">{{ .Status }}</td>
+        <td class="right-text statusWait narrow-width">{{ .Status }}</td>
         {{ else if $enAttente }}
-        <td class="right-text statusWait">{{ .Status }}</td>
+        <td class="right-text statusWait narrow-width">{{ .Status }}</td>
         {{ end }}
 
         {{ if $enCours }}
-        <td class="right-text statusAffected">{{ .Status }}</td>
+        <td class="right-text statusAffected narrow-width">{{ .Status }}</td>
         {{ else if $aff }}
-        <td class="right-text statusAffected">{{ .Status }}</td>
+        <td class="right-text statusAffected narrow-width">{{ .Status }}</td>
         {{ end }}
 
         {{ if $res }}
-        <td class="right-text statusDone">{{ .Status }}</td>
+        <td class="right-text statusDone narrow-width">{{ .Status }}</td>
         {{ else if $reso }}
-        <td class="right-text statusDone">{{ .Status }}</td>
+        <td class="right-text statusDone narrow-width">{{ .Status }}</td>
         {{ end }}
 
         {{ if $arch }}
-        <td class="right-text statusArchived">{{ .Status }}</td>
+        <td class="right-text statusArchived narrow-width">{{ .Status }}</td>
         {{ end }}
       </tr>
       {{ end }}
