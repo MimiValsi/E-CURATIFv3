@@ -1,9 +1,6 @@
 package main
 
 import (
-	"E-CURATIFv3/database"
-	"E-CURATIFv3/internal/validator"
-
 	"context"
 	"encoding/json"
 	"errors"
@@ -14,6 +11,9 @@ import (
 	"os"
 	"strconv"
 	"time"
+
+	"E-CURATIFv3/database"
+	"E-CURATIFv3/internal/validator"
 
 	// package pour les routers
 	"github.com/go-chi/chi/v5"
@@ -52,6 +52,8 @@ func (app *application) home(w http.ResponseWriter, r *http.Request) {
 		app.serverError(w, err)
 		return
 	}
+
+	app.csvExport.Export_DB_csv(conn)
 
 	// newTemplateData @ cmd/templates.go
 	data := app.newTemplateData()
@@ -99,24 +101,24 @@ func (app *application) jsonData(w http.ResponseWriter, r *http.Request) {
 	w.Write(jsonGraph)
 }
 
-func (app *application) curatifDone(w http.ResponseWriter, r *http.Request) {
-	conn := app.dbConn(r.Context())
-	defer conn.Release()
-
-	sources, err := app.sources.CuratifsDone(conn)
-	if err != nil {
-		app.serverError(w, err)
-	}
-
-	jsonGraph, err := json.Marshal(sources)
-	if err != nil {
-		app.serverError(w, err)
-	}
-
-	w.WriteHeader(http.StatusOK)
-	w.Header().Set("Content-Type", "application/json")
-	w.Write(jsonGraph)
-}
+// func (app *application) curatifDone(w http.ResponseWriter, r *http.Request) {
+// 	conn := app.dbConn(r.Context())
+// 	defer conn.Release()
+//
+// 	sources, err := app.sources.CuratifsDone(conn)
+// 	if err != nil {
+// 		app.serverError(w, err)
+// 	}
+//
+// 	jsonGraph, err := json.Marshal(sources)
+// 	if err != nil {
+// 		app.serverError(w, err)
+// 	}
+//
+// 	w.WriteHeader(http.StatusOK)
+// 	w.Header().Set("Content-Type", "application/json")
+// 	w.Write(jsonGraph)
+// }
 
 //
 // Sources Handlers
@@ -639,10 +641,10 @@ func (app *application) infoUpdatePost(w http.ResponseWriter, r *http.Request) {
 // Import CSV data functionality
 // Copy the file content, check it's encoding
 // and send data to DB
-func (app *application) importCSV(w http.ResponseWriter, r *http.Request) {
-	data := app.newTemplateData()
-	app.render(w, http.StatusOK, "importCSV.gotpl.html", data)
-}
+// func (app *application) importCSV(w http.ResponseWriter, r *http.Request) {
+// 	data := app.newTemplateData()
+// 	app.render(w, http.StatusOK, "importCSV.gotpl.html", data)
+// }
 
 func (app *application) importCSVPost(w http.ResponseWriter, r *http.Request) {
 	conn := app.dbConn(r.Context())
@@ -682,4 +684,14 @@ func (app *application) importCSVPost(w http.ResponseWriter, r *http.Request) {
 	app.csvImport.VerifyCSV("csvFiles/"+handler.Filename, conn)
 
 	http.Redirect(w, r, "/", http.StatusSeeOther)
+}
+
+func (app *application) exportCSVPost(w http.ResponseWriter, r *http.Request) {
+	conn := app.dbConn(r.Context())
+	defer conn.Release()
+	app.csvExport.Export_DB_csv(conn)
+
+	w.Header().Set("Content-Disposition", "attachment;")
+	w.Header().Set("Content-Type", r.Header.Get("Content-Type"))
+	w.Header().Set("Content-Length", r.Header.Get("Content-Length"))
 }
