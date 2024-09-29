@@ -10,15 +10,16 @@ import (
 )
 
 type Source struct {
-	ID        int    `json:"-"`                    // Source ID (PK)
-	SID       int    `json:"-"`                    // Infos source_id (FK)
-	Average   int    `json:"average,omitempty"`    // Average 'Réalisée/résolu'
-	ARealiser int    `json:"a_realiser,omitempty"` // Curatifs 'a réaliser'
-	EnCours   int    `json:"en_cours,omitempty"`   // Curatifs 'en cours/affecté'
-	Done      int    `json:"done,omitempty"`       // Curatifs 'Réalisée/résolu'
-	Curatifs  int    `json:"curatifs,omitempty"`   // Info ouvrage
-	Name      string `json:"name,omitempty"`       // Source name
-	CodeGMAO  string `json:"code_GMAO,omitempty"`
+	ID        int    `json:"-"`                   // Source ID (PK)
+	SID       int    `json:"-"`                   // Infos source_id (FK)
+	Average   int    `json:"average"`             // Average 'Réalisée/résolu'
+	ARealiser int    `json:"a_realiser"`          // Curatifs 'a réaliser'
+	EnCours   int    `json:"en_cours"`            // Curatifs 'en cours/affecté'
+	Done      int    `json:"done"`                // Curatifs 'Réalisée/résolu'
+	Curatifs  int    `json:"curatifs"`            // Info ouvrage
+	Diff      int    `json:"diff"`                // Calculate difference between Done and not done (except archives)
+	Name      string `json:"name,omitempty"`      // Source name
+	CodeGMAO  string `json:"code_GMAO,omitempty"` // CodeGMAO to be display in the graph
 }
 
 // fonction afin de choper tous les postes sources
@@ -29,10 +30,10 @@ func (src *Source) MenuSource(conn *pgxpool.Conn) ([]*Source, error) {
 SELECT s.id,
        s.name,
        s.code_GMAO,
-       COUNT(i.status) FILTER (WHERE i.status = 'A réaliser' OR i.status = 'en attente') as a_realiser,
-       COUNT(i.status) FILTER (WHERE i.status = 'En cours' OR i.status = 'affecté') as en_cours,
-       COUNT(i.status) FILTER (WHERE i.status = 'Réalisée' OR i.status = 'résolu') as done,
-       COUNT(i.status) as all
+       COUNT(i.status) FILTER (WHERE i.status = 'a réaliser' OR i.status = 'en attente') as a_realiser,
+       COUNT(i.status) FILTER (WHERE i.status = 'en cours' OR i.status = 'affecté') as en_cours,
+       COUNT(i.status) FILTER (WHERE i.status = 'réalisée' OR i.status = 'résolu') as done,
+       COUNT(i.status) FILTER (WHERE i.status <> 'archivée') as all
   FROM source AS s
        LEFT JOIN info AS i 
        ON i.source_id = s.id
@@ -56,57 +57,20 @@ SELECT s.id,
 		var all *int
 		err = rows.Scan(&sObj.ID, &sObj.Name, &sObj.CodeGMAO,
 			&sObj.ARealiser, &sObj.EnCours, &sObj.Done, &all)
-
 		if err != nil {
 			return nil, err
 		}
 
 		if *all > 0 {
+			sObj.Curatifs = *all
 			tmp := float64(sObj.Done) / float64(*all)
 			sObj.Average = int(tmp * 100)
 		} else {
+			sObj.Curatifs = *all
 			sObj.Average = 100
 		}
 
-		sources = append(sources, sObj)
-	}
-
-	if err = rows.Err(); err != nil {
-		return nil, err
-	}
-
-	return sources, nil
-}
-
-func (src *Source) CuratifsDone(conn *pgxpool.Conn) ([]*Source, error) {
-	ctx := context.Background()
-	query := `
-SELECT s.id,
-       s.name,
-       s.code_GMAO,
-       COUNT(i.status) FILTER (WHERE i.status = 'Réalisée' OR i.status = 'résolu')
-  FROM source AS s
-       LEFT JOIN info AS i 
-       ON i.source_id = s.id
- GROUP BY s.id
- ORDER BY name ASC
-`
-
-	rows, err := conn.Query(ctx, query)
-	if err != nil {
-		return nil, err
-	}
-	defer rows.Close()
-
-	sources := []*Source{}
-
-	for rows.Next() {
-		sObj := &Source{}
-
-		err = rows.Scan(&sObj.ID, &sObj.Name, &sObj.CodeGMAO, &sObj.Curatifs)
-		if err != nil {
-			return nil, err
-		}
+		sObj.Diff = *all - (sObj.Done)
 
 		sources = append(sources, sObj)
 	}
@@ -179,8 +143,7 @@ UPDATE source
        code_gmao = $2
  WHERE id = $3
 `
-	tmp := strings.ToUpper(src.CodeGMAO)
-	_, err := conn.Exec(ctx, query, src.Name, tmp, id)
+	_, err := conn.Exec(ctx, query, src.Name, strings.ToUpper(src.CodeGMAO), id)
 	if err != nil {
 		return err
 	}
