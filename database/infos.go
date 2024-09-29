@@ -4,24 +4,27 @@ import (
 	"context"
 	"errors"
 	"strconv"
+	"strings"
 	"time"
 
 	"github.com/jackc/pgx/v5"
 	"github.com/jackc/pgx/v5/pgxpool"
+
+	"E-CURATIFv3/internal/validator"
 )
 
 type Info struct {
 	ID          int    `json:"-"` // primary key
-	Priorite    int    `json:"priorite,omitempty"`
+	Priorite    int    `json:"priorite"`
 	SourceID    int    `json:"-"` // foreign key en référence au PK de source
-	Agent       string `json:"agent,omitempty"`
-	Ouvrage     string `json:"ouvrage,omitempty"`
-	Echeance    string `json:"echeance,omitempty"`
-	Detail      string `json:"detail,omitempty"`
-	Status      string `json:"status,omitempty"`
-	Evenement   string `json:"evenement,omitempty"`
-	Commentaire string `json:"commentaire,omitempty"`
-	Entite      string `json:"entite,omitempty"`
+	Agent       string `json:"agent"`
+	Ouvrage     string `json:"ouvrage"`
+	Echeance    string `json:"echeance"`
+	Detail      string `json:"detail"`
+	Status      string `json:"status"`
+	Evenement   string `json:"evenement"`
+	Commentaire string `json:"commentaire"`
+	Entite      string `json:"entite"`
 
 	ZeroTime time.Time `json:"-"`
 	Created  time.Time `json:"-"`
@@ -36,8 +39,8 @@ func (i *Info) PriorityInfos(conn *pgxpool.Conn) ([]*Info, error) {
 SELECT i.ouvrage,
        i.detail
   FROM info AS i
- WHERE status <> 'Réalisée' AND status <> 'résolu' AND 
-       status <> 'Archivée'
+ WHERE status NOT LIKE 'réalis%' AND status NOT LIKE 'résol%' AND 
+       status NOT LIKE 'archiv%'
 `
 
 	rows, err := conn.Query(ctx, query)
@@ -70,7 +73,7 @@ SELECT i.ouvrage,
 func (i *Info) Insert(id int, conn *pgxpool.Conn) (int, error) {
 	ctx := context.Background()
 	query := `
-INSERT INTO info (source_id, ouvrage, detail, 
+INSERT INTO info (source_id, ouvrage, detail,
 		  evenement, priorite, echeance, status,
 		  created, entite, commentaire)
 VALUES ($1,  $2,  $3,  $4, $5,
@@ -79,7 +82,7 @@ VALUES ($1,  $2,  $3,  $4, $5,
 `
 	err := conn.QueryRow(ctx, query, id,
 		i.Ouvrage, i.Detail, i.Evenement, i.Priorite,
-		i.Echeance, i.Status, i.Created,
+		i.Echeance, strings.ToLower(i.Status), i.Created,
 		i.Entite, i.Commentaire).Scan(&i.ID)
 	if err != nil {
 		return 0, err
@@ -129,7 +132,7 @@ SELECT id, ouvrage, priorite,
 	}
 
 	if status != nil {
-		iObj.Status = *status
+		iObj.Status = validator.ToCapital(*status)
 	}
 
 	if evenement != nil {
@@ -143,10 +146,6 @@ SELECT id, ouvrage, priorite,
 	if updated != nil {
 		iObj.Updated = *updated
 	}
-
-	// if created != nil {
-	// 	iObj.Updated = *updated
-	// }
 
 	if commentaire != nil {
 		iObj.Commentaire = *commentaire
@@ -164,7 +163,7 @@ SELECT id, ouvrage, detail,
        status, source_id, priorite
   FROM info
  WHERE source_id = $1 AND
- status <> 'Archivé' AND status <> 'Réalisée' AND status <> 'résolu'
+ status NOT LIKE 'archiv%' AND status NOT LIKE 'réalis%' AND status NOT LIKE 'résol%'
  ORDER BY priorite ASC
 `
 	rows, err := conn.Query(ctx, query, id)
@@ -178,11 +177,28 @@ SELECT id, ouvrage, detail,
 	for rows.Next() {
 		iObj := &Info{}
 
-		err = rows.Scan(&iObj.ID, &iObj.Ouvrage,
-			&iObj.Detail, &iObj.Status,
-			&iObj.SourceID, &iObj.Priorite)
+		var status, ouvrage, priorite, detail *string
+		err = rows.Scan(&iObj.ID, &ouvrage,
+			&detail, &status,
+			&iObj.SourceID, &priorite)
 		if err != nil {
 			return nil, err
+		}
+
+		if status != nil {
+			iObj.Status = validator.ToCapital(*status)
+		}
+
+		if ouvrage != nil {
+			iObj.Ouvrage = *ouvrage
+		}
+
+		if priorite != nil {
+			iObj.Priorite, _ = strconv.Atoi(*priorite)
+		}
+
+		if detail != nil {
+			iObj.Detail = *detail
 		}
 
 		infos = append(infos, iObj)
@@ -221,23 +237,6 @@ UPDATE info
 	_, err := conn.Exec(ctx, query, i.Ouvrage, i.Detail, i.Evenement,
 		i.Priorite, i.Echeance, i.Status, time.Now().UTC(),
 		i.Entite, i.Commentaire, id)
-	if err != nil {
-		return err
-	}
-
-	return nil
-}
-
-// Fonction de test
-func (i *Info) InfoUp(id int, conn *pgxpool.Conn) error {
-	ctx := context.Background()
-	query := `
-UPDATE info
-   SET ouvrage = $1, updated = $2
- WHERE id = $3
-`
-	_, err := conn.Exec(ctx, query, i.Ouvrage,
-		time.Now().UTC(), id)
 	if err != nil {
 		return err
 	}
