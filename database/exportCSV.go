@@ -73,6 +73,13 @@ SELECT i.id AS "Info ID",
 
 	defer file.Close()
 
+	header := fmt.Sprintln("\"Info ID\",\"Poste Source\",\"Evènement\",\"Date de détection\",\"Ouvrage\",\"Détail\",\"Priorité\",\"Etat\",\"Échéance\",\"Entité\"")
+	_, err = io.WriteString(file, header)
+	if err != nil {
+		data.ErrorLog.Println("io couldn't write header to file")
+		return // add io err
+	}
+
 	rows, err := conn.Query(ctx, query)
 	if err != nil {
 		data.ErrorLog.Println("Couldn't fetch from DB")
@@ -136,7 +143,7 @@ SELECT i.id AS "Info ID",
 
 		_, err := io.WriteString(file, s)
 		if err != nil {
-			data.ErrorLog.Println("io couldn't write to file")
+			data.ErrorLog.Println("io couldn't write row to file")
 			return // add io err
 		}
 

@@ -78,8 +78,6 @@ func main() {
 		// jSource: &database.JsonSource{DB: db},
 	}
 
-	// app.csvExport.Decode_from_UTF8("./csvFiles/export_actions.csv")
-
 	// Default parameters values to routes
 	// See routers.go
 	srv := &http.Server{

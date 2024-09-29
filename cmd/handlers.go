@@ -53,7 +53,7 @@ func (app *application) home(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	app.csvExport.Export_DB_csv(conn)
+	// app.csvExport.Export_DB_csv(conn)
 
 	// newTemplateData @ cmd/templates.go
 	data := app.newTemplateData()
