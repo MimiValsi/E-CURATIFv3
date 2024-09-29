@@ -3,9 +3,9 @@ LIST DES CURATIFS:
  - Rajouter détail	OK
  - trier par priorité	DEJA SUR PLACE
  - Nom des status: 
- - Changer couleurs Billboard
- - Code couleurs par poste, calculer le nombre total de fait / total curatifs * 100
- - Code couleurs: Vert -> Turquoise -> Bleu -> Jaune -> Orange -> Rouge clignotant
+ - Changer couleurs Billboard   OK
+ - Code couleurs par poste, calculer le nombre total de fait / total curatifs * 100     OK
+ - Code couleurs: Vert -> Turquoise -> Bleu -> Jaune -> Orange -> Rouge clignotant      OK
 
 Anciens status:
  - en attente
@@ -16,6 +16,8 @@ Anciens status:
  petit rouge a la place
 
  Ajouter update dans DB
+
+ Changer fonctionnement upload csv file         OK
 
  ---- export query ----
 
