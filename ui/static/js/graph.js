@@ -21,39 +21,21 @@
 
   // Fetch every active 'Curatif'
   const jsData = await getJson();
-  let jsonLen = jsData.length;
 
   let nomSources = [];
   let codeGMAO = []
   let aRealiser = [];
   let enCours = [];
   let done = [];
+  let total = [];
 
-  for (let i = 0; i < jsonLen; i++) {
-    let jec = jsData[i].en_cours;
-    let jar = jsData[i].a_realiser;
-    let jd = jsData[i].done;
-
+  for (let i = 0; i < jsData.length; i++) {
+    aRealiser.push(jsData[i].a_realiser);
+    enCours.push(jsData[i].en_cours);
+    done.push(jsData[i].done);
     nomSources.push(jsData[i].name);
     codeGMAO.push(jsData[i].code_GMAO);
-
-    if (typeof jar == 'undefined') {
-      aRealiser.push(0);
-    } else {
-      aRealiser.push(jsData[i].a_realiser);
-    }
-
-    if (typeof jec == 'undefined') {
-      enCours.push(0);
-    } else {
-      enCours.push(jsData[i].en_cours);
-    }
-
-    if (typeof jd == 'undefined') {
-      done.push(0);
-    } else {
-      done.push(jsData[i].done);
-    }
+    total.push(jsData[i].curatifs);
   }
 
   var chart = bb.generate({
@@ -68,12 +50,21 @@
         ["Curatifs à réaliser", ...aRealiser],
         ["Curatifs en cours", ...enCours],
         ["Curatifs réalisées", ...done],
+        ["Total", ...total]
       ],
       type: "bar",
+
+      groups: [
+        [
+          "Curatifs à réaliser",
+          "Curatifs en cours",
+          "Curatifs réalisées"
+        ]
+      ]
     },
 
     color: {
-      pattern: ['#ff0000', '#0000ff', '#00ff00']
+      pattern: ["#cc1111", "#0080ff", "#99cc33", "#999999"]
     },
 
     axis: {
@@ -81,10 +72,6 @@
         type: "category",
         categories: [...codeGMAO],
         height: 50,
-        tick: {
-          rotate: 75,
-          multiline: false,
-        }
       }
     },
 
@@ -95,7 +82,10 @@
 
     padding: true,
 
-    resize: true,
+    // resize: {
+    //   auto: true,
+    //   timer: 100
+    // },
 
     zoom: {
       enabled: true,
@@ -103,7 +93,7 @@
     },
 
     legend: {
-      position: "inset"
+      position: "bottom"
     },
 
     bar: {
