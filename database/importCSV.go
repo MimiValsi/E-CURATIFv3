@@ -130,7 +130,7 @@ INSERT INTO info
 	  ($1, $2, $3, $4, $5, $6, $7, $8 ,$9)
 `
 	_, err := conn.Exec(ctx, query, data.SourceID, data.Evenement,
-		data.Ouvrage, data.Detail, data.Priorite, data.Status, data.Created,
+		data.Ouvrage, data.Detail, data.Priorite, strings.ToLower(data.Status), data.Created,
 		data.Echeance, data.Entite)
 	if err != nil {
 		data.ErrorLog.Println(err)
