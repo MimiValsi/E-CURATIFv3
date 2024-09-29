@@ -262,6 +262,14 @@ top-margin {
     padding-right: 0.5rem;
 }
 
+.narrow-width {
+  width: 5rem;
+}
+
+.large-width {
+  width: 40rem;
+}
+
 /*****************
  * VIEW PAGE END *
  *****************/
@@ -270,16 +278,33 @@ top-margin {
  * BUTTONS *
  ***********/
 .green-btn {
-    background-color: #96cd32 !important;
+  background-color: #99cc33 !important;
+  color: white;
+}
+
+.turquoise-btn {
+  background-color: #33cccc !important;
+}
+
+.blue-btn {
+  background-color: #0080ff !important;
+  color: white;
 }
 
 .yellow-btn {
-    background-color: yellow !important;
+  background-color: #fff000 !important;
 }
 
 .orange-btn {
-    background-color: orange !important;
+  background-color: #ff7f00 !important;
+  color: white;
 }
+
+.red-btn {
+  background-color: #cc1111 !important;
+  color: white;
+}
+
 
 @keyframes glowing {
     0% {
@@ -296,7 +321,7 @@ top-margin {
     }
 }
 
-.red-btn {
+.warning-btn {
     animation: glowing 1200ms infinite;
 }
 
