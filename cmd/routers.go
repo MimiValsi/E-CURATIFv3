@@ -16,9 +16,6 @@ func (app *application) routes() http.Handler {
 	r.Get("/", app.home)
 	r.Get("/jsonGraph", app.jsonData)
 	r.Get("/prioData", app.priorityData)
-	// r.Get("/charts", app.charts)
-	// r.Get("/pageTest", app.pageTest)
-	r.Get("/curatifDone", app.curatifDone)
 
 	// Pages Source
 	// Chaque place réservée doit être unique pour chaque router
@@ -38,11 +35,8 @@ func (app *application) routes() http.Handler {
 	r.Post("/source/{sid}/info/update/{id}", app.infoUpdatePost)
 
 	// En cours de création
-	r.Get("/importCSV", app.importCSV)
 	r.Post("/importCSV", app.importCSVPost)
-
-	// Page de test
-	// r.Get("/pageTest", app.pageTest)
+	r.Post("/exportCSV", app.exportCSVPost)
 
 	// Fichiers statiques
 	fileServer := http.FileServer(http.Dir("./ui/static/"))
