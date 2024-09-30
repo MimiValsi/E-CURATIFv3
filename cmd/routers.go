@@ -36,7 +36,7 @@ func (app *application) routes() http.Handler {
 
 	// En cours de création
 	r.Post("/importCSV", app.importCSVPost)
-	r.Post("/exportCSV", app.exportCSVPost)
+	r.Get("/exportCSV", app.exportCSVPost)
 
 	// Fichiers statiques
 	fileServer := http.FileServer(http.Dir("./ui/static/"))
