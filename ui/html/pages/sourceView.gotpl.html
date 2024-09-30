@@ -46,15 +46,15 @@
       {{ range .Infos }}
 
       {{ $aRealiser := eq .Status "A réaliser" }}
-      {{ $enAttente := eq .Status "en attente" }}
+      {{ $enAttente := eq .Status "En attente" }}
 
       {{ $enCours := eq .Status "En cours" }}
-      {{ $aff := eq .Status "affecté" }}
+      {{ $aff := eq .Status "Affecté" }}
 
       {{ $res := eq .Status "Réalisée" }}
-      {{ $reso := eq .Status "résolu" }}
+      {{ $reso := eq .Status "Résolu" }}
 
-      {{ $arch := eq .Status "archivé" }}
+      {{ $arch := eq .Status "Archivé" }}
 
       <tr>
         {{ if .Ouvrage }}

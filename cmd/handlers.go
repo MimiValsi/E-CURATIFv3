@@ -689,9 +689,13 @@ func (app *application) importCSVPost(w http.ResponseWriter, r *http.Request) {
 func (app *application) exportCSVPost(w http.ResponseWriter, r *http.Request) {
 	conn := app.dbConn(r.Context())
 	defer conn.Release()
+
 	app.csvExport.Export_DB_csv(conn)
+	app.infoLog.Println("Export en cours")
 
 	w.Header().Set("Content-Disposition", "attachment;")
 	w.Header().Set("Content-Type", r.Header.Get("Content-Type"))
 	w.Header().Set("Content-Length", r.Header.Get("Content-Length"))
+
+	http.Redirect(w, r, "/", http.StatusSeeOther)
 }
