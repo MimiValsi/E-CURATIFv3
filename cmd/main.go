@@ -2,6 +2,7 @@ package main
 
 import (
 	"context"
+	// "crypto/tls"
 	"html/template"
 	"log"
 	"net/http"
@@ -78,6 +79,10 @@ func main() {
 		// jSource: &database.JsonSource{DB: db},
 	}
 
+	// tlsConfig := &tls.Config{
+	// 	CurvePreferences: []tls.CurveID{tls.X25519, tls.CurveP256},
+	// }
+
 	// Default parameters values to routes
 	// See routers.go
 	srv := &http.Server{
@@ -85,10 +90,12 @@ func main() {
 		Handler:      app.routes(),
 		ReadTimeout:  10 * time.Second,
 		WriteTimeout: 10 * time.Second,
+		// TLSConfig:    tlsConfig,
 	}
 
 	infoLog.Printf("Starting server on %s", addr)
 	err = srv.ListenAndServe()
+	// err = srv.ListenAndServeTLS("./tls/cert.pem", "./tls/key.pem")
 	errorLog.Fatal(err)
 }
 
