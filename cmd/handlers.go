@@ -53,8 +53,6 @@ func (app *application) home(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	// app.csvExport.Export_DB_csv(conn)
-
 	// newTemplateData @ cmd/templates.go
 	data := app.newTemplateData()
 	data.Sources = sources
@@ -686,16 +684,54 @@ func (app *application) importCSVPost(w http.ResponseWriter, r *http.Request) {
 	http.Redirect(w, r, "/", http.StatusSeeOther)
 }
 
+// func (app *application) exportCSVPost(w http.ResponseWriter, r *http.Request) {
+// 	text := "This file is very big!"
+// 	words := strings.Split(text, " ")
+// 	w.Header().Add("Content-Type", "text/plain")
+// 	w.Header().Add("Content-Disposition", "attachment; filename=words.txt")
+// 	w.Header().Add("Content-Length", fmt.Sprint(len(text)))
+// 	flusher, ok := w.(http.Flusher)
+// 	if !ok {
+// 		log.Fatal("Cannot use flusher")
+// 	}
+// 	w.Write([]byte(words[0]))
+// 	flusher.Flush()
+// 	for i := 1; i < len(words); i++ {
+// 		// time.Sleep(5 * time.Second)
+// 		w.Write([]byte(" " + words[i]))
+// 		flusher.Flush()
+// 	}
+// }
+
 func (app *application) exportCSVPost(w http.ResponseWriter, r *http.Request) {
 	conn := app.dbConn(r.Context())
 	defer conn.Release()
 
-	app.csvExport.Export_DB_csv(conn)
+	path, err := app.csvExport.Export_DB_csv(conn)
+	if err != nil {
+		app.errorLog.Println("Couldn't fetch file")
+		return
+	}
+
 	app.infoLog.Println("Export en cours")
 
-	w.Header().Set("Content-Disposition", "attachment;")
-	w.Header().Set("Content-Type", r.Header.Get("Content-Type"))
-	w.Header().Set("Content-Length", r.Header.Get("Content-Length"))
+	file, err := os.ReadFile(path)
+	if err != nil {
+		app.errorLog.Println("File doesn't exist")
+		return
+	}
+
+	w.Header().Set("Content-Disposition", "attachment; filename=export.csv")
+	w.Header().Set("Content-Type", "text/plain")
+	w.Header().Set("Content-Length", fmt.Sprint(len(file)))
+
+	flusher, ok := w.(http.Flusher)
+	if !ok {
+		app.errorLog.Println("Cannot use flusher")
+	}
+	w.Write(file)
+
+	flusher.Flush()
 
 	http.Redirect(w, r, "/", http.StatusSeeOther)
 }
