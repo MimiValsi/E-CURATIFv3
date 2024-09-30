@@ -45,7 +45,7 @@ type Export struct {
 	ZeroTime time.Time
 }
 
-func (data *Export) Export_DB_csv(conn *pgxpool.Conn) {
+func (data *Export) Export_DB_csv(conn *pgxpool.Conn) (string, error) {
 	ctx := context.Background()
 	query := `
 SELECT i.id AS "Info ID",
@@ -68,7 +68,7 @@ SELECT i.id AS "Info ID",
 	file, err := os.OpenFile(path, os.O_CREATE|os.O_WRONLY, 0o644)
 	if err != nil {
 		data.ErrorLog.Println("Cannot create or open file")
-		return // err file open
+		return "", err // err file open
 	}
 
 	defer file.Close()
@@ -77,13 +77,13 @@ SELECT i.id AS "Info ID",
 	_, err = io.WriteString(file, header)
 	if err != nil {
 		data.ErrorLog.Println("io couldn't write header to file")
-		return // add io err
+		return "", err // add io err
 	}
 
 	rows, err := conn.Query(ctx, query)
 	if err != nil {
 		data.ErrorLog.Println("Couldn't fetch from DB")
-		return // Add err return
+		return "", err // Add err return
 	}
 	defer rows.Close()
 
@@ -96,11 +96,11 @@ SELECT i.id AS "Info ID",
 			&detail, &priorite, &status, &echeance, &entite)
 		if err != nil {
 			if errors.Is(err, pgx.ErrNoRows) {
-				return // error here pgx
+				return "", err // error here pgx
 			}
 			data.ErrorLog.Println("Couldn't copy to var")
 			data.ErrorLog.Println(err)
-			return // Add err return
+			return "", err // Add err return
 		}
 
 		// line.Created, err = time.Parse("02/01/2006", *created)
@@ -144,33 +144,41 @@ SELECT i.id AS "Info ID",
 		_, err := io.WriteString(file, s)
 		if err != nil {
 			data.ErrorLog.Println("io couldn't write row to file")
-			return // add io err
+			return "", err // add io err
 		}
 
 	}
 
-	data.decode_from_UTF8(path)
+	path, err = data.decode_from_UTF8(path)
+	if err != nil {
+		data.ErrorLog.Println("bad encoding")
+		return "", nil
+	}
+
+	return path, nil
 }
 
-func (data *Export) decode_from_UTF8(s string) {
+func (data *Export) decode_from_UTF8(s string) (string, error) {
 	file, err := os.ReadFile(s)
 	if err != nil {
 		log.Printf("File does not exists: %v", s)
 		log.Println(err)
-		return
+		return "", err
 	}
 
 	tr, err := charmap.Windows1252.NewEncoder().Bytes(file)
 	if err != nil {
 		log.Printf("Bad encoded file: %v", file)
 		log.Println(err)
-		return
+		return "", err
 	}
 
 	new_file := "./csvFiles/test/Actions_exportés.csv"
 	err = os.WriteFile(new_file, tr, 0o666)
 	if err != nil {
 		log.Println("Cannot write to file")
-		return
+		return "", err
 	}
+
+	return new_file, nil
 }
