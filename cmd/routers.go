@@ -15,7 +15,7 @@ func (app *application) routes() http.Handler {
 	// Home page
 	r.Get("/", app.home)
 	r.Get("/jsonGraph", app.jsonData)
-	r.Get("/prioData", app.priorityData)
+	// r.Get("/prioData", app.priorityData)
 
 	// Pages Source
 	// Chaque place réservée doit être unique pour chaque router

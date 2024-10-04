@@ -26,6 +26,14 @@ CREATE TABLE IF NOT EXISTS info (
 	  FOREIGN KEY(source_id) REFERENCES source(id)
 );
 
+CREATE TABLE sessions (
+	token TEXT PRIMARY KEY,
+	data BYTEA NOT NULL,
+	expiry TIMESTAMP NOT NULL
+);
+
+CREATE INDEX sessions_expiry_idx ON sessions (expiry);
+
 INSERT INTO source (name, code_gmao)
 VALUES ('ALSACE', 'ALSAC');
 

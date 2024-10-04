@@ -2,13 +2,14 @@ package main
 
 import (
 	"context"
-	// "crypto/tls"
 	"html/template"
 	"log"
 	"net/http"
 	"os"
 	"time"
 
+	"github.com/alexedwards/scs/pgxstore"
+	"github.com/alexedwards/scs/v2"
 	"github.com/jackc/pgx/v5/pgxpool" // PostgreSQL driver
 
 	"E-CURATIFv3/database" // Database regroupe toutes les fonctions pour communiquer avec PSQL
@@ -30,10 +31,10 @@ type application struct {
 
 	DB *pgxpool.Pool
 
-	// jSource *database.JsonSource
+	sessionManager *scs.SessionManager
 }
 
-// Ces 2 variables ne sont pas sensé être ni modifiés ni pour la prod
+// Const for dev
 const (
 	addr    = ":3001"
 	dataURL = "postgres://ameps:pass@localhost:5432/ecuratif"
@@ -41,29 +42,34 @@ const (
 )
 
 func main() {
-	// infoLog et errorLog permettent d'avoir un peu plus d'info
-	// de ce qui se passe en cas d'erreur
+	// infoLog and errorLog are own made middleware
+	// in complementary of go-chi middleware
 
 	// Ldate = Local data & Ltime = Local time
 	infoLog := log.New(os.Stderr, "INFO\t", log.Ldate|log.Ltime)
 	errorLog := log.New(os.Stderr, "ERROR\t",
 		log.Ldate|log.Ltime|log.Lshortfile)
 
-	// Execute la fonction de connection de la BD
+	var sessionManager *scs.SessionManager
+
+	// Send an connection request to DB
 	db, err := openDB(dataURL)
 	if err != nil {
 		errorLog.Fatal(err)
 	}
 	defer db.Close()
 
-	// Fontion @ cmd/template.go
+	sessionManager = scs.New()
+	sessionManager.Store = pgxstore.New(db)
+
+	// Func @ cmd/template.go
 	templateCache, err := newTemplateCache()
 	if err != nil {
 		errorLog.Fatal(err)
 	}
 
-	// Permet la comm avec PSQL et autres fonctions
-	// Tout passe par ici
+	// Application dependencies are centralized here
+	// Gives the possibility to access the middleware logging everywhere
 	app := &application{
 		DB:      db,
 		sources: &database.Source{},
@@ -76,7 +82,7 @@ func main() {
 		infoLog:  infoLog,
 		errorLog: errorLog,
 
-		// jSource: &database.JsonSource{DB: db},
+		sessionManager: sessionManager,
 	}
 
 	// tlsConfig := &tls.Config{
@@ -99,7 +105,7 @@ func main() {
 	errorLog.Fatal(err)
 }
 
-// Fonction qui permet la connection avec PSQL via pgx.pgxpool
+// Create a context background and create a new PSQL connection
 func openDB(dataURL string) (*pgxpool.Pool, error) {
 	ctx := context.Background()
 

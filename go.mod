@@ -2,9 +2,9 @@ module E-CURATIFv3
 
 go 1.21
 
-toolchain go1.23.0
-
 require (
+	github.com/alexedwards/scs/pgxstore v0.0.0-20240316134038-7e11d57e8885
+	github.com/alexedwards/scs/v2 v2.8.0
 	github.com/go-chi/chi/v5 v5.1.0
 	github.com/jackc/pgx/v5 v5.7.1
 	golang.org/x/text v0.18.0
