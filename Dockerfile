@@ -1,15 +1,6 @@
 FROM golang:1.21
 
-WORKDIR /app
+COPY ./launch .
 
-COPY go.mod ./
+WORKDIR .
 
-RUN go mod download && go mod verify
-
-COPY . .
-
-RUN go build -v -o main ./cmd
-
-EXPOSE 3001
-
-CMD ["./main"]
