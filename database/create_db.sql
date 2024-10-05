@@ -42,6 +42,8 @@ CREATE TABLE IF NOT EXISTS users (
   created DATE NOT NULL
 );
 
+ALTER TABLE users ADD CONSTRAINT users_uc_email UNIQUE (email);
+
 INSERT INTO source (name, code_gmao)
 VALUES ('ALSACE', 'ALSAC');
 
