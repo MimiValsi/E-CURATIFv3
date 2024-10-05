@@ -1,4 +1,4 @@
-SELECT 'CREATE DATABASE test' WHERE NOT EXISTS (SELECT FROM pg_database WHERE datname = 'ecuratif')\gexec
+SELECT 'CREATE DATABASE ecuratif' WHERE NOT EXISTS (SELECT FROM pg_database WHERE datname = 'ecuratif')\gexec
 
 \c ecuratif
 
@@ -25,6 +25,14 @@ CREATE TABLE IF NOT EXISTS info (
 	CONSTRAINT fk_source
 	  FOREIGN KEY(source_id) REFERENCES source(id)
 );
+
+CREATE TABLE sessions (
+	token VARCHAR(43) PRIMARY KEY,
+	data BYTEA NOT NULL,
+	expiry TIMESTAMP(6) NOT NULL
+);
+
+CREATE INDEX sessions_expiry_idx ON sessions (expiry);
 
 INSERT INTO source (name, code_gmao)
 VALUES ('ALSACE', 'ALSAC');
