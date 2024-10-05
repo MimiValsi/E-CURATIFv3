@@ -2,8 +2,10 @@ package main
 
 import (
 	"context"
+	"crypto/tls"
 	"html/template"
 	"log"
+	"log/slog"
 	"net/http"
 	"os"
 	"time"
@@ -24,6 +26,7 @@ type application struct {
 
 	errorLog *log.Logger
 	infoLog  *log.Logger
+	logger   *log.Logger
 
 	// csvSource *database.CSVSource
 	csvImport *database.Import
@@ -49,6 +52,7 @@ func main() {
 	infoLog := log.New(os.Stderr, "INFO\t", log.Ldate|log.Ltime)
 	errorLog := log.New(os.Stderr, "ERROR\t",
 		log.Ldate|log.Ltime|log.Lshortfile)
+	logger := slog.New(slog.NewTextHandler(os.Stdout, nil))
 
 	var sessionManager *scs.SessionManager
 
@@ -62,6 +66,7 @@ func main() {
 	sessionManager = scs.New()
 	sessionManager.Store = pgxstore.New(db)
 	sessionManager.Lifetime = 12 * time.Hour
+	sessionManager.Cookie.Secure = true
 
 	// Func @ cmd/template.go
 	templateCache, err := newTemplateCache()
@@ -82,13 +87,14 @@ func main() {
 
 		infoLog:  infoLog,
 		errorLog: errorLog,
+		logger:   slog.NewLogLogger(logger.Handler(), slog.LevelError),
 
 		sessionManager: sessionManager,
 	}
 
-	// tlsConfig := &tls.Config{
-	// 	CurvePreferences: []tls.CurveID{tls.X25519, tls.CurveP256},
-	// }
+	tlsConfig := &tls.Config{
+		CurvePreferences: []tls.CurveID{tls.X25519, tls.CurveP256},
+	}
 
 	// Default parameters values to routes
 	// See routers.go
@@ -97,12 +103,12 @@ func main() {
 		Handler:      app.routes(),
 		ReadTimeout:  10 * time.Second,
 		WriteTimeout: 10 * time.Second,
-		// TLSConfig:    tlsConfig,
+		TLSConfig:    tlsConfig,
 	}
 
 	infoLog.Printf("Starting server on %s", addr)
-	err = srv.ListenAndServe()
-	// err = srv.ListenAndServeTLS("./tls/cert.pem", "./tls/key.pem")
+	// err = srv.ListenAndServe()
+	err = srv.ListenAndServeTLS("./tls/cert.pem", "./tls/key.pem")
 	errorLog.Fatal(err)
 }
 
