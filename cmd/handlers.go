@@ -12,14 +12,11 @@ import (
 	"strconv"
 	"time"
 
+	"github.com/go-chi/chi/v5"
+	"github.com/jackc/pgx/v5/pgxpool"
+
 	"E-CURATIFv3/database"
 	"E-CURATIFv3/internal/validator"
-
-	// package pour les routers
-	"github.com/go-chi/chi/v5"
-
-	// pkg pour Psql driver
-	"github.com/jackc/pgx/v5/pgxpool"
 )
 
 func (app *application) dbConn(ctx context.Context) *pgxpool.Conn {
@@ -421,33 +418,6 @@ func (app *application) infoCreatePost(w http.ResponseWriter, r *http.Request) {
 		Created:     r.PostForm.Get("created"),
 	}
 
-	// Certains champs ne doivent pas être vides.
-	// Afin de ne pas recevoir une erreur venant de la BD
-	// On la vérifie en avance.
-	// Ceci sera fait en JS en amont en plus
-	// emptyField := "Ce champ ne doit pas être vide"
-
-	// form.CheckField(validator.NotBlank(form.Agent),
-	// 	"agent", emptyField)
-	// form.CheckField(validator.NotBlank(form.Ouvrage),
-	// 	"ouvrage", emptyField)
-	// form.CheckField(validator.NotBlank(form.Detail),
-	// 	"detail", emptyField)
-	// form.CheckField(validator.NotBlank(form.Evenement),
-	// 	"evenement", emptyField)
-	// form.CheckField(validator.NotBlank(form.Priorite),
-	// 	"priorite", emptyField)
-	// form.CheckField(validator.NotBlank(form.Status),
-	// 	"status", emptyField)
-
-	// if !form.Valid() {
-	// 	data := app.newTemplateData()
-	// 	data.Form = form
-	// 	app.render(w, http.StatusUnprocessableEntity,
-	// 		"infoCreate.gotpl.html", data)
-	// 	return
-	// }
-
 	app.infos.Ouvrage = form.Ouvrage
 	app.infos.Detail = form.Detail
 	app.infos.Evenement = form.Evenement
@@ -478,6 +448,8 @@ func (app *application) infoCreatePost(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
+	app.sessionManager.Put(r.Context(), "flash", "Info crée avec succès!")
+
 	http.Redirect(w, r, fmt.Sprintf("/source/%d/info/view/%d",
 		sID, iid), http.StatusSeeOther)
 }
@@ -506,8 +478,11 @@ func (app *application) infoView(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
+	flash := app.sessionManager.PopString(r.Context(), "flash")
+
 	data := app.newTemplateData()
 	data.Info = info
+	data.Flash = flash
 
 	app.render(w, http.StatusOK, "infoView.gotpl.html", data)
 }
