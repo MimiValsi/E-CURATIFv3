@@ -15,12 +15,14 @@ import (
 	"github.com/jackc/pgx/v5/pgxpool" // PostgreSQL driver
 
 	"E-CURATIFv3/database" // Database regroupe toutes les fonctions pour communiquer avec PSQL
+	"E-CURATIFv3/internal/models"
 )
 
 // afin de permettre la vérif les informations et communiquer avec PSQL
 type application struct {
 	sources *database.Source
 	infos   *database.Info
+	users   *models.User
 
 	templateCache map[string]*template.Template
 
@@ -80,6 +82,7 @@ func main() {
 		DB:      db,
 		sources: &database.Source{},
 		infos:   &database.Info{},
+		users:   &models.User{},
 
 		templateCache: templateCache,
 		csvImport:     &database.Import{InfoLog: infoLog, ErrorLog: errorLog},

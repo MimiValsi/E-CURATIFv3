@@ -692,13 +692,60 @@ func (app *application) exportCSVPost(w http.ResponseWriter, r *http.Request) {
 	http.Redirect(w, r, "/", http.StatusSeeOther)
 }
 
+type userSignupForm struct {
+	Name     string
+	Email    string
+	Password string
+	validator.Validator
+}
+
 // users
 func (app *application) userSignup(w http.ResponseWriter, r *http.Request) {
-	fmt.Fprintln(w, "user sign up page")
+	data := app.newTemplateData()
+	data.Form = userSignupForm{}
+	app.render(w, http.StatusOK, "signup.gotpl.html", data)
 }
 
 func (app *application) userSignupPost(w http.ResponseWriter, r *http.Request) {
-	fmt.Fprintln(w, "user signup post")
+	conn := app.dbConn(r.Context())
+	defer conn.Release()
+
+	err := r.ParseForm()
+	if err != nil {
+		app.clientError(w, http.StatusBadRequest)
+	}
+
+	form := userSignupForm{
+		Name:     r.PostForm.Get("name"),
+		Email:    r.PostForm.Get("email"),
+		Password: r.PostForm.Get("password"),
+	}
+
+	form.CheckField(validator.NotBlank(form.Email), "email", "This field cannot be blank")
+	form.CheckField(validator.Matches(form.Email, validator.EmailRX), "email", "This field must be a valid email address")
+	form.CheckField(validator.NotBlank(form.Password), "password", "This field cannot be blank")
+	form.CheckField(validator.MinChars(form.Password, 8), "password", "This field must be at least 8 characters long")
+
+	if !form.Valid() {
+		data := app.newTemplateData()
+		data.Form = form
+		app.render(w, http.StatusUnprocessableEntity, "signup.gotpl.html", data)
+		return
+	}
+
+	app.users.Name = form.Name
+	app.users.Email = form.Email
+	app.users.HashedPassword = []byte(form.Password)
+
+	err = app.users.Insert(conn)
+	if err != nil {
+		app.serverError(w, err)
+		return
+	}
+
+	app.sessionManager.Put(r.Context(), "flash", "Vous vous êtes bien enregistré")
+
+	http.Redirect(w, r, "/user/login", http.StatusSeeOther)
 }
 
 func (app *application) userLogin(w http.ResponseWriter, r *http.Request) {
