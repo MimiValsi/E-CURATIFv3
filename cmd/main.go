@@ -37,7 +37,7 @@ type application struct {
 // Const for dev
 const (
 	addr    = ":3001"
-	dataURL = "postgres://ameps:pass@localhost:5432/ecuratif"
+	dataURL = "postgres://postgres:pass@localhost:5432/ecuratif"
 	// dataURL = "postgres://ameps:pass@localhost:5432/test"
 )
 
