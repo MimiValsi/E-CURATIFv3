@@ -25,7 +25,8 @@ type templateData struct {
 
 	JSource []byte
 
-	Form any
+	Flash string
+	Form  any
 }
 
 // @ tables sources et infos, colonnes "Created" et "Updated"
