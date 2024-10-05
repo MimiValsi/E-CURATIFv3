@@ -9,38 +9,41 @@ import (
 
 // Chaque page commence avec chi.NewRouter()
 func (app *application) routes() http.Handler {
+	// r := http.NewServeMux()
 	r := chi.NewRouter()
 	r.Use(middleware.Logger)
-
-	// Home page
-	r.Get("/", app.home)
-	r.Get("/jsonGraph", app.jsonData)
-	// r.Get("/prioData", app.priorityData)
-
-	// Pages Source
-	// Chaque place réservée doit être unique pour chaque router
-	r.Get("/source/view/{id}", app.sourceView)
-	r.Get("/source/create", app.sourceCreate)
-	r.Post("/source/create", app.sourceCreatePost)
-	r.Post("/source/delete/{id}", app.sourceDeletePost)
-	r.Get("/source/update/{id}", app.sourceUpdate)
-	r.Post("/source/update/{id}", app.sourceUpdatePost)
-
-	// Pages Infos
-	r.Get("/source/{sid}/info/view/{id}", app.infoView)
-	r.Get("/source/{id}/info/create", app.infoCreate)
-	r.Post("/source/{id}/info/create", app.infoCreatePost)
-	r.Post("/source/{sid}/info/delete/{id}", app.infoDeletePost)
-	r.Get("/source/{sid}/info/update/{id}", app.infoUpdate)
-	r.Post("/source/{sid}/info/update/{id}", app.infoUpdatePost)
-
-	// En cours de création
-	r.Post("/importCSV", app.importCSVPost)
-	r.Get("/exportCSV", app.exportCSVPost)
+	r.Use(middleware.Recoverer)
 
 	// Fichiers statiques
 	fileServer := http.FileServer(http.Dir("./ui/static/"))
-	r.Handle("/static/*", http.StripPrefix("/static", fileServer))
+	r.Handle("GET /static/*", http.StripPrefix("/static", fileServer))
+
+	chain := chi.Chain(app.sessionManager.LoadAndSave).HandlerFunc
+
+	// Home page
+	r.Handle("GET /", chain(app.home))
+	r.Handle("GET /jsonGraph", chain(app.jsonData))
+
+	// Pages Source
+	// Chaque place réservée doit être unique pour chaque router
+	r.Handle("GET /source/view/{id}", chain(app.sourceView))
+	r.Handle("GET /source/create", chain(app.sourceCreate))
+	r.Handle("POST /source/create", chain(app.sourceCreatePost))
+	r.Handle("POST /source/delete/{id}", chain(app.sourceDeletePost))
+	r.Handle("GET /source/update/{id}", chain(app.sourceUpdate))
+	r.Handle("POST /source/update/{id}", chain(app.sourceUpdatePost))
+
+	// Pages Infos
+	r.Handle("GET /source/{sid}/info/view/{id}", chain(app.infoView))
+	r.Handle("GET /source/{id}/info/create", chain(app.infoCreate))
+	r.Handle("POST /source/{id}/info/create", chain(app.infoCreatePost))
+	r.Handle("POST /source/{sid}/info/delete/{id}", chain(app.infoDeletePost))
+	r.Handle("GET /source/{sid}/info/update/{id}", chain(app.infoUpdate))
+	r.Handle("POST /source/{sid}/info/update/{id}", chain(app.infoUpdatePost))
+
+	// En cours de création
+	r.Handle("POST /importCSV", chain(app.importCSVPost))
+	r.Handle("POST /exportCSV", chain(app.exportCSVPost))
 
 	return r
 }
