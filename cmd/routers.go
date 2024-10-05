@@ -41,7 +41,7 @@ func (app *application) routes() http.Handler {
 	r.Handle("GET /source/{sid}/info/update/{id}", chain(app.infoUpdate))
 	r.Handle("POST /source/{sid}/info/update/{id}", chain(app.infoUpdatePost))
 
-	// En cours de création
+	// Import / Export CSV
 	r.Handle("POST /importCSV", chain(app.importCSVPost))
 	r.Handle("POST /exportCSV", chain(app.exportCSVPost))
 
