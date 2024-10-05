@@ -61,6 +61,7 @@ func main() {
 
 	sessionManager = scs.New()
 	sessionManager.Store = pgxstore.New(db)
+	sessionManager.Lifetime = 12 * time.Hour
 
 	// Func @ cmd/template.go
 	templateCache, err := newTemplateCache()
