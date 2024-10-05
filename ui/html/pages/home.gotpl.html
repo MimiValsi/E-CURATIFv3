@@ -19,6 +19,14 @@
 
     <a href="http://localhost:3001/exportCSV"><img class="iconeWidth" src="/static/img/icone_export.png" /></a>
   </div>
+  <div>
+    <a href="/user/signup">Créer compte</a>
+    <a href="/user/login">Se connecter</a>
+  <form action="/user/logout" method="POST">
+    <button type="submit" class="delete-btn">
+      <img class="delete-img" src="/static/img/icone_corbeille.png">
+  </form>
+  </div>
 
 </nav>
 {{ end }}
