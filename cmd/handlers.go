@@ -659,25 +659,6 @@ func (app *application) importCSVPost(w http.ResponseWriter, r *http.Request) {
 	http.Redirect(w, r, "/", http.StatusSeeOther)
 }
 
-// func (app *application) exportCSVPost(w http.ResponseWriter, r *http.Request) {
-// 	text := "This file is very big!"
-// 	words := strings.Split(text, " ")
-// 	w.Header().Add("Content-Type", "text/plain")
-// 	w.Header().Add("Content-Disposition", "attachment; filename=words.txt")
-// 	w.Header().Add("Content-Length", fmt.Sprint(len(text)))
-// 	flusher, ok := w.(http.Flusher)
-// 	if !ok {
-// 		log.Fatal("Cannot use flusher")
-// 	}
-// 	w.Write([]byte(words[0]))
-// 	flusher.Flush()
-// 	for i := 1; i < len(words); i++ {
-// 		// time.Sleep(5 * time.Second)
-// 		w.Write([]byte(" " + words[i]))
-// 		flusher.Flush()
-// 	}
-// }
-
 func (app *application) exportCSVPost(w http.ResponseWriter, r *http.Request) {
 	conn := app.dbConn(r.Context())
 	defer conn.Release()
@@ -709,4 +690,26 @@ func (app *application) exportCSVPost(w http.ResponseWriter, r *http.Request) {
 	flusher.Flush()
 
 	http.Redirect(w, r, "/", http.StatusSeeOther)
+}
+
+// users
+func (app *application) userSignup(w http.ResponseWriter, r *http.Request) {
+	fmt.Fprintln(w, "user sign up page")
+}
+
+func (app *application) userSignupPost(w http.ResponseWriter, r *http.Request) {
+	fmt.Fprintln(w, "user signup post")
+}
+
+func (app *application) userLogin(w http.ResponseWriter, r *http.Request) {
+	fmt.Fprintln(w, "user login page")
+}
+
+func (app *application) userLoginPost(w http.ResponseWriter, r *http.Request) {
+	fmt.Fprintln(w, "user login page post")
+}
+
+func (app *application) userLogoutPost(w http.ResponseWriter, r *http.Request) {
+	fmt.Fprintln(w, "user logout post")
+
 }

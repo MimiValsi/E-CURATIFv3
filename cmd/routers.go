@@ -41,6 +41,13 @@ func (app *application) routes() http.Handler {
 	r.Handle("GET /source/{sid}/info/update/{id}", chain(app.infoUpdate))
 	r.Handle("POST /source/{sid}/info/update/{id}", chain(app.infoUpdatePost))
 
+	// Pages user
+	r.Handle("GET /user/signup", chain(app.userSignup))
+	r.Handle("POST /user/signup", chain(app.userSignupPost))
+	r.Handle("GET /user/login", chain(app.userLogin))
+	r.Handle("GET /user/login", chain(app.userSignupPost))
+	r.Handle("GET /user/logout", chain(app.userLogoutPost))
+
 	// Import / Export CSV
 	r.Handle("POST /importCSV", chain(app.importCSVPost))
 	r.Handle("POST /exportCSV", chain(app.exportCSVPost))
