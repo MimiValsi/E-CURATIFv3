@@ -8,5 +8,7 @@ import (
 // avec PSQL
 // global variable(s) to be used for each PSQL connexion
 var (
-	ErrNoRecord = errors.New("models: No matching record found")
+	ErrNoRecord           = errors.New("models: No matching record found")
+	ErrInvalidCredentials = errors.New("models: invalid credentials")
+	ErrDuplicateEmail     = errors.New("models: duplicate email")
 )
