@@ -748,12 +748,76 @@ func (app *application) userSignupPost(w http.ResponseWriter, r *http.Request) {
 	http.Redirect(w, r, "/user/login", http.StatusSeeOther)
 }
 
+type userLoginForm struct {
+	Email    string
+	Password string
+	validator.Validator
+}
+
 func (app *application) userLogin(w http.ResponseWriter, r *http.Request) {
-	fmt.Fprintln(w, "user login page")
+	data := app.newTemplateData()
+	data.Form = userLoginForm{}
+
+	app.render(w, http.StatusOK, "login.gotpl.html", data)
 }
 
 func (app *application) userLoginPost(w http.ResponseWriter, r *http.Request) {
-	fmt.Fprintln(w, "user login page post")
+	conn := app.dbConn(r.Context())
+	defer conn.Release()
+
+	err := r.ParseForm()
+	if err != nil {
+		app.clientError(w, http.StatusBadRequest)
+	}
+	fmt.Println("here?")
+
+	form := userLoginForm{
+		Email:    r.PostForm.Get("email"),
+		Password: r.PostForm.Get("password"),
+	}
+	fmt.Println("here? 2")
+
+	form.CheckField(validator.NotBlank(form.Email), "email", "This field cannot be blank")
+	form.CheckField(validator.Matches(form.Email, validator.EmailRX), "email", "This field must be a valid email address")
+	form.CheckField(validator.NotBlank(form.Password), "password", "This field cannot be blank")
+
+	if !form.Valid() {
+		data := app.newTemplateData()
+		data.Form = form
+		app.render(w, http.StatusUnprocessableEntity, "login.gotpl.html", data)
+		return
+	}
+	fmt.Println("here? 3")
+
+	app.users.Email = form.Email
+	app.users.HashedPassword = []byte(form.Password)
+
+	id, err := app.users.Authenticate(conn)
+	if err != nil {
+		if errors.Is(err, database.ErrInvalidCredentials) {
+			form.AddNonFieldError("Email or password is incorrect")
+			data := app.newTemplateData()
+			data.Form = form
+			app.render(w, http.StatusUnprocessableEntity, "login.gotpl.html", data)
+			return
+		} else {
+			app.serverError(w, err)
+		}
+
+		return
+	}
+
+	fmt.Println("here? 4")
+
+	err = app.sessionManager.RenewToken(r.Context())
+	if err != nil {
+		app.serverError(w, err)
+		return
+	}
+
+	app.sessionManager.Put(r.Context(), "authenticatedUserID", id)
+
+	http.Redirect(w, r, "/", http.StatusSeeOther)
 }
 
 func (app *application) userLogoutPost(w http.ResponseWriter, r *http.Request) {
