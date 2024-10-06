@@ -8,13 +8,14 @@ import (
 
 // Validator type qui contient un map d'erreurs de validation
 type Validator struct {
-	FieldErrors map[string]string
+	nonFieldErrors []string
+	FieldErrors    map[string]string
 }
 
 // Valid() retourne un "vrai" si les FieldErrors map
 // si la case n'est pas vide.
 func (v *Validator) Valid() bool {
-	return len(v.FieldErrors) == 0
+	return len(v.FieldErrors) == 0 && len(v.nonFieldErrors) == 0
 }
 
 // AddFieldError() génère un message d'erreur vers FieldErrors map
@@ -55,4 +56,8 @@ func MinChars(value string, n int) bool {
 
 func Matches(value string, rx *regexp.Regexp) bool {
 	return rx.MatchString(value)
+}
+
+func (v *Validator) AddNonFieldError(message string) {
+	v.nonFieldErrors = append(v.nonFieldErrors, message)
 }
