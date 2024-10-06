@@ -745,7 +745,7 @@ func (app *application) userSignupPost(w http.ResponseWriter, r *http.Request) {
 
 	app.sessionManager.Put(r.Context(), "flash", "Vous vous êtes bien enregistré")
 
-	http.Redirect(w, r, "/user/login", http.StatusSeeOther)
+	http.Redirect(w, r, "/", http.StatusSeeOther)
 }
 
 type userLoginForm struct {
@@ -778,13 +778,20 @@ func (app *application) userLoginPost(w http.ResponseWriter, r *http.Request) {
 	fmt.Println("here? 2")
 
 	form.CheckField(validator.NotBlank(form.Email), "email", "This field cannot be blank")
+	fmt.Println("here? 2.1")
 	form.CheckField(validator.Matches(form.Email, validator.EmailRX), "email", "This field must be a valid email address")
+	fmt.Println("here? 2.2")
 	form.CheckField(validator.NotBlank(form.Password), "password", "This field cannot be blank")
+	fmt.Println("here? 2.3")
 
 	if !form.Valid() {
+		fmt.Println("here? 2.4")
 		data := app.newTemplateData()
+		fmt.Println("here? 2.5")
 		data.Form = form
+		fmt.Println("here? 2.6")
 		app.render(w, http.StatusUnprocessableEntity, "login.gotpl.html", data)
+		fmt.Println("here? 2.7")
 		return
 	}
 	fmt.Println("here? 3")
