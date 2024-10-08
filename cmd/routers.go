@@ -5,11 +5,11 @@ import (
 
 	"github.com/go-chi/chi/v5"
 	"github.com/go-chi/chi/v5/middleware"
+	"github.com/justinas/alice"
 )
 
 // Chaque page commence avec chi.NewRouter()
 func (app *application) routes() http.Handler {
-	// r := http.NewServeMux()
 	r := chi.NewRouter()
 	r.Use(middleware.Logger)
 	r.Use(middleware.Recoverer)
@@ -18,39 +18,41 @@ func (app *application) routes() http.Handler {
 	fileServer := http.FileServer(http.Dir("./ui/static/"))
 	r.Handle("GET /static/*", http.StripPrefix("/static", fileServer))
 
-	chain := chi.Chain(app.sessionManager.LoadAndSave).HandlerFunc
+	chain := chi.Chain(app.sessionManager.LoadAndSave, noSurf, app.authenticate)
+	protected := append(chain, app.requireAuthentication)
 
 	// Home page
-	r.Handle("GET /", chain(app.home))
-	r.Handle("GET /jsonGraph", chain(app.jsonData))
+	r.Handle("GET /", chain.HandlerFunc(app.home))
+	r.Handle("GET /jsonGraph", chain.HandlerFunc(app.jsonData))
 
 	// Pages Source
 	// Chaque place réservée doit être unique pour chaque router
-	r.Handle("GET /source/view/{id}", chain(app.sourceView))
-	r.Handle("GET /source/create", chain(app.sourceCreate))
-	r.Handle("POST /source/create", chain(app.sourceCreatePost))
-	r.Handle("POST /source/delete/{id}", chain(app.sourceDeletePost))
-	r.Handle("GET /source/update/{id}", chain(app.sourceUpdate))
-	r.Handle("POST /source/update/{id}", chain(app.sourceUpdatePost))
+	r.Handle("GET /source/view/{id}", chain.HandlerFunc(app.sourceView))
+	r.Handle("GET /source/create", protected.HandlerFunc(app.sourceCreate))
+	r.Handle("POST /source/create", protected.HandlerFunc(app.sourceCreatePost))
+	r.Handle("POST /source/delete/{id}", protected.HandlerFunc(app.sourceDeletePost))
+	r.Handle("GET /source/update/{id}", protected.HandlerFunc(app.sourceUpdate))
+	r.Handle("POST /source/update/{id}", protected.HandlerFunc(app.sourceUpdatePost))
 
 	// Pages Infos
-	r.Handle("GET /source/{sid}/info/view/{id}", chain(app.infoView))
-	r.Handle("GET /source/{id}/info/create", chain(app.infoCreate))
-	r.Handle("POST /source/{id}/info/create", chain(app.infoCreatePost))
-	r.Handle("POST /source/{sid}/info/delete/{id}", chain(app.infoDeletePost))
-	r.Handle("GET /source/{sid}/info/update/{id}", chain(app.infoUpdate))
-	r.Handle("POST /source/{sid}/info/update/{id}", chain(app.infoUpdatePost))
+	r.Handle("GET /source/{sid}/info/view/{id}", chain.HandlerFunc(app.infoView))
+	r.Handle("GET /source/{id}/info/create", protected.HandlerFunc(app.infoCreate))
+	r.Handle("POST /source/{id}/info/create", protected.HandlerFunc(app.infoCreatePost))
+	r.Handle("POST /source/{sid}/info/delete/{id}", protected.HandlerFunc(app.infoDeletePost))
+	r.Handle("GET /source/{sid}/info/update/{id}", protected.HandlerFunc(app.infoUpdate))
+	r.Handle("POST /source/{sid}/info/update/{id}", protected.HandlerFunc(app.infoUpdatePost))
 
 	// Pages user
-	r.Handle("GET /user/signup", chain(app.userSignup))
-	r.Handle("POST /user/signup", chain(app.userSignupPost))
-	r.Handle("GET /user/login", chain(app.userLogin))
-	r.Handle("GET /user/login", chain(app.userLoginPost))
-	r.Handle("GET /user/logout", chain(app.userLogoutPost))
+	r.Handle("GET /user/signup", chain.HandlerFunc(app.userSignup))
+	r.Handle("POST /user/signup", chain.HandlerFunc(app.userSignupPost))
+	r.Handle("GET /user/login", chain.HandlerFunc(app.userLogin))
+	r.Handle("POST /user/login", chain.HandlerFunc(app.userLoginPost))
+	r.Handle("POST /user/logout", chain.HandlerFunc(app.userLogoutPost))
 
 	// Import / Export CSV
-	r.Handle("POST /importCSV", chain(app.importCSVPost))
-	r.Handle("POST /exportCSV", chain(app.exportCSVPost))
+	r.Handle("POST /importCSV", protected.HandlerFunc(app.importCSVPost))
+	r.Handle("POST /exportCSV", protected.HandlerFunc(app.exportCSVPost))
 
-	return r
+	std := alice.New(app.recoverPanic, app.logRequest, commonHeaders)
+	return std.Then(r)
 }
