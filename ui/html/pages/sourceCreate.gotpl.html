@@ -12,7 +12,7 @@
 <form name="srcInpt" action="/source/create" method="POST">
   <input type="hidden" name="csrf_token" value="{{ .CSRFToken }}">
   <label class="title blockMargin">Nom du Poste Source:<br></label>
-  <input placeholder="Ex.: Billancourt" id="name" type="text" name="name" class="inpt blockMargin" required><br>
+  <input placeholder="Ex.: Billancourt" id="name" type="text" name="name" class="inpt blockMargin" required autofocus><br>
   <label class="title blockMargin">Code GMAO<br></label>
   <input placeholder="Ex.: BILLA" id="name" type="text" name="code_gmao" class="inpt blockMargin" required><br>
   <input type="submit" value="Soumettre" class="button is-primary is-light is-medium blockMargin">
