@@ -51,7 +51,7 @@ func (app *application) routes() http.Handler {
 
 	// Import / Export CSV
 	r.Handle("POST /importCSV", protected.HandlerFunc(app.importCSVPost))
-	r.Handle("POST /exportCSV", protected.HandlerFunc(app.exportCSVPost))
+	r.Handle("GET /exportCSV", protected.HandlerFunc(app.exportCSVPost))
 
 	std := alice.New(app.recoverPanic, app.logRequest, commonHeaders)
 	return std.Then(r)
