@@ -59,25 +59,6 @@ func (app *application) home(w http.ResponseWriter, r *http.Request) {
 	app.render(w, r, http.StatusOK, "home.gotpl.html", data)
 }
 
-func (app *application) priorityData(w http.ResponseWriter, r *http.Request) {
-	conn := app.dbConn(r.Context())
-	defer conn.Release()
-
-	infos, err := app.infos.PriorityInfos(conn)
-	if err != nil {
-		app.serverError(w, r, err)
-	}
-
-	jsonData, err := json.Marshal(infos)
-	if err != nil {
-		app.serverError(w, r, err)
-	}
-
-	w.WriteHeader(http.StatusOK)
-	w.Header().Set("Content-Type", "application/json")
-	w.Write(jsonData)
-}
-
 func (app *application) jsonData(w http.ResponseWriter, r *http.Request) {
 	conn := app.dbConn(r.Context())
 	defer conn.Release()
@@ -703,6 +684,10 @@ func (app *application) userSignupPost(w http.ResponseWriter, r *http.Request) {
 		Password: r.PostForm.Get("password"),
 	}
 
+	app.users.Name = form.Name
+	app.users.Email = form.Email
+	app.users.Password = form.Password
+
 	form.CheckField(validator.NotBlank(form.Email), "email", "This field cannot be blank")
 	form.CheckField(validator.Matches(form.Email, validator.EmailRX), "email", "This field must be a valid email address")
 	form.CheckField(validator.NotBlank(form.Password), "password", "This field cannot be blank")
@@ -715,7 +700,7 @@ func (app *application) userSignupPost(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	err = app.users.Insert(form.Name, form.Email, form.Password, conn)
+	err = app.users.Insert(conn)
 	if err != nil {
 		app.serverError(w, r, err)
 		return
@@ -765,7 +750,10 @@ func (app *application) userLoginPost(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	id, err := app.users.Authenticate(form.Email, form.Password, conn)
+	app.users.Email = form.Email
+	app.users.Password = form.Password
+
+	id, err := app.users.Authenticate(conn)
 	if err != nil {
 		if errors.Is(err, database.ErrInvalidCredentials) {
 			form.AddNonFieldError("Email or password is incorrect")
