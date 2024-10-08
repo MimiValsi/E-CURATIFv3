@@ -5,13 +5,15 @@ import (
 	"fmt"
 	"net/http"
 	"runtime/debug"
+
+	"github.com/justinas/nosurf"
 )
 
 // Les status web sont gérés ici
 
 // Le serverError écrit les message d'erreur
 // puis envoi 500 Internal Server Error à l'utilisateur
-func (app *application) serverError(w http.ResponseWriter, err error) {
+func (app *application) serverError(w http.ResponseWriter, r *http.Request, err error) {
 	trace := fmt.Sprintf("%s\n%s", err.Error(), debug.Stack())
 
 	app.errorLog.Print(trace)
@@ -32,7 +34,7 @@ func (app *application) notFound(w http.ResponseWriter) {
 // Alloue de la mémoire pour qu'un template puisse être rendue
 // Vérifie si le template dérisé existe avant d´être envoyé
 // au http.ResponseWriter
-func (app *application) render(w http.ResponseWriter, status int, page string,
+func (app *application) render(w http.ResponseWriter, r *http.Request, status int, page string,
 	data *templateData,
 ) {
 	// Récupère le template approprié du cache
@@ -40,7 +42,7 @@ func (app *application) render(w http.ResponseWriter, status int, page string,
 	if !ok {
 		err := fmt.Errorf("the template %s does not exist",
 			page)
-		app.serverError(w, err)
+		app.serverError(w, r, err)
 		return
 	}
 
@@ -49,7 +51,7 @@ func (app *application) render(w http.ResponseWriter, status int, page string,
 	// Execute les templates et envoie au response body
 	err := ts.ExecuteTemplate(buf, "base", data)
 	if err != nil {
-		app.serverError(w, err)
+		app.serverError(w, r, err)
 	}
 
 	w.WriteHeader(status)
@@ -60,6 +62,19 @@ func (app *application) render(w http.ResponseWriter, status int, page string,
 // newTemplateData retourne un pointeur vers templateData
 // non initializé et est utilisé par toutes les fonctions dans
 // Handler. Permer une meilleur lisibilité du code
-func (app *application) newTemplateData() *templateData {
-	return &templateData{}
+func (app *application) newTemplateData(r *http.Request) *templateData {
+	return &templateData{
+		Flash:           app.sessionManager.PopString(r.Context(), "flash"),
+		IsAuthenticated: app.isAuthenticated(r),
+		CSRFToken:       nosurf.Token(r),
+	}
+}
+
+func (app *application) isAuthenticated(r *http.Request) bool {
+	isAuthenticated, ok := r.Context().Value(isAuthenticatedContextKey).(bool)
+	if !ok {
+		return false
+	}
+
+	return isAuthenticated
 }
