@@ -25,8 +25,10 @@ type templateData struct {
 
 	JSource []byte
 
-	Flash string
-	Form  any
+	Flash           string
+	Form            any
+	IsAuthenticated bool
+	CSRFToken       string
 }
 
 // @ tables sources et infos, colonnes "Created" et "Updated"
@@ -65,11 +67,6 @@ func newTemplateCache() (map[string]*template.Template, error) {
 		if err != nil {
 			return nil, err
 		}
-
-		// ts, err = ts.ParseGlob("./ui/html/partials/*.html.gotpl")
-		// if err != nil {
-		// 	return nil, err
-		// }
 
 		ts, err = ts.ParseFiles(page)
 		if err != nil {
