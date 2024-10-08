@@ -715,10 +715,6 @@ func (app *application) userSignupPost(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	// app.users.Name = form.Name
-	// app.users.Email = form.Email
-	// app.users.HashedPassword = []byte(form.Password)
-
 	err = app.users.Insert(form.Name, form.Email, form.Password, conn)
 	if err != nil {
 		app.serverError(w, r, err)
@@ -768,9 +764,6 @@ func (app *application) userLoginPost(w http.ResponseWriter, r *http.Request) {
 		app.render(w, r, http.StatusUnprocessableEntity, "login.gotpl.html", data)
 		return
 	}
-
-	// app.users.Email = form.Email
-	// app.users.HashedPassword = []byte(form.Password)
 
 	id, err := app.users.Authenticate(form.Email, form.Password, conn)
 	if err != nil {
