@@ -23,6 +23,7 @@ func (app *application) dbConn(ctx context.Context) *pgxpool.Conn {
 	conn, err := app.DB.Acquire(ctx)
 	if err != nil {
 		app.errorLog.Println("Couldn't connect to DB")
+		app.errorLog.Println(err)
 		return nil
 	}
 
@@ -40,22 +41,22 @@ func (app *application) home(w http.ResponseWriter, r *http.Request) {
 	// MenuSource func @ database/sources.go
 	sources, err := app.sources.MenuSource(conn)
 	if err != nil {
-		app.serverError(w, err)
+		app.serverError(w, r, err)
 		return
 	}
 
 	jData, err := json.Marshal(sources)
 	if err != nil {
-		app.serverError(w, err)
+		app.serverError(w, r, err)
 		return
 	}
 
 	// newTemplateData @ cmd/templates.go
-	data := app.newTemplateData()
+	data := app.newTemplateData(r)
 	data.Sources = sources
 	data.JSource = jData
 
-	app.render(w, http.StatusOK, "home.gotpl.html", data)
+	app.render(w, r, http.StatusOK, "home.gotpl.html", data)
 }
 
 func (app *application) priorityData(w http.ResponseWriter, r *http.Request) {
@@ -64,12 +65,12 @@ func (app *application) priorityData(w http.ResponseWriter, r *http.Request) {
 
 	infos, err := app.infos.PriorityInfos(conn)
 	if err != nil {
-		app.serverError(w, err)
+		app.serverError(w, r, err)
 	}
 
 	jsonData, err := json.Marshal(infos)
 	if err != nil {
-		app.serverError(w, err)
+		app.serverError(w, r, err)
 	}
 
 	w.WriteHeader(http.StatusOK)
@@ -83,37 +84,18 @@ func (app *application) jsonData(w http.ResponseWriter, r *http.Request) {
 
 	sources, err := app.sources.MenuSource(conn)
 	if err != nil {
-		app.serverError(w, err)
+		app.serverError(w, r, err)
 	}
 
 	jsonGraph, err := json.Marshal(sources)
 	if err != nil {
-		app.serverError(w, err)
+		app.serverError(w, r, err)
 	}
 
 	w.Header().Set("Content-Type", "application/json")
 	w.WriteHeader(http.StatusOK)
 	w.Write(jsonGraph)
 }
-
-// func (app *application) curatifDone(w http.ResponseWriter, r *http.Request) {
-// 	conn := app.dbConn(r.Context())
-// 	defer conn.Release()
-//
-// 	sources, err := app.sources.CuratifsDone(conn)
-// 	if err != nil {
-// 		app.serverError(w, err)
-// 	}
-//
-// 	jsonGraph, err := json.Marshal(sources)
-// 	if err != nil {
-// 		app.serverError(w, err)
-// 	}
-//
-// 	w.WriteHeader(http.StatusOK)
-// 	w.Header().Set("Content-Type", "application/json")
-// 	w.Write(jsonGraph)
-// }
 
 //
 // Sources Handlers
@@ -146,7 +128,7 @@ func (app *application) sourceView(w http.ResponseWriter, r *http.Request) {
 		if errors.Is(err, database.ErrNoRecord) {
 			app.notFound(w)
 		} else {
-			app.serverError(w, err)
+			app.serverError(w, r, err)
 		}
 	}
 
@@ -157,17 +139,17 @@ func (app *application) sourceView(w http.ResponseWriter, r *http.Request) {
 		if errors.Is(err, database.ErrNoRecord) {
 			app.notFound(w)
 		} else {
-			app.serverError(w, err)
+			app.serverError(w, r, err)
 		}
 	}
 
 	// Allocation de mémoire pour création de template
-	data := app.newTemplateData()
+	data := app.newTemplateData(r)
 	data.Infos = info
 	data.Source = source
 
 	// Génération de la page web
-	app.render(w, http.StatusOK, "sourceView.gotpl.html", data)
+	app.render(w, r, http.StatusOK, "sourceView.gotpl.html", data)
 }
 
 // Génération de la page de création de source
@@ -175,10 +157,10 @@ func (app *application) sourceView(w http.ResponseWriter, r *http.Request) {
 // La première est une GET, une fois le nom du source choisi
 // la fonction sourceCreatePost prend le relais
 func (app *application) sourceCreate(w http.ResponseWriter, r *http.Request) {
-	data := app.newTemplateData()
+	data := app.newTemplateData(r)
 	data.Form = sourceCreateForm{}
 
-	app.render(w, http.StatusOK, "sourceCreate.gotpl.html", data)
+	app.render(w, r, http.StatusOK, "sourceCreate.gotpl.html", data)
 }
 
 func (app *application) sourceCreatePost(w http.ResponseWriter, r *http.Request) {
@@ -207,17 +189,16 @@ func (app *application) sourceCreatePost(w http.ResponseWriter, r *http.Request)
 		"code_gmao", emptyField)
 
 	if !form.Valid() {
-		data := app.newTemplateData()
+		data := app.newTemplateData(r)
 		data.Form = form
-		app.render(w, http.StatusUnprocessableEntity,
-			"sourceCreate.gotpl.html", data)
+		app.render(w, r, http.StatusUnprocessableEntity, "sourceCreate.gotpl.html", data)
 		return
 	}
 
 	// Si pas d'erreur, les données sont envoyés vers la BD
 	id, err := app.sources.Insert(form.Name, form.CodeGmao, conn)
 	if err != nil {
-		app.serverError(w, err)
+		app.serverError(w, r, err)
 		return
 	}
 
@@ -247,7 +228,7 @@ func (app *application) sourceDeletePost(w http.ResponseWriter, r *http.Request)
 		if errors.Is(err, database.ErrNoRecord) {
 			app.notFound(w)
 		} else {
-			app.serverError(w, err)
+			app.serverError(w, r, err)
 		}
 		return
 	}
@@ -274,15 +255,15 @@ func (app *application) sourceUpdate(w http.ResponseWriter, r *http.Request) {
 		if errors.Is(err, database.ErrNoRecord) {
 			app.notFound(w)
 		} else {
-			app.serverError(w, err)
+			app.serverError(w, r, err)
 		}
 		return
 	}
 
-	data := app.newTemplateData()
+	data := app.newTemplateData(r)
 	data.Source = source
 
-	app.render(w, http.StatusOK, "sourceUpdate.gotpl.html", data)
+	app.render(w, r, http.StatusOK, "sourceUpdate.gotpl.html", data)
 }
 
 // Une fois les changements faites, elles sont reenvoyés vers la BD
@@ -312,10 +293,9 @@ func (app *application) sourceUpdatePost(w http.ResponseWriter, r *http.Request)
 		"name", emptyField)
 
 	if !form.Valid() {
-		data := app.newTemplateData()
+		data := app.newTemplateData(r)
 		data.Form = form
-		app.render(w, http.StatusUnprocessableEntity,
-			"sourceUpdate.gotpl.html", data)
+		app.render(w, r, http.StatusUnprocessableEntity, "sourceUpdate.gotpl.html", data)
 		return
 	}
 
@@ -323,7 +303,7 @@ func (app *application) sourceUpdatePost(w http.ResponseWriter, r *http.Request)
 
 	err = app.sources.Update(id, conn)
 	if err != nil {
-		app.serverError(w, err)
+		app.serverError(w, r, err)
 		return
 	}
 
@@ -375,16 +355,16 @@ func (app *application) infoCreate(w http.ResponseWriter, r *http.Request) {
 		if errors.Is(err, database.ErrNoRecord) {
 			app.notFound(w)
 		} else {
-			app.serverError(w, err)
+			app.serverError(w, r, err)
 		}
 		return
 	}
 
-	data := app.newTemplateData()
+	data := app.newTemplateData(r)
 	data.Form = infoCreateForm{}
 	data.Source = source
 
-	app.render(w, http.StatusOK, "infoCreate.gotpl.html", data)
+	app.render(w, r, http.StatusOK, "infoCreate.gotpl.html", data)
 }
 
 func (app *application) infoCreatePost(w http.ResponseWriter, r *http.Request) {
@@ -444,7 +424,7 @@ func (app *application) infoCreatePost(w http.ResponseWriter, r *http.Request) {
 
 	iid, err := app.infos.Insert(sID, conn)
 	if err != nil {
-		app.serverError(w, err)
+		app.serverError(w, r, err)
 		return
 	}
 
@@ -473,18 +453,18 @@ func (app *application) infoView(w http.ResponseWriter, r *http.Request) {
 		if errors.Is(err, database.ErrNoRecord) {
 			app.notFound(w)
 		} else {
-			app.serverError(w, err)
+			app.serverError(w, r, err)
 		}
 		return
 	}
 
 	flash := app.sessionManager.PopString(r.Context(), "flash")
 
-	data := app.newTemplateData()
+	data := app.newTemplateData(r)
 	data.Info = info
 	data.Flash = flash
 
-	app.render(w, http.StatusOK, "infoView.gotpl.html", data)
+	app.render(w, r, http.StatusOK, "infoView.gotpl.html", data)
 }
 
 // HTML POST afin de supprimer le curatif(info)
@@ -512,7 +492,7 @@ func (app *application) infoDeletePost(w http.ResponseWriter, r *http.Request) {
 		if errors.Is(err, database.ErrNoRecord) {
 			app.notFound(w)
 		} else {
-			app.serverError(w, err)
+			app.serverError(w, r, err)
 		}
 		return
 	}
@@ -539,15 +519,15 @@ func (app *application) infoUpdate(w http.ResponseWriter, r *http.Request) {
 		if errors.Is(err, database.ErrNoRecord) {
 			app.notFound(w)
 		} else {
-			app.serverError(w, err)
+			app.serverError(w, r, err)
 		}
 		return
 	}
 
-	data := app.newTemplateData()
+	data := app.newTemplateData(r)
 	data.Info = info
 
-	app.render(w, http.StatusOK, "infoUpdate.gotpl.html", data)
+	app.render(w, r, http.StatusOK, "infoUpdate.gotpl.html", data)
 }
 
 func (app *application) infoUpdatePost(w http.ResponseWriter, r *http.Request) {
@@ -603,7 +583,7 @@ func (app *application) infoUpdatePost(w http.ResponseWriter, r *http.Request) {
 
 	err = app.infos.Update(iID, conn)
 	if err != nil {
-		app.serverError(w, err)
+		app.serverError(w, r, err)
 		return
 	}
 
@@ -696,14 +676,16 @@ type userSignupForm struct {
 	Name     string
 	Email    string
 	Password string
+
 	validator.Validator
 }
 
 // users
 func (app *application) userSignup(w http.ResponseWriter, r *http.Request) {
-	data := app.newTemplateData()
+	data := app.newTemplateData(r)
 	data.Form = userSignupForm{}
-	app.render(w, http.StatusOK, "signup.gotpl.html", data)
+
+	app.render(w, r, http.StatusOK, "signup.gotpl.html", data)
 }
 
 func (app *application) userSignupPost(w http.ResponseWriter, r *http.Request) {
@@ -727,19 +709,19 @@ func (app *application) userSignupPost(w http.ResponseWriter, r *http.Request) {
 	form.CheckField(validator.MinChars(form.Password, 8), "password", "This field must be at least 8 characters long")
 
 	if !form.Valid() {
-		data := app.newTemplateData()
+		data := app.newTemplateData(r)
 		data.Form = form
-		app.render(w, http.StatusUnprocessableEntity, "signup.gotpl.html", data)
+		app.render(w, r, http.StatusUnprocessableEntity, "signup.gotpl.html", data)
 		return
 	}
 
-	app.users.Name = form.Name
-	app.users.Email = form.Email
-	app.users.HashedPassword = []byte(form.Password)
+	// app.users.Name = form.Name
+	// app.users.Email = form.Email
+	// app.users.HashedPassword = []byte(form.Password)
 
-	err = app.users.Insert(conn)
+	err = app.users.Insert(form.Name, form.Email, form.Password, conn)
 	if err != nil {
-		app.serverError(w, err)
+		app.serverError(w, r, err)
 		return
 	}
 
@@ -751,14 +733,15 @@ func (app *application) userSignupPost(w http.ResponseWriter, r *http.Request) {
 type userLoginForm struct {
 	Email    string
 	Password string
+
 	validator.Validator
 }
 
 func (app *application) userLogin(w http.ResponseWriter, r *http.Request) {
-	data := app.newTemplateData()
+	data := app.newTemplateData(r)
 	data.Form = userLoginForm{}
 
-	app.render(w, http.StatusOK, "login.gotpl.html", data)
+	app.render(w, r, http.StatusOK, "login.gotpl.html", data)
 }
 
 func (app *application) userLoginPost(w http.ResponseWriter, r *http.Request) {
@@ -769,56 +752,44 @@ func (app *application) userLoginPost(w http.ResponseWriter, r *http.Request) {
 	if err != nil {
 		app.clientError(w, http.StatusBadRequest)
 	}
-	fmt.Println("here?")
 
 	form := userLoginForm{
 		Email:    r.PostForm.Get("email"),
 		Password: r.PostForm.Get("password"),
 	}
-	fmt.Println("here? 2")
 
 	form.CheckField(validator.NotBlank(form.Email), "email", "This field cannot be blank")
-	fmt.Println("here? 2.1")
 	form.CheckField(validator.Matches(form.Email, validator.EmailRX), "email", "This field must be a valid email address")
-	fmt.Println("here? 2.2")
 	form.CheckField(validator.NotBlank(form.Password), "password", "This field cannot be blank")
-	fmt.Println("here? 2.3")
 
 	if !form.Valid() {
-		fmt.Println("here? 2.4")
-		data := app.newTemplateData()
-		fmt.Println("here? 2.5")
+		data := app.newTemplateData(r)
 		data.Form = form
-		fmt.Println("here? 2.6")
-		app.render(w, http.StatusUnprocessableEntity, "login.gotpl.html", data)
-		fmt.Println("here? 2.7")
+		app.render(w, r, http.StatusUnprocessableEntity, "login.gotpl.html", data)
 		return
 	}
-	fmt.Println("here? 3")
 
-	app.users.Email = form.Email
-	app.users.HashedPassword = []byte(form.Password)
+	// app.users.Email = form.Email
+	// app.users.HashedPassword = []byte(form.Password)
 
-	id, err := app.users.Authenticate(conn)
+	id, err := app.users.Authenticate(form.Email, form.Password, conn)
 	if err != nil {
 		if errors.Is(err, database.ErrInvalidCredentials) {
 			form.AddNonFieldError("Email or password is incorrect")
-			data := app.newTemplateData()
+			data := app.newTemplateData(r)
 			data.Form = form
-			app.render(w, http.StatusUnprocessableEntity, "login.gotpl.html", data)
+			app.render(w, r, http.StatusUnprocessableEntity, "login.gotpl.html", data)
 			return
 		} else {
-			app.serverError(w, err)
+			app.serverError(w, r, err)
 		}
 
 		return
 	}
 
-	fmt.Println("here? 4")
-
 	err = app.sessionManager.RenewToken(r.Context())
 	if err != nil {
-		app.serverError(w, err)
+		app.serverError(w, r, err)
 		return
 	}
 
@@ -828,6 +799,15 @@ func (app *application) userLoginPost(w http.ResponseWriter, r *http.Request) {
 }
 
 func (app *application) userLogoutPost(w http.ResponseWriter, r *http.Request) {
-	fmt.Fprintln(w, "user logout post")
+	ctx := r.Context()
+	err := app.sessionManager.RenewToken(ctx)
+	if err != nil {
+		app.serverError(w, r, err)
+	}
 
+	app.sessionManager.Remove(ctx, "authenticatedUserID")
+
+	app.sessionManager.Put(ctx, "flash", "Déconnecté avec succès!")
+
+	http.Redirect(w, r, "/", http.StatusSeeOther)
 }
