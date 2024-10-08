@@ -10,6 +10,7 @@
     <a href="/source/view/{{ .Info.SourceID }}">
       <img class="iconeWidth" src="/static/img/icone_fleche.png">
     </a>
+    {{ if .IsAuthenticated }}
     <a href="/source/{{ .Info.SourceID }}/info/update/{{ .Info.ID }}">
       <img class="iconeWidth" src="/static/img/icone_edition.png">
     </a>
@@ -18,6 +19,7 @@
     <button type="submit" class="delete-btn">
       <img class="delete-img" src="/static/img/icone_corbeille.png">
   </form>
+  {{ end }}
 </nav>
 {{ end }}
 

@@ -3,20 +3,21 @@
 {{ end }}
 {{define "main"}}
 <form action='/user/signup' method='POST' novalidate>
+  <input type="hidden" name="csrf_token" value="{{ .CSRFToken }}">
   <div>
     <label>Name:</label>
-    <input type='text' name='name'>
+    <input type="text" name="name" id="name">
   </div>
   <div>
     <label>Email:</label>
-    <input type='email' name='email'>
+    <input type="email" name='email' id='email'>
   </div>
   <div>
     <label>Password:</label>
-    <input type='password' name='password'>
+    <input type="password" name='password' id='password'>
   </div>
   <div>
-    <input type='submit' value='Signup'>
+    <input type="submit">
   </div>
 </form>
 {{end}}

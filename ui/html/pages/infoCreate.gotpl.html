@@ -19,6 +19,7 @@
 <div id="srcName">
 
   <form method="POST" name="infoInpt">
+    <input type="hidden" name="csrf_token" value="{{ .CSRFToken }}">
     <table>
       <tr>
         <th class="center-text">Ouvrage</th>

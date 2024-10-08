@@ -16,6 +16,7 @@
 {{ define "main" }}
 <div id="srcName">
   <form action="/source/{{ .Info.SourceID }}/info/update/{{ .Info.ID }}" method="POST">
+    <input type="hidden" name="csrf_token" value="{{ .CSRFToken }}">
     <table>
       <tr>
         <th>

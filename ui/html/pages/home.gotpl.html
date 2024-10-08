@@ -6,27 +6,33 @@
   <div>
     <a href="/"><img class="iconeWidth" src="/static/img/icone_maison.png" /></a>
   </div>
+  {{ if .IsAuthenticated }}
   <div>
     <a href="/source/create"><img class="iconeWidth" src="/static/img/icone_ps.png" /></a>
 
-    <form enctype="multipart/form-data" action="http://localhost:3001/importCSV" method="post">
+    <form enctype="multipart/form-data" action="https://localhost:8080/importCSV" method="post">
       <label class="custom-file-button">
-        <input id="importCSV" type="file" accept=".csv" name="inpt"
-          onchange="form.submit(); alert('Fichier en cours de transfert...');">
-        <img class="iconeWidth" src="/static/img/icone_import.png">
+	<input id="importCSV" type="file" accept=".csv" name="inpt"
+	  onchange="form.submit(); alert('Fichier en cours de transfert...');">
+	<img class="iconeWidth" src="/static/img/icone_import.png">
       </label>
     </form>
 
-    <a href="http://localhost:3001/exportCSV"><img class="iconeWidth" src="/static/img/icone_export.png" /></a>
+    <a href="https://localhost:8080/exportCSV"><img class="iconeWidth" src="/static/img/icone_export.png" /></a>
   </div>
+    {{ end }}
   <div>
-    <a href="/user/signup">Créer compte</a>
-    <a href="/user/login">Se connecter</a>
+    {{ if .IsAuthenticated }}
+    <form action="/user/logout" method="POST">
+      <input type="hidden" name="csrf_token" value="{{ .CSRFToken }}">
+      <button type="submit" class="delete-btn">
+	<img class="delete-img" src="/static/img/icone_corbeille.png">
+    </form>
+    {{ else }}
+      <a href="/user/signup">Créer compte</a>
+      <a href="/user/login">Se connecter</a>
 
-  <form action="/user/logout" method="POST">
-    <button type="submit" class="delete-btn">
-      <img class="delete-img" src="/static/img/icone_corbeille.png">
-  </form>
+    {{ end }}
   </div>
 
 </nav>
@@ -44,64 +50,64 @@
 
     <div>
       <form action="/source/view/{{ .ID }}" method="get">
-        {{ if .ID }}
-        <!-- if ID -->
+	{{ if .ID }}
+	<!-- if ID -->
 
-        <!-- ge: Greater Equal
-             le: Lesser Equal  -->
-        {{ if and (ge .Average 0) (le .Average 19) }}
-        <!-- if curatif -->
-        <button name="{{ .Curatifs }}" class="button is-large red-btn">
-          <span class="is-size-5">
-            {{ .Name }}
-            <!-- {{ .Diff }} -->
-          </span>
-        </button>
+	<!-- ge: Greater Equal
+le: Lesser Equal  -->
+	{{ if and (ge .Average 0) (le .Average 19) }}
+	<!-- if curatif -->
+	<button name="{{ .Curatifs }}" class="button is-large red-btn">
+	  <span class="is-size-5">
+	    {{ .Name }}
+	    <!-- {{ .Diff }} -->
+	  </span>
+	</button>
 
-        {{ else if and (ge .Average 20) (le .Average 39) }}
-        <button name="{{ .Curatifs }}" class="button is-large orange-btn">
-          <span class="is-size-5">
-            {{ .Name }}
-            <!-- {{ .Diff }} -->
-          </span>
-        </button>
+	{{ else if and (ge .Average 20) (le .Average 39) }}
+	<button name="{{ .Curatifs }}" class="button is-large orange-btn">
+	  <span class="is-size-5">
+	    {{ .Name }}
+	    <!-- {{ .Diff }} -->
+	  </span>
+	</button>
 
-        {{ else if and (ge .Average 40) (le .Average 59) }}
-        <button name="{{ .Curatifs }}" class="button is-large yellow-btn">
-          <span class="is-size-5">
-            {{ .Name }}
-            <!-- {{ .Diff }} -->
-          </span>
-        </button>
+	{{ else if and (ge .Average 40) (le .Average 59) }}
+	<button name="{{ .Curatifs }}" class="button is-large yellow-btn">
+	  <span class="is-size-5">
+	    {{ .Name }}
+	    <!-- {{ .Diff }} -->
+	  </span>
+	</button>
 
-        {{ else if and (ge .Average 60) (le .Average 79) }}
-        <button name="{{ .Curatifs }}" class="button is-large blue-btn">
-          <span class="is-size-5">
-            {{ .Name }}
-            <!-- {{ .Diff }} -->
-          </span>
-        </button>
+	{{ else if and (ge .Average 60) (le .Average 79) }}
+	<button name="{{ .Curatifs }}" class="button is-large blue-btn">
+	  <span class="is-size-5">
+	    {{ .Name }}
+	    <!-- {{ .Diff }} -->
+	  </span>
+	</button>
 
-        {{ else if and (ge .Average 80) (le .Average 99) }}
-        <button name="{{ .Curatifs }}" class="button is-large turquoise-btn">
-          <span class="is-size-5">
-            {{ .Name }}
-            <!-- {{ .Diff }} -->
-          </span>
-        </button>
+	{{ else if and (ge .Average 80) (le .Average 99) }}
+	<button name="{{ .Curatifs }}" class="button is-large turquoise-btn">
+	  <span class="is-size-5">
+	    {{ .Name }}
+	    <!-- {{ .Diff }} -->
+	  </span>
+	</button>
 
-        {{ else if (eq .Average 100) }}
-        <button name="{{ .Curatifs }}" class="button is-large green-btn">
-          <span class="is-size-5">
-            {{ .Name }}
-            <!-- {{ .Diff }} -->
-          </span>
-        </button>
-        {{ end }}
-        <!-- if curatif end -->
+	{{ else if (eq .Average 100) }}
+	<button name="{{ .Curatifs }}" class="button is-large green-btn">
+	  <span class="is-size-5">
+	    {{ .Name }}
+	    <!-- {{ .Diff }} -->
+	  </span>
+	</button>
+	{{ end }}
+	<!-- if curatif end -->
 
-        {{ end }}
-        <!-- if ID end -->
+	{{ end }}
+	<!-- if ID end -->
       </form>
     </div>
 
