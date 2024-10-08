@@ -10,11 +10,11 @@ import (
 	"strconv"
 	"time"
 
-	"E-CURATIFv3/internal/validator"
-
 	"github.com/jackc/pgx/v5"
 	"github.com/jackc/pgx/v5/pgxpool"
 	"golang.org/x/text/encoding/charmap"
+
+	"E-CURATIFv3/internal/validator"
 )
 
 type Export struct {
@@ -102,12 +102,6 @@ SELECT i.id AS "Info ID",
 			data.ErrorLog.Println(err)
 			return "", err // Add err return
 		}
-
-		// line.Created, err = time.Parse("02/01/2006", *created)
-		// if err != nil {
-		// 	data.ErrorLog.Printf("Format de date invalide: %v", created)
-		// 	data.ErrorLog.Println(err)
-		// }
 
 		if evenement != nil {
 			line.Evenement = *evenement
