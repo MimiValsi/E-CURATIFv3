@@ -114,6 +114,7 @@
   {{ if .Infos }}
   {{ else }}
   <form action="/source/delete/{{ .Source.ID }}" method="POST">
+    <input type="hidden" name="csrf_token" value="{{ .CSRFToken }}">
     <button type="submit" class="delete-btn">
       <img src="/static/img/icone_corbeille.png" class="delete-img">
   </form>
