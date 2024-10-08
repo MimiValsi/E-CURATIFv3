@@ -3,7 +3,6 @@ package models
 import (
 	"context"
 	"errors"
-	"fmt"
 	"time"
 
 	"github.com/jackc/pgx/v5"
@@ -14,11 +13,11 @@ import (
 )
 
 type User struct {
-	ID             int
-	Name           string
-	Email          string
-	HashedPassword []byte
-	Created        time.Time
+	ID       int
+	Name     string
+	Email    string
+	Password string
+	Created  time.Time
 
 	DB *pgxpool.Pool
 }
@@ -26,7 +25,7 @@ type User struct {
 func (u *User) Insert(conn *pgxpool.Conn) error {
 	ctx := context.Background()
 
-	hashedPasswd, err := bcrypt.GenerateFromPassword(u.HashedPassword, 12)
+	hashedPasswd, err := bcrypt.GenerateFromPassword([]byte(u.Password), 12)
 	if err != nil {
 		return err
 	}
@@ -42,7 +41,6 @@ RETURNING id;
 	if err != nil {
 		return err
 	}
-	fmt.Println("user sent")
 
 	return nil
 
@@ -55,17 +53,18 @@ func (u *User) Authenticate(conn *pgxpool.Conn) (int, error) {
 
 	query := `SELECT id, hashed_password FROM users WHERE email = $1`
 
-	err := conn.QueryRow(ctx, query, u.Email).Scan(&u.ID, &hashed_passwd)
+	var id int
+	err := conn.QueryRow(ctx, query, u.Email).Scan(&id, &hashed_passwd)
+
 	if err != nil {
 		if errors.Is(err, pgx.ErrNoRows) {
-			fmt.Println("pas bon du tout")
 			return 0, database.ErrInvalidCredentials
 		} else {
 			return 0, err
 		}
 	}
 
-	err = bcrypt.CompareHashAndPassword(hashed_passwd, u.HashedPassword)
+	err = bcrypt.CompareHashAndPassword(hashed_passwd, []byte(u.Password))
 	if err != nil {
 		if errors.Is(err, bcrypt.ErrMismatchedHashAndPassword) {
 			return 0, database.ErrInvalidCredentials
@@ -73,9 +72,14 @@ func (u *User) Authenticate(conn *pgxpool.Conn) (int, error) {
 		return 0, err
 	}
 
-	return u.ID, nil
+	return id, nil
 }
 
-func (u *User) Exists(id int) (bool, error) {
-	return false, nil
+func (u *User) Exists(conn *pgxpool.Conn) (bool, error) {
+	ctx := context.Background()
+	var exists bool
+
+	query := `SELECT EXISTS(SELECT true FROM users WHERE id = $1)`
+	err := conn.QueryRow(ctx, query, u.ID).Scan(&exists)
+	return exists, err
 }
