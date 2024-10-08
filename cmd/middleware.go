@@ -80,13 +80,13 @@ func (app *application) authenticate(next http.Handler) http.Handler {
 		conn := app.dbConn(ctx)
 		defer conn.Release()
 
-		id := app.sessionManager.GetInt(ctx, "authenticatedUserID")
-		if id == 0 {
+		app.users.ID = app.sessionManager.GetInt(ctx, "authenticatedUserID")
+		if app.users.ID == 0 {
 			next.ServeHTTP(w, r)
 			return
 		}
 
-		exists, err := app.users.Exists(id, conn)
+		exists, err := app.users.Exists(conn)
 		if err != nil {
 			app.serverError(w, r, err)
 			return
