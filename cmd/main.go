@@ -28,9 +28,8 @@ type application struct {
 
 	errorLog *log.Logger
 	infoLog  *log.Logger
-	logger   *log.Logger
+	logger   *slog.Logger
 
-	// csvSource *database.CSVSource
 	csvImport *database.Import
 	csvExport *database.Export
 
@@ -41,7 +40,7 @@ type application struct {
 
 // Const for dev
 const (
-	addr    = ":3001"
+	addr    = ":8080"
 	dataURL = "postgres://postgres:pass@localhost:5432/ecuratif"
 	// dataURL = "postgres://ameps:pass@localhost:5432/test"
 )
@@ -54,6 +53,7 @@ func main() {
 	infoLog := log.New(os.Stderr, "INFO\t", log.Ldate|log.Ltime)
 	errorLog := log.New(os.Stderr, "ERROR\t",
 		log.Ldate|log.Ltime|log.Lshortfile)
+
 	logger := slog.New(slog.NewTextHandler(os.Stdout, nil))
 
 	var sessionManager *scs.SessionManager
@@ -90,7 +90,7 @@ func main() {
 
 		infoLog:  infoLog,
 		errorLog: errorLog,
-		logger:   slog.NewLogLogger(logger.Handler(), slog.LevelError),
+		logger:   logger,
 
 		sessionManager: sessionManager,
 	}
@@ -104,13 +104,13 @@ func main() {
 	srv := &http.Server{
 		Addr:         addr,
 		Handler:      app.routes(),
-		ReadTimeout:  10 * time.Second,
+		IdleTimeout:  time.Minute,
+		ReadTimeout:  5 * time.Second,
 		WriteTimeout: 10 * time.Second,
 		TLSConfig:    tlsConfig,
 	}
 
 	infoLog.Printf("Starting server on %s", addr)
-	// err = srv.ListenAndServe()
 	err = srv.ListenAndServeTLS("./tls/cert.pem", "./tls/key.pem")
 	errorLog.Fatal(err)
 }
@@ -123,7 +123,9 @@ func openDB(dataURL string) (*pgxpool.Pool, error) {
 	if err != nil {
 		return nil, err
 	}
+
 	if err = db.Ping(ctx); err != nil {
+		db.Close()
 		return nil, err
 	}
 
