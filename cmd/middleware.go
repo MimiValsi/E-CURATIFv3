@@ -76,10 +76,11 @@ func noSurf(next http.Handler) http.Handler {
 
 func (app *application) authenticate(next http.Handler) http.Handler {
 	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
-		// ctx := r.Context()
-		conn := app.dbConn(r.Context())
+		ctx := r.Context()
+		conn := app.dbConn(ctx)
+		defer conn.Release()
 
-		id := app.sessionManager.GetInt(r.Context(), "authenticatedUserID")
+		id := app.sessionManager.GetInt(ctx, "authenticatedUserID")
 		if id == 0 {
 			next.ServeHTTP(w, r)
 			return
@@ -92,7 +93,7 @@ func (app *application) authenticate(next http.Handler) http.Handler {
 		}
 
 		if exists {
-			ctx := context.WithValue(r.Context(), isAuthenticatedContextKey, true)
+			ctx = context.WithValue(ctx, isAuthenticatedContextKey, true)
 			r = r.WithContext(ctx)
 		}
 
