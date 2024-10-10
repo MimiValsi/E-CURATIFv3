@@ -26,6 +26,7 @@ type templateData struct {
 	JSource []byte
 
 	Flash           string
+	Cree            string
 	Form            any
 	IsAuthenticated bool
 	CSRFToken       string
