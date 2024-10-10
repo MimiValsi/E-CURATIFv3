@@ -15,6 +15,7 @@ import (
 type User struct {
 	ID       int
 	Name     string
+	NNI      string
 	Email    string
 	Password string
 	Created  time.Time
@@ -74,6 +75,12 @@ func (u *User) Authenticate(conn *pgxpool.Conn) (int, error) {
 
 	return id, nil
 }
+
+// func (u *User) GetUser(conn *pgxpool.Conn) (string, error) {
+// 	ctx := context.Background()
+//
+// 	query := `SELECT nni FROM users WHERE`
+// }
 
 func (u *User) Exists(conn *pgxpool.Conn) (bool, error) {
 	ctx := context.Background()
