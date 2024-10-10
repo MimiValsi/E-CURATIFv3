@@ -1,31 +1,19 @@
 LIST DES CURATIFS:
 
- - Rajouter détail	OK
- - trier par priorité	DEJA SUR PLACE
- - Nom des status: 
- - Changer couleurs Billboard   OK
- - Code couleurs par poste, calculer le nombre total de fait / total curatifs * 100     OK
- - Code couleurs: Vert -> Turquoise -> Bleu -> Jaune -> Orange -> Rouge clignotant      OK
-
-Anciens status:
- - en attente
- - affecté
- - résolu
 
  Rajouter rougle alerte en cas de trop de diff entre a realiser et total
  petit rouge a la place
 
  Ajouter update dans DB
 
- Changer fonctionnement upload csv file         OK
-
-
- Create user session. Create own or ask for Gardian?
+ Create users session. Create own or ask for Gardian? ( BOTH )
 
  Rajouter emplacement pour images
  Rajouter DI depuis Maximo et éventuellement fiche avarie
 
  Create docker and dockerfile config
+
+ Add SIGTERM behavior
 
 Autho OKTA OPENIDconnect
 Gardien
