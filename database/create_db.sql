@@ -36,7 +36,7 @@ CREATE INDEX sessions_expiry_idx ON sessions (expiry);
 
 CREATE TABLE IF NOT EXISTS users (
   id SERIAL PRIMARY KEY NOT NULL,
-  name VARCHAR NOT NULL,
+  nni VARCHAR NOT NULL,
   email VARCHAR NOT NULL,
   hashed_password VARCHAR(60) NOT NULL,
   created DATE NOT NULL
