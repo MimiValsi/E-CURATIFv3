@@ -51,6 +51,8 @@ func (app *application) home(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
+	// user, err := app.users.
+
 	// newTemplateData @ cmd/templates.go
 	data := app.newTemplateData(r)
 	data.Sources = sources
@@ -124,10 +126,13 @@ func (app *application) sourceView(w http.ResponseWriter, r *http.Request) {
 		}
 	}
 
+	cree := app.sessionManager.PopString(r.Context(), "cree")
+
 	// Allocation de mémoire pour création de template
 	data := app.newTemplateData(r)
 	data.Infos = info
 	data.Source = source
+	data.Cree = cree
 
 	// Génération de la page web
 	app.render(w, r, http.StatusOK, "sourceView.gotpl.html", data)
@@ -182,6 +187,8 @@ func (app *application) sourceCreatePost(w http.ResponseWriter, r *http.Request)
 		app.serverError(w, r, err)
 		return
 	}
+
+	app.sessionManager.Put(r.Context(), "cree", "Source crée avec succès!")
 
 	http.Redirect(w, r, fmt.Sprintf("/source/view/%d", id),
 		http.StatusSeeOther)
@@ -409,7 +416,7 @@ func (app *application) infoCreatePost(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	app.sessionManager.Put(r.Context(), "flash", "Info crée avec succès!")
+	app.sessionManager.Put(r.Context(), "cree", "Info crée avec succès!")
 
 	http.Redirect(w, r, fmt.Sprintf("/source/%d/info/view/%d",
 		sID, iid), http.StatusSeeOther)
@@ -439,11 +446,11 @@ func (app *application) infoView(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	flash := app.sessionManager.PopString(r.Context(), "flash")
+	cree := app.sessionManager.PopString(r.Context(), "cree")
 
 	data := app.newTemplateData(r)
 	data.Info = info
-	data.Flash = flash
+	data.Cree = cree
 
 	app.render(w, r, http.StatusOK, "infoView.gotpl.html", data)
 }
@@ -624,7 +631,7 @@ func (app *application) exportCSVPost(w http.ResponseWriter, r *http.Request) {
 	conn := app.dbConn(r.Context())
 	defer conn.Release()
 
-	path, err := app.csvExport.Export_DB_csv(conn)
+	err := app.csvExport.Export_DB_csv(conn)
 	if err != nil {
 		app.errorLog.Println("Couldn't fetch file")
 		return
@@ -632,7 +639,7 @@ func (app *application) exportCSVPost(w http.ResponseWriter, r *http.Request) {
 
 	app.infoLog.Println("Export en cours")
 
-	file, err := os.ReadFile(path)
+	file, err := os.ReadFile(app.csvExport.Path)
 	if err != nil {
 		app.errorLog.Println("File doesn't exist")
 		return
@@ -650,18 +657,36 @@ func (app *application) exportCSVPost(w http.ResponseWriter, r *http.Request) {
 
 	flusher.Flush()
 
+	path := "./csvFiles/test/Actions_exportés.csv"
+	err = os.Remove(path)
+	if err != nil {
+		app.errorLog.Printf("Could not remove file: %s", path)
+	}
+	app.infoLog.Printf("File erased: %s", path)
+
+	path = "./csvFiles/test/test_export.csv"
+	err = os.Remove(path)
+	if err != nil {
+		app.errorLog.Printf("Could not remove file: %s", path)
+	}
+	app.infoLog.Printf("File erased: %s", path)
+
 	http.Redirect(w, r, "/", http.StatusSeeOther)
 }
 
+//
+// users
+//
+
 type userSignupForm struct {
 	Name     string
+	NNI      string
 	Email    string
 	Password string
 
 	validator.Validator
 }
 
-// users
 func (app *application) userSignup(w http.ResponseWriter, r *http.Request) {
 	data := app.newTemplateData(r)
 	data.Form = userSignupForm{}
@@ -680,25 +705,27 @@ func (app *application) userSignupPost(w http.ResponseWriter, r *http.Request) {
 
 	form := userSignupForm{
 		Name:     r.PostForm.Get("name"),
+		NNI:      r.PostForm.Get("nni"),
 		Email:    r.PostForm.Get("email"),
 		Password: r.PostForm.Get("password"),
 	}
 
 	app.users.Name = form.Name
+	app.users.NNI = form.NNI
 	app.users.Email = form.Email
 	app.users.Password = form.Password
 
-	form.CheckField(validator.NotBlank(form.Email), "email", "This field cannot be blank")
-	form.CheckField(validator.Matches(form.Email, validator.EmailRX), "email", "This field must be a valid email address")
-	form.CheckField(validator.NotBlank(form.Password), "password", "This field cannot be blank")
-	form.CheckField(validator.MinChars(form.Password, 8), "password", "This field must be at least 8 characters long")
+	// form.CheckField(validator.NotBlank(form.Email), "email", "This field cannot be blank")
+	// form.CheckField(validator.Matches(form.Email, validator.EmailRX), "email", "This field must be a valid email address")
+	// form.CheckField(validator.NotBlank(form.Password), "password", "This field cannot be blank")
+	// form.CheckField(validator.MinChars(form.Password, 8), "password", "This field must be at least 8 characters long")
 
-	if !form.Valid() {
-		data := app.newTemplateData(r)
-		data.Form = form
-		app.render(w, r, http.StatusUnprocessableEntity, "signup.gotpl.html", data)
-		return
-	}
+	// if !form.Valid() {
+	// 	data := app.newTemplateData(r)
+	// 	data.Form = form
+	// 	app.render(w, r, http.StatusUnprocessableEntity, "signup.gotpl.html", data)
+	// 	return
+	// }
 
 	err = app.users.Insert(conn)
 	if err != nil {
@@ -713,6 +740,7 @@ func (app *application) userSignupPost(w http.ResponseWriter, r *http.Request) {
 
 type userLoginForm struct {
 	Email    string
+	NNI      string
 	Password string
 
 	validator.Validator
@@ -736,21 +764,23 @@ func (app *application) userLoginPost(w http.ResponseWriter, r *http.Request) {
 
 	form := userLoginForm{
 		Email:    r.PostForm.Get("email"),
+		NNI:      r.PostForm.Get("nni"),
 		Password: r.PostForm.Get("password"),
 	}
 
-	form.CheckField(validator.NotBlank(form.Email), "email", "This field cannot be blank")
-	form.CheckField(validator.Matches(form.Email, validator.EmailRX), "email", "This field must be a valid email address")
-	form.CheckField(validator.NotBlank(form.Password), "password", "This field cannot be blank")
-
-	if !form.Valid() {
-		data := app.newTemplateData(r)
-		data.Form = form
-		app.render(w, r, http.StatusUnprocessableEntity, "login.gotpl.html", data)
-		return
-	}
+	// form.CheckField(validator.NotBlank(form.Email), "email", "This field cannot be blank")
+	// form.CheckField(validator.Matches(form.Email, validator.EmailRX), "email", "This field must be a valid email address")
+	// form.CheckField(validator.NotBlank(form.Password), "password", "This field cannot be blank")
+	//
+	// if !form.Valid() {
+	// 	data := app.newTemplateData(r)
+	// 	data.Form = form
+	// 	app.render(w, r, http.StatusUnprocessableEntity, "login.gotpl.html", data)
+	// 	return
+	// }
 
 	app.users.Email = form.Email
+	app.users.NNI = form.NNI
 	app.users.Password = form.Password
 
 	id, err := app.users.Authenticate(conn)
