@@ -67,6 +67,7 @@ func (app *application) newTemplateData(r *http.Request) *templateData {
 		Flash:           app.sessionManager.PopString(r.Context(), "flash"),
 		IsAuthenticated: app.isAuthenticated(r),
 		CSRFToken:       nosurf.Token(r),
+		Cree:            app.sessionManager.PopString(r.Context(), "cree"),
 	}
 }
 
