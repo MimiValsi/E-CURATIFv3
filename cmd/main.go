@@ -2,11 +2,9 @@ package main
 
 import (
 	"context"
-	"crypto/tls"
 	"html/template"
 	"log"
 	"log/slog"
-	"net/http"
 	"os"
 	"time"
 
@@ -15,14 +13,13 @@ import (
 	"github.com/jackc/pgx/v5/pgxpool" // PostgreSQL driver
 
 	"E-CURATIFv3/database" // Database regroupe toutes les fonctions pour communiquer avec PSQL
-	"E-CURATIFv3/internal/models"
 )
 
 // afin de permettre la vérif les informations et communiquer avec PSQL
 type application struct {
 	sources *database.Source
 	infos   *database.Info
-	users   *models.User
+	users   *database.User
 
 	templateCache map[string]*template.Template
 
@@ -80,7 +77,7 @@ func main() {
 		DB:      db,
 		sources: &database.Source{},
 		infos:   &database.Info{},
-		users:   &models.User{},
+		users:   &database.User{},
 
 		templateCache: templateCache,
 		csvImport:     &database.Import{InfoLog: infoLog, ErrorLog: errorLog},
@@ -93,24 +90,7 @@ func main() {
 		sessionManager: sessionManager,
 	}
 
-	tlsConfig := &tls.Config{
-		CurvePreferences: []tls.CurveID{tls.X25519, tls.CurveP256},
-	}
-
-	// Default parameters values to routes
-	// See routers.go
-	srv := &http.Server{
-		Addr:         addr,
-		Handler:      app.routes(),
-		IdleTimeout:  time.Minute,
-		ReadTimeout:  5 * time.Second,
-		WriteTimeout: 10 * time.Second,
-		TLSConfig:    tlsConfig,
-	}
-
-	infoLog.Printf("Starting server on %s", addr)
-	err = srv.ListenAndServeTLS("./tls/cert.pem", "./tls/key.pem")
-	// err = srv.ListenAndServe()
+	err = app.serve()
 	errorLog.Fatal(err)
 }
 
