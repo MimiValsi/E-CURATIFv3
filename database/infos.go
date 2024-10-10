@@ -39,7 +39,7 @@ func (i *Info) PriorityInfos(conn *pgxpool.Conn) ([]*Info, error) {
 SELECT i.ouvrage,
        i.detail
   FROM info AS i
- WHERE status NOT LIKE 'réalis%' AND status NOT LIKE 'résol%' AND 
+ WHERE status NOT LIKE 'réalis%' AND status NOT LIKE 'résol%' AND
        status NOT LIKE 'archiv%'
 `
 
