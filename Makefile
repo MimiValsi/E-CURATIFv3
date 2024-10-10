@@ -1,37 +1,48 @@
 NAME=launch
 
-# Lauch everything
-all: sass build start
+# Lance la compilation et le web app
+# Seulement utilisé pour développement
+all: sass build
 
-# Build sass file to css
+# Compile le fichier scss vers css
 sass:
 	@echo "Compiling css file"
 	@sassc ui/static/sass/main.scss ui/static/sass/main.css
 
-# @sass --no-source-map ui/static/sass/main.scss:ui/static/sass/main.css
-# Compile entirely the program
+# Compile seulement côté golang
 build:
 	@echo "Compiling program"
 	@go build -o $(NAME) ./cmd/
 	@echo "Start E-Curatif"
-	@make start
+	@./$(NAME)
 
-# start program (if exists) else run make all
-start:
-	@if [ -f ./$(NAME) ]; then \
-		./$(NAME) \
-	else \
-		make all; \
-	fi
 
-# run temporarely the program (dev only)
-temp: 
-	go run ./cmd/
+# Lance la création de l'image ecuratif db
+# Lance le contenaire
+# sleep cmd permet une attente de 10s afin de laisser psql faire son taff
+# Lance la compilation du web app (css et go)
+install:
+	@echo "building docker..."
+	@docker buildx build -t ecuratif_db ./database/
+	@docker run -d --name ecuratif_psql_container -p 5432:5432 ecuratif_db:latest
+	@sleep 10
+	@echo "Compiling css files..."
+	@sassc ui/static/sass/main.scss ui/static/sass/main.css
+	@echo "Compiling program..."
+	@go build -o $(NAME) ./cmd/
+	@echo "E-Curatif online!"
+	@./$(NAME)
 
 test:
 	@echo "Compiling test"
 	@go build -o test ./test/
 	@./test
+
+# Trouver moyen de choper ./launch PID pour envoyer SIGTERM
+uninstall:
+	@docker stop ecuratif_psql_container
+	@docker rm ecuratif_psql_container
+	@docker rmi ecuratif_db:latest
 
 clean:
 	rm ./$(NAME)
