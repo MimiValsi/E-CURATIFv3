@@ -1,29 +1,28 @@
 (async () => {
   const getJson = async () => {
-    const response = await fetch("http://localhost:3001/jsonGraph");
+    const response = await fetch("https://localhost:8080/jsonGraph");
 
     const data = await response.json();
     const js = JSON.stringify(data);
-    const jp = await JSON.parse(js)
+    const jp = await JSON.parse(js);
 
     return jp;
   };
 
-
   const getJsonCD = async () => {
-    const curatifDone = await fetch("http://localhost:3001/curatifDone");
+    const curatifDone = await fetch("https://localhost:8080/curatifDone");
     const data = await curatifDone.json();
     const js = JSON.stringify(data);
     const jp = await JSON.parse(js);
 
     return jp;
-  }
+  };
 
   // Fetch every active 'Curatif'
   const jsData = await getJson();
 
   let nomSources = [];
-  let codeGMAO = []
+  let codeGMAO = [];
   let aRealiser = [];
   let enCours = [];
   let done = [];
@@ -44,27 +43,23 @@
     data: {
       names: {
         data1: "Curatifs",
-        data2: "Sources"
+        data2: "Sources",
       },
       columns: [
         ["Curatifs à réaliser", ...aRealiser],
         ["Curatifs en cours", ...enCours],
         ["Curatifs réalisées", ...done],
-        ["Total", ...total]
+        ["Total", ...total],
       ],
       type: "bar",
 
       groups: [
-        [
-          "Curatifs à réaliser",
-          "Curatifs en cours",
-          "Curatifs réalisées"
-        ]
-      ]
+        ["Curatifs à réaliser", "Curatifs en cours", "Curatifs réalisées"],
+      ],
     },
 
     color: {
-      pattern: ["#cc1111", "#0080ff", "#99cc33", "#999999"]
+      pattern: ["#cc1111", "#0080ff", "#99cc33", "#999999"],
     },
 
     axis: {
@@ -72,12 +67,12 @@
         type: "category",
         categories: [...codeGMAO],
         height: 50,
-      }
+      },
     },
 
     size: {
       width: 1000,
-      height: 400
+      height: 400,
     },
 
     padding: true,
@@ -89,17 +84,17 @@
 
     zoom: {
       enabled: true,
-      type: "drag"
+      type: "drag",
     },
 
     legend: {
-      position: "bottom"
+      position: "bottom",
     },
 
     bar: {
       width: {
-        ratio: 0.5
-      }
-    }
+        ratio: 0.5,
+      },
+    },
   });
 })();
