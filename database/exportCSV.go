@@ -34,6 +34,8 @@ type Export struct {
 	Echeance  string
 	Entite    string
 
+	Path string
+
 	// db conn
 	DB *pgxpool.Pool
 
@@ -45,7 +47,7 @@ type Export struct {
 	ZeroTime time.Time
 }
 
-func (data *Export) Export_DB_csv(conn *pgxpool.Conn) (string, error) {
+func (data *Export) Export_DB_csv(conn *pgxpool.Conn) error {
 	ctx := context.Background()
 	query := `
 SELECT i.id AS "Info ID",
@@ -68,7 +70,7 @@ SELECT i.id AS "Info ID",
 	file, err := os.OpenFile(path, os.O_CREATE|os.O_WRONLY, 0o644)
 	if err != nil {
 		data.ErrorLog.Println("Cannot create or open file")
-		return "", err // err file open
+		return err
 	}
 
 	defer file.Close()
@@ -77,13 +79,13 @@ SELECT i.id AS "Info ID",
 	_, err = io.WriteString(file, header)
 	if err != nil {
 		data.ErrorLog.Println("io couldn't write header to file")
-		return "", err // add io err
+		return err
 	}
 
 	rows, err := conn.Query(ctx, query)
 	if err != nil {
 		data.ErrorLog.Println("Couldn't fetch from DB")
-		return "", err // Add err return
+		return err
 	}
 	defer rows.Close()
 
@@ -96,11 +98,11 @@ SELECT i.id AS "Info ID",
 			&detail, &priorite, &status, &echeance, &entite)
 		if err != nil {
 			if errors.Is(err, pgx.ErrNoRows) {
-				return "", err // error here pgx
+				return err
 			}
 			data.ErrorLog.Println("Couldn't copy to var")
 			data.ErrorLog.Println(err)
-			return "", err // Add err return
+			return err
 		}
 
 		if evenement != nil {
@@ -135,21 +137,21 @@ SELECT i.id AS "Info ID",
 			line.ID, line.SourceName, line.Evenement, line.Created.Format("02/01/2006"), line.Ouvrage,
 			line.Detail, line.Priorite, line.Status, line.Echeance, line.Entite)
 
-		_, err := io.WriteString(file, s)
+		_, err = io.WriteString(file, s)
 		if err != nil {
 			data.ErrorLog.Println("io couldn't write row to file")
-			return "", err // add io err
+			return err
 		}
 
 	}
 
-	path, err = data.decode_from_UTF8(path)
+	data.Path, err = data.decode_from_UTF8(path)
 	if err != nil {
 		data.ErrorLog.Println("bad encoding")
-		return "", nil
+		return nil
 	}
 
-	return path, nil
+	return nil
 }
 
 func (data *Export) decode_from_UTF8(s string) (string, error) {
