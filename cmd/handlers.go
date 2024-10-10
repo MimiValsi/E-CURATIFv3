@@ -10,6 +10,7 @@ import (
 	"net/http"
 	"os"
 	"strconv"
+	"strings"
 	"time"
 
 	"github.com/go-chi/chi/v5"
@@ -679,7 +680,6 @@ func (app *application) exportCSVPost(w http.ResponseWriter, r *http.Request) {
 //
 
 type userSignupForm struct {
-	Name     string
 	NNI      string
 	Email    string
 	Password string
@@ -704,14 +704,12 @@ func (app *application) userSignupPost(w http.ResponseWriter, r *http.Request) {
 	}
 
 	form := userSignupForm{
-		Name:     r.PostForm.Get("name"),
 		NNI:      r.PostForm.Get("nni"),
 		Email:    r.PostForm.Get("email"),
 		Password: r.PostForm.Get("password"),
 	}
 
-	app.users.Name = form.Name
-	app.users.NNI = form.NNI
+	app.users.NNI = strings.ToUpper(form.NNI)
 	app.users.Email = form.Email
 	app.users.Password = form.Password
 
@@ -739,8 +737,8 @@ func (app *application) userSignupPost(w http.ResponseWriter, r *http.Request) {
 }
 
 type userLoginForm struct {
-	Email    string
 	NNI      string
+	Email    string
 	Password string
 
 	validator.Validator
