@@ -56,8 +56,6 @@ func main() {
 
 	logger := slog.New(slog.NewTextHandler(os.Stdout, nil))
 
-	var sessionManager *scs.SessionManager
-
 	// Send an connection request to DB
 	db, err := openDB(dataURL)
 	if err != nil {
@@ -65,7 +63,7 @@ func main() {
 	}
 	defer db.Close()
 
-	sessionManager = scs.New()
+	sessionManager := scs.New()
 	sessionManager.Store = pgxstore.New(db)
 	sessionManager.Lifetime = 12 * time.Hour
 	sessionManager.Cookie.Secure = true
@@ -112,6 +110,7 @@ func main() {
 
 	infoLog.Printf("Starting server on %s", addr)
 	err = srv.ListenAndServeTLS("./tls/cert.pem", "./tls/key.pem")
+	// err = srv.ListenAndServe()
 	errorLog.Fatal(err)
 }
 
