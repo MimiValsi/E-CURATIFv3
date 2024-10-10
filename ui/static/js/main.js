@@ -1,5 +1,3 @@
-const { window } = require("d3-selection");
-
 function searchStatus() {
   let input, filter, table, tr, td, i, txtValue;
 
