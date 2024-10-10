@@ -15,6 +15,9 @@
 {{ end }}
 
 {{ define "main" }}
+{{ with .Cree }}
+  <div class="cree">{{ . }}</div>
+{{ end }}
 
 {{ with .Source }}
 <div class="margin">
@@ -115,7 +118,7 @@
   {{ else }}
   <form action="/source/delete/{{ .Source.ID }}" method="POST">
     <input type="hidden" name="csrf_token" value="{{ .CSRFToken }}">
-    <button type="submit" class="delete-btn">
+    <button type="submit" onclick="return confirm('Êtes-vous sûr de supprimer?');" class="delete-btn">
       <img src="/static/img/icone_corbeille.png" class="delete-img">
   </form>
   {{ end }}

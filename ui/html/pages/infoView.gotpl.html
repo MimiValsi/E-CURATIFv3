@@ -16,7 +16,7 @@
   </div>
   <form action="/source/{{ .Info.SourceID }}/info/delete/{{ .Info.ID }}" method="POST">
     <input type="hidden" name="csrf_token" value="{{ .CSRFToken }}">
-    <button type="submit" class="delete-btn">
+    <button onclick="return confirm('Êtes-vous sûr de supprimer?');" type="submit" class="delete-btn">
       <img class="delete-img" src="/static/img/icone_corbeille.png">
   </form>
   {{ end }}
@@ -24,6 +24,9 @@
 {{ end }}
 
 {{ define "main" }}
+  {{ with .Cree }}
+      <div class="cree">{{ . }}</div>
+  {{ end }} 
 {{ with .Info }}
 
 {{ $aRealiser := eq .Status "A réaliser" }}

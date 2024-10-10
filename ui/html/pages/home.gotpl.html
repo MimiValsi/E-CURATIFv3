@@ -10,30 +10,33 @@
   <div>
     <a href="/source/create"><img class="iconeWidth" src="/static/img/icone_ps.png" /></a>
 
-    <form enctype="multipart/form-data" action="https://localhost:8080/importCSV" method="POST">
+    <form enctype="multipart/form-data" action="//localhost:8080/importCSV" method="POST">
+      <input type="hidden" name="csrf_token" value="{{ .CSRFToken }}">
       <label class="custom-file-button">
-	<input type="hidden" name="csrf_token" value="{{ .CSRFToken }}">
 	<input id="importCSV" type="file" accept=".csv" name="inpt"
 	  onchange="form.submit(); alert('Fichier en cours de transfert...');">
 	<img class="iconeWidth" src="/static/img/icone_import2.png">
       </label>
     </form>
 
-    <a href="https://localhost:8080/exportCSV">
+    <a href="//localhost:8080/exportCSV">
       <img class="iconeWidth" src="/static/img/icone_export2.png" />
     </a>
   </div>
-  <div>
-    <form action="/user/logout" method="POST">
+  <div class="user_div">
+    <form class="user" action="/user/logout" method="POST">
       <input type="hidden" name="csrf_token" value="{{ .CSRFToken }}">
-      <button type="submit" class="delete-btn">
-	<img class="delete-img" src="/static/img/icone_corbeille.png">
+      <button type="submit" class="logout">
+	Déconnexion
     </form>
-    {{ else }}
-    <a class="is-right" href="/user/signup">Créer compte</a>
-    <a class="is-right" href="/user/login">Se connecter</a>
-    {{ end }}
   </div>
+  {{ else }}
+  <div></div>
+  <div class="user_div">
+    <a class="user" href="/user/signup">Créer compte</a>
+    <a class="user" href="/user/login">Connexion</a>
+  </div>
+  {{ end }}
 
 </nav>
 {{ end }}
