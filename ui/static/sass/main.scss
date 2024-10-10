@@ -20,13 +20,30 @@ $file-cta-background-color: none;
 /********************
  * MY VARIABLES END *
  ********************/
+div.flash {
+    color: #FFFFFF;
+    font-weight: bold;
+    background-color: #34495E;
+    padding: 18px;
+    margin-bottom: 36px;
+    text-align: center;
+}
+
+div.cree {
+    color: #FFFFFF;
+    font-weight: bold;
+    background-color: #2ecc71;
+    padding: 18px;
+    margin-bottom: 36px;
+    text-align: center;
+}
 
 /*******
  * NAV *
  *******/
 #navHome {
     display: grid;
-    grid-template-columns: repeat(4, auto);
+    grid-template-columns: repeat(3, auto);
 }
 
 .upload-icon-size {
@@ -50,6 +67,24 @@ nav .fileSize {
     font-size: 1.35rem;
 }
 
+nav .user_div {
+  margin-left: auto;
+}
+
+nav .user {
+  align-content: center;
+  margin-right: 1rem;
+}
+
+nav .logout {
+  padding: 1rem 0;
+  border: transparent;
+  background: none;
+  cursor: pointer;
+  font-size: 1rem;
+  color: #485fc7;
+}
+
 .csv-upload>input {
     display: none;
 }
@@ -58,19 +93,11 @@ nav .fileSize {
     cursor: pointer;
 }
 
-// .inpt-img {
-//   background-image: url("../img/icone_import.png");
-//   background-repeat: no-repeat;
-// }
-
 input[type="file"] {
   display: none;
 }
 
 .custom-file-button {
-  // border: 1px solid black;
-  // display: inline-block;
-  // background-image: url("../img/icone_import.png");
   cursor: pointer;
 }
 /***********
