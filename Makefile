@@ -1,4 +1,4 @@
-NAME=launch
+NAME=ecuratif
 
 # Lance la compilation et le web app
 # Seulement utilisé pour développement
