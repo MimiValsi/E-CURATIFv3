@@ -21,50 +21,50 @@ $file-cta-background-color: none;
  * MY VARIABLES END *
  ********************/
 div.flash {
-    color: #FFFFFF;
-    font-weight: bold;
-    background-color: #34495E;
-    padding: 18px;
-    margin-bottom: 36px;
-    text-align: center;
+  color: #FFFFFF;
+  font-weight: bold;
+  background-color: #34495E;
+  padding: 18px;
+  margin-bottom: 36px;
+  text-align: center;
 }
 
 div.cree {
-    color: #FFFFFF;
-    font-weight: bold;
-    background-color: #2ecc71;
-    padding: 18px;
-    margin-bottom: 36px;
-    text-align: center;
+  color: #FFFFFF;
+  font-weight: bold;
+  background-color: #2ecc71;
+  padding: 18px;
+  margin-bottom: 36px;
+  text-align: center;
 }
 
 /*******
  * NAV *
  *******/
 #navHome {
-    display: grid;
-    grid-template-columns: repeat(3, auto);
+  display: grid;
+  grid-template-columns: repeat(3, auto);
 }
 
-.upload-icon-size {
-    font-size: 3rem;
+nav .upload-icon-size {
+  font-size: 3rem;
 }
 
 nav div {
-    display: flex;
+  display: flex;
 }
 
 nav span {
-    color: black;
-    align-content: center;
+  color: black;
+  align-content: center;
 }
 
 nav .iconeWidth {
-    width: 3rem;
+  width: 3rem;
 }
 
 nav .fileSize {
-    font-size: 1.35rem;
+  font-size: 1.35rem;
 }
 
 nav .user_div {
@@ -85,21 +85,22 @@ nav .logout {
   color: #485fc7;
 }
 
-.csv-upload>input {
-    display: none;
-}
-
-.csv-hover {
-    cursor: pointer;
-}
-
-input[type="file"] {
+nav .csv-upload>input {
   display: none;
 }
 
-.custom-file-button {
+nav .csv-hover {
   cursor: pointer;
 }
+
+nav input[type="file"] {
+  display: none;
+}
+
+nav .custom-file-button {
+  cursor: pointer;
+}
+
 /***********
  * NAV END *
  ***********/
@@ -109,7 +110,7 @@ input[type="file"] {
  **********/
 
 #header {
-    margin-bottom: 1rem;
+  margin-bottom: 1rem;
 }
 
 /**************
@@ -120,22 +121,6 @@ input[type="file"] {
  * HOME *
  ********/
 
-// .info-urgent {
-//   display: inline-block;
-//   animation: slide-left 60s linear infinite;
-//   white-space: nowrap;
-// }
-//
-// @keyframes slide-left {
-//   0% {
-//     transform: translateX(60%);
-//   }
-//
-//   100% {
-//     transform: translateX(-100%);
-//   }
-// }
-
 /************
  * HOME END *
  ************/
@@ -144,71 +129,73 @@ input[type="file"] {
  * GRID *
  ********/
 .grid-container {
-    display: grid;
-    grid-template-columns: repeat(4,minmax(0,11rem));
+  display: grid;
+  grid-template-columns: repeat(4, minmax(0, 11rem));
 }
 
 .grid-container div {
-    padding: 0.625rem;
+  padding: 0.625rem;
 }
 
 .grid-container button {
-    width: 100%;
+  width: 100%;
 }
+
 /************
  * GRID END *
  ************/
 
 
 #page-header {
-    padding: 1rem;
+  padding: 1rem;
 }
 
 #header {
-    background-image: -webkit-linear-gradient(left, #96cd32 15%, #1423cd 30%, #1423cd 100%);
-    background-size: 100% 0.6rem;
-    background-repeat: no-repeat;
-    padding-top: 1rem;
-    text-align: center;
+  background-image: -webkit-linear-gradient(left, #96cd32 15%, #1423cd 30%, #1423cd 100%);
+  background-size: 100% 0.6rem;
+  background-repeat: no-repeat;
+  padding-top: 1rem;
+  text-align: center;
 
-    /* Temporaire, délimitation des divs*/
-    // border-bottom: 0.063rem solid;
+  /* Temporaire, délimitation des divs*/
+  // border-bottom: 0.063rem solid;
 }
 
 #myPlot {
-    margin-left: auto;
-    margin-right: auto;
+  margin-left: auto;
+  margin-right: auto;
 }
 
 /*****************
  * CREATION PAGE *
  *****************/
 .blockMargin {
-    margin: 0 0 0.5rem 0.5rem;
+  margin: 0 0 0.5rem 0.5rem;
 }
 
 .ps-title {
-    font-size: 3rem;
-    font-style: bold;
-    text-align: center;
+  font-size: 3rem;
+  font-style: bold;
+  text-align: center;
 }
 
 .inpt {
-    height: 3rem;
-    font-size: 1.2rem;
-    border-radius: 0.25rem;
+  height: 3rem;
+  font-size: 1.2rem;
+  border-radius: 0.25rem;
 }
 
 .inptAlert {
-    height: 3rem;
-    font-size: 1.2rem;
-    border-radius: 0.25rem;
-    border-color: red;
+  height: 3rem;
+  font-size: 1.2rem;
+  border-radius: 0.25rem;
+  border-color: red;
 }
 
 .hidden {
-    display: none;
+  display: none;
 }
+
 /*********************
  * CREATION PAGE END *
  *********************/
@@ -217,76 +204,80 @@ input[type="file"] {
  * VIEW PAGE *
  *************/
 .search-info {
-    background-image: url("/static/img/loupe.png");
-    background-repeat: no-repeat;
-    background-size: 2rem;
-    background-position: left center;
-    font-size: 1rem;
-    padding: 0.75rem 1.25rem 0.75rem 2.5rem;
+  background-image: url("/static/img/loupe.png");
+  background-repeat: no-repeat;
+  background-size: 2rem;
+  background-position: left center;
+  font-size: 1rem;
+  padding: 0.75rem 1.25rem 0.75rem 2.5rem;
 }
 
 table {
-    width: calc(100% / 2);
-    border-collapse: collapse;
-    table-layout: fixed;
-    margin: 1rem auto;
+  width: calc(100% / 2);
+  border-collapse: collapse;
+  table-layout: fixed;
+  margin: 1rem auto;
 }
 
-th, td {
-    padding: 1rem;
+th,
+td {
+  padding: 1rem;
 }
 
 th {
-    background: #e4e5e7;
-    font-weight: bold;
-    text-align: left;
+  background: #e4e5e7;
+  font-weight: bold;
+  text-align: left;
 }
 
 td {
-    border-top: 0.063rem solid white;
-    background: #f7f9fa;
+  border-top: 0.063rem solid white;
+  background: #f7f9fa;
 }
 
 .margin {
-    margin: 0 1rem;
+  margin: 0 1rem;
 }
 
 top-margin {
-    margin-top: 1rem;
+  margin-top: 1rem;
 }
 
 .center-text {
-    text-align: center !important;
+  text-align: center !important;
 }
 
 .right-text {
-    text-align: right !important;
-    padding-right: 0.5rem;
+  text-align: right !important;
+  padding-right: 0.5rem;
 }
 
 .left-text {
-    padding-left: 0.5rem;
+  padding-left: 0.5rem;
 }
 
 .statusWait {
-    color: #c0392b;
+  color: #c0392b;
 }
 
 .statusAffected {
-    color: #c0732b;
+  color: #c0732b;
 }
 
 .statusDone {
-    color: #4eb722;
+  color: #4eb722;
 }
 
 .statusArchived {
-    color: #1423dc;
+  color: #1423dc;
 }
 
-.statusWait, .statusAffected, .statusDone, .statusArchived {
-    text-align: right !important;
-    padding-right: 0.5rem;
+.statusWait,
+.statusAffected,
+.statusDone,
+.statusArchived {
+  text-align: right !important;
+  padding-right: 0.5rem;
 }
 
 .narrow-width {
@@ -334,33 +325,35 @@ top-margin {
 
 
 @keyframes glowing {
-    0% {
-        background-color: #db0707;
-        box-shadow: 0 0 0.313rem #db0707;
-    }
-    50% {
-        background-color: #f72525;
-        box-shadow: 0 0 1.25rem #f72525;
-    }
-    100% {
-        background-color: #db0707;
-        box-shadow: 0 0 0.313rem #db0707;
-    }
+  0% {
+    background-color: #db0707;
+    box-shadow: 0 0 0.313rem #db0707;
+  }
+
+  50% {
+    background-color: #f72525;
+    box-shadow: 0 0 1.25rem #f72525;
+  }
+
+  100% {
+    background-color: #db0707;
+    box-shadow: 0 0 0.313rem #db0707;
+  }
 }
 
 .warning-btn {
-    animation: glowing 1200ms infinite;
+  animation: glowing 1200ms infinite;
 }
 
 .delete-img {
-    height: 3rem;
+  height: 3rem;
 }
 
 .delete-btn {
-    border: transparent;
-    background: none;
-    cursor: pointer;
-    padding: 0;
+  border: transparent;
+  background: none;
+  cursor: pointer;
+  padding: 0;
 }
 
 /***************
@@ -371,14 +364,81 @@ top-margin {
  * GRAPH *
  *********/
 .graphClass {
-    display: flex;
-    width: 100%;
-    max-width: 42.75rem;
+  display: flex;
+  width: 100%;
+  max-width: 42.75rem;
 }
 
 .myGrid {
-    display: flex;
+  display: flex;
 }
+
 /*************
  * GRAPH END *
  *************/
+
+
+/*********
+ * USER  *
+ *********/
+.error {
+  color: #C0392B;
+  font-weight: bold;
+  display: block;
+}
+
+.error+textarea,
+.error+input {
+  border-color: #C0392B !important;
+  border-width: 2px !important;
+}
+
+.sign {
+  text-align: center;
+  margin-bottom: 1rem;
+}
+
+form input[type="text"],
+form input[type="nni"],
+form input[type="password"],
+form input[type="email"] {
+  padding: 0.75rem 1rem;
+  width: 15%;
+  font-size: 1rem;
+}
+
+form input[type=text],
+form input[type="nni"],
+form input[type="password"],
+form input[type="email"],
+textarea {
+  color: #6A6C6F;
+  background: #FFFFFF;
+  border: 1px solid #E4E5E7;
+  border-radius: 3px;
+}
+
+a.button,
+input[type="submit"] {
+  background-color: #62CB31;
+  border-radius: 3px;
+  color: #FFFFFF;
+  padding: 18px 27px;
+  border: none;
+  display: inline-block;
+  margin-top: 18px;
+  font-weight: 700;
+  font-size: 1rem;
+}
+
+a.button:hover,
+input[type="submit"]:hover {
+  background-color: #4EB722;
+  color: #FFFFFF;
+  cursor: pointer;
+  text-decoration: none;
+}
+
+/************
+ * USER END *
+ ************/
