@@ -22,6 +22,8 @@
     <a href="//localhost:8080/exportCSV">
       <img class="iconeWidth" src="/static/img/icone_export2.png" />
     </a>
+
+    <a href="/user/profile" class="user_div"><img class="iconeWidth" src="/static/img/icone_user.png" /></a>
   </div>
   <div class="user_div">
     <form class="user" action="/user/logout" method="POST">
@@ -57,7 +59,7 @@
 	<!-- if ID -->
 
 	<!-- ge: Greater Equal
-le: Lesser Equal  -->
+	     le: Lesser Equal  -->
 	{{ if and (ge .Average 0) (le .Average 19) }}
 	<!-- if curatif -->
 	<button name="{{ .Curatifs }}" class="button is-large red-btn">
@@ -120,15 +122,7 @@ le: Lesser Equal  -->
     <script src="/static/js/graph.js"></script>
     <script src="/static/js/csv.js"></script>
   </div>
-
-  <!-- <div id="myPlot"> -->
-  <!--   <script src="/static/js/csv.js"></script> -->
-  <!-- </div> -->
 </div>
-
-<!-- <div class="info-urgent" id="infoUrgent"> -->
-<!--         <script src="/static/js/prioData.js"></script> -->
-<!-- </div> -->
 
 {{ end }}
 <!-- if Sources end -->
