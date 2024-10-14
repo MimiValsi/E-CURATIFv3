@@ -8,14 +8,14 @@ import (
 
 // Validator type qui contient un map d'erreurs de validation
 type Validator struct {
-	nonFieldErrors []string
+	NonFieldErrors []string
 	FieldErrors    map[string]string
 }
 
 // Valid() retourne un "vrai" si les FieldErrors map
 // si la case n'est pas vide.
 func (v *Validator) Valid() bool {
-	return len(v.FieldErrors) == 0 && len(v.nonFieldErrors) == 0
+	return len(v.FieldErrors) == 0 && len(v.NonFieldErrors) == 0
 }
 
 // AddFieldError() génère un message d'erreur vers FieldErrors map
@@ -50,6 +50,8 @@ func MaxChars(value string, n int) bool {
 
 var EmailRX = regexp.MustCompile("^[a-zA-Z0-9.!#$%&'*+/=?^_`{|}~-]+@[a-zA-Z0-9](?:[a-zA-Z0-9-]{0,61}[a-zA-Z0-9])?(?:\\.[a-zA-Z0-9](?:[a-zA-Z0-9-]{0,61}[a-zA-Z0-9])?)*$")
 
+var NniRx = regexp.MustCompile("^[a-zA-Z]{1}[0-9]{5}$")
+
 func MinChars(value string, n int) bool {
 	return utf8.RuneCountInString(value) >= n
 }
@@ -59,5 +61,5 @@ func Matches(value string, rx *regexp.Regexp) bool {
 }
 
 func (v *Validator) AddNonFieldError(message string) {
-	v.nonFieldErrors = append(v.nonFieldErrors, message)
+	v.NonFieldErrors = append(v.NonFieldErrors, message)
 }
