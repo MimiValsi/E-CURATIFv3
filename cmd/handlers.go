@@ -713,17 +713,20 @@ func (app *application) userSignupPost(w http.ResponseWriter, r *http.Request) {
 	app.users.Email = form.Email
 	app.users.Password = form.Password
 
-	// form.CheckField(validator.NotBlank(form.Email), "email", "This field cannot be blank")
-	// form.CheckField(validator.Matches(form.Email, validator.EmailRX), "email", "This field must be a valid email address")
-	// form.CheckField(validator.NotBlank(form.Password), "password", "This field cannot be blank")
-	// form.CheckField(validator.MinChars(form.Password, 8), "password", "This field must be at least 8 characters long")
+	form.CheckField(validator.NotBlank(form.NNI), "nni", "Veuillez rentrer un NNI")
+	form.CheckField(validator.Matches(form.NNI, validator.NniRx), "nni", "NNI non valable")
+	form.CheckField(validator.NotBlank(form.Email), "email", "Veuillez rentrer votre e-mail")
+	form.CheckField(validator.Matches(form.Email, validator.EmailRX), "email", "Veuillez rentrer un e-mail valide")
+	form.CheckField(validator.NotBlank(form.Password), "password", "Veuillez rentrer un mot de passe")
+	form.CheckField(validator.MinChars(form.Password, 8), "password", "Mot de passe doit être 8 charactères minimum")
 
-	// if !form.Valid() {
-	// 	data := app.newTemplateData(r)
-	// 	data.Form = form
-	// 	app.render(w, r, http.StatusUnprocessableEntity, "signup.gotpl.html", data)
-	// 	return
-	// }
+	if !form.Valid() {
+		data := app.newTemplateData(r)
+		data.Form = form
+
+		app.render(w, r, http.StatusUnprocessableEntity, "signup.gotpl.html", data)
+		return
+	}
 
 	err = app.users.Insert(conn)
 	if err != nil {
@@ -761,36 +764,34 @@ func (app *application) userLoginPost(w http.ResponseWriter, r *http.Request) {
 	}
 
 	form := userLoginForm{
-		Email:    r.PostForm.Get("email"),
 		NNI:      r.PostForm.Get("nni"),
 		Password: r.PostForm.Get("password"),
 	}
 
-	// form.CheckField(validator.NotBlank(form.Email), "email", "This field cannot be blank")
-	// form.CheckField(validator.Matches(form.Email, validator.EmailRX), "email", "This field must be a valid email address")
-	// form.CheckField(validator.NotBlank(form.Password), "password", "This field cannot be blank")
-	//
-	// if !form.Valid() {
-	// 	data := app.newTemplateData(r)
-	// 	data.Form = form
-	// 	app.render(w, r, http.StatusUnprocessableEntity, "login.gotpl.html", data)
-	// 	return
-	// }
+	form.CheckField(validator.NotBlank(form.NNI), "nni", "Veuillez rentrer votre NNI")
+	form.CheckField(validator.Matches(form.NNI, validator.NniRx), "nni", "Mauvais format du NNI ex.: A12345")
+	form.CheckField(validator.NotBlank(form.Password), "password", "Veuillez rentrer un mot de passe")
 
-	app.users.Email = form.Email
-	app.users.NNI = form.NNI
+	if !form.Valid() {
+		data := app.newTemplateData(r)
+		data.Form = form
+		app.render(w, r, http.StatusUnprocessableEntity, "login.gotpl.html", data)
+		return
+	}
+
+	app.users.NNI = strings.ToUpper(form.NNI)
 	app.users.Password = form.Password
 
 	id, err := app.users.Authenticate(conn)
 	if err != nil {
 		if errors.Is(err, database.ErrInvalidCredentials) {
-			form.AddNonFieldError("Email or password is incorrect")
+			form.AddNonFieldError("NNI ou password est incorrect")
+
 			data := app.newTemplateData(r)
 			data.Form = form
+
 			app.render(w, r, http.StatusUnprocessableEntity, "login.gotpl.html", data)
 			return
-		} else {
-			app.serverError(w, r, err)
 		}
 
 		return
@@ -805,6 +806,13 @@ func (app *application) userLoginPost(w http.ResponseWriter, r *http.Request) {
 	app.sessionManager.Put(r.Context(), "authenticatedUserID", id)
 
 	http.Redirect(w, r, "/", http.StatusSeeOther)
+}
+
+func (app *application) userProfile(w http.ResponseWriter, r *http.Request) {
+	// ctx := r.Context()
+	data := app.newTemplateData(r)
+
+	app.render(w, r, http.StatusOK, "userProfile.gotpl.html", data)
 }
 
 func (app *application) userLogoutPost(w http.ResponseWriter, r *http.Request) {
