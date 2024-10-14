@@ -1,20 +1,29 @@
 {{define "title"}}Signup{{end}} {{ define "nav" }} {{ end }} {{define "main"}}
 <form action="/user/signup" method="POST" novalidate>
   <input type="hidden" name="csrf_token" value="{{ .CSRFToken }}" />
-  <div>
-    <label>NNI:</label>
-    <input type="text" name="nni" autofocus required />
+  <div class="sign">
+    <label>NNI:</label><br />
+    {{ with .Form.FieldErrors.nni }}
+    <label class="error">{{ . }}</label>
+    {{ end }}
+    <input type="text" name="nni" value="{{ .Form.NNI }}" autofocus required />
   </div>
-  <div>
-    <label>Email:</label>
-    <input type="email" name="email" required />
+  <div class="sign">
+    <label>Email:</label><br />
+    {{ with .Form.FieldErrors.email }}
+    <label class="error">{{ . }}</label>
+    {{ end }}
+    <input type="email" name="email" value="{{ .Form.Email }}" required />
   </div>
-  <div>
-    <label>Password:</label>
+  <div class="sign">
+    <label>Password:</label><br />
+    {{ with .Form.FieldErrors.password }}
+    <label class="error">{{ . }}</label>
+    {{ end }}
     <input type="password" name="password" id="password" required />
   </div>
-  <div>
-    <input type="submit" />
+  <div class="sign">
+    <input type="submit" value="Créer" />
   </div>
 </form>
 {{end}}
