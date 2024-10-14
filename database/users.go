@@ -11,13 +11,13 @@ import (
 )
 
 type User struct {
-	ID       int
-	NNI      string
-	Email    string
-	Password string
-	Created  time.Time
+	ID       int       `json:"-"`
+	NNI      string    `json:"nni"`
+	Email    string    `json:"email"`
+	Password string    `json:"-"`
+	Created  time.Time `json:"-"`
 
-	DB *pgxpool.Pool
+	DB *pgxpool.Pool `json:"-"`
 }
 
 func (u *User) Insert(conn *pgxpool.Conn) error {
@@ -42,6 +42,12 @@ RETURNING id;
 
 	return nil
 
+}
+
+func (u *User) Get(conn *pgxpool.Conn) (string, error) {
+	// ctx := context.Background()
+
+	return "", nil
 }
 
 func (u *User) Authenticate(conn *pgxpool.Conn) (int, error) {
