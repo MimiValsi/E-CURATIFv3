@@ -48,6 +48,7 @@ func (app *application) routes() http.Handler {
 	r.Handle("GET /user/login", chain.HandlerFunc(app.userLogin))
 	r.Handle("POST /user/login", chain.HandlerFunc(app.userLoginPost))
 	r.Handle("POST /user/logout", chain.HandlerFunc(app.userLogoutPost))
+	r.Handle("GET /user/profile", chain.HandlerFunc(app.userProfile))
 
 	// Import / Export CSV
 	r.Handle("POST /importCSV", protected.HandlerFunc(app.importCSVPost))
