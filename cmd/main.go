@@ -33,6 +33,10 @@ type application struct {
 	DB *pgxpool.Pool
 
 	sessionManager *scs.SessionManager
+
+	cors struct {
+		trustedOrigins []string
+	}
 }
 
 // Const for dev
