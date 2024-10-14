@@ -12,11 +12,11 @@
   </div>
   {{ end }}
 </nav>
-{{ end }}
+{{ end }} <!-- nav -->
 
 {{ define "main" }}
 {{ with .Cree }}
-  <div class="cree">{{ . }}</div>
+<div class="cree">{{ . }}</div>
 {{ end }}
 
 {{ with .Source }}
@@ -28,7 +28,7 @@
 
     {{ if .Infos }}
     <div>
-      <input class="search-info top-margin" id="searchStatus" onkeyup="searchStatus()"
+      <input class="search-info top-margin" id="search_status" onkeyup="search_status()"
         placeholder="Chercher des status...">
     </div>
     {{ if .IsAuthenticated }}
