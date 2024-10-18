@@ -662,15 +662,19 @@ func (app *application) exportCSVPost(w http.ResponseWriter, r *http.Request) {
 	err = os.Remove(path)
 	if err != nil {
 		app.errorLog.Printf("Could not remove file: %s", path)
+	} else {
+		app.infoLog.Printf("File erased: %s", path)
 	}
-	app.infoLog.Printf("File erased: %s", path)
 
 	path = "./csvFiles/export/test_export.csv"
 	err = os.Remove(path)
 	if err != nil {
 		app.errorLog.Printf("Could not remove file: %s", path)
+	} else {
+		app.infoLog.Printf("File erased: %s", path)
 	}
-	app.infoLog.Printf("File erased: %s", path)
+
+	app.infoLog.Println("Export fait avec succès")
 
 	http.Redirect(w, r, "/", http.StatusSeeOther)
 }
