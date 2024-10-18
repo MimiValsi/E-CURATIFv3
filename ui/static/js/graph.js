@@ -1,100 +1,90 @@
-(async () => {
-  const getJson = async () => {
-    const response = await fetch("https://localhost:8080/jsonGraph");
+async function FetchJSON() {
+  const response = await fetch("https://localhost:8080/jsonGraph");
 
-    const data = await response.json();
-    const js = JSON.stringify(data);
-    const jp = await JSON.parse(js);
-
-    return jp;
-  };
-
-  const getJsonCD = async () => {
-    const curatifDone = await fetch("https://localhost:8080/curatifDone");
-    const data = await curatifDone.json();
-    const js = JSON.stringify(data);
-    const jp = await JSON.parse(js);
-
-    return jp;
-  };
-
-  // Fetch every active 'Curatif'
-  const jsData = await getJson();
-
-  let nomSources = [];
-  let codeGMAO = [];
-  let aRealiser = [];
-  let enCours = [];
-  let done = [];
-  let total = [];
-
-  for (let i = 0; i < jsData.length; i++) {
-    aRealiser.push(jsData[i].a_realiser);
-    enCours.push(jsData[i].en_cours);
-    done.push(jsData[i].done);
-    nomSources.push(jsData[i].name);
-    codeGMAO.push(jsData[i].code_GMAO);
-    total.push(jsData[i].curatifs);
+  if (!response.ok) {
+    const msg = `An error has occured: ${response.status}`;
+    throw new Error(msg);
   }
 
-  var chart = bb.generate({
-    bindto: "#myPlot",
+  const data = await response.json();
+  return data;
+}
 
-    data: {
-      names: {
-        data1: "Curatifs",
-        data2: "Sources",
+FetchJSON().then(
+  function (js) {
+    let sources = [];
+    let codeGMAO = [];
+    let aRealiser = [];
+    let enCours = [];
+    let done = [];
+    let total = [];
+
+    for (let i = 0; i < js.length; i++) {
+      aRealiser.push(js[i].a_realiser);
+      enCours.push(js[i].en_cours);
+      done.push(js[i].done);
+      sources.push(js[i].name);
+      codeGMAO.push(js[i].code_GMAO);
+      total.push(js[i].curatifs);
+    }
+
+    bb.generate({
+      bindto: "#myPlot",
+
+      data: {
+        names: {
+          data1: "Curatifs",
+          data2: "Sources",
+        },
+        columns: [
+          ["Curatifs à réaliser", ...aRealiser],
+          ["Curatifs en cours", ...enCours],
+          ["Curatifs réalisés", ...done],
+          ["Total", ...total],
+        ],
+        type: "bar",
+
+        groups: [
+          ["Curatifs à réaliser", "Curatifs en cours", "Curatifs réalisés"],
+        ],
       },
-      columns: [
-        ["Curatifs à réaliser", ...aRealiser],
-        ["Curatifs en cours", ...enCours],
-        ["Curatifs réalisées", ...done],
-        ["Total", ...total],
-      ],
-      type: "bar",
-
-      groups: [
-        ["Curatifs à réaliser", "Curatifs en cours", "Curatifs réalisées"],
-      ],
-    },
-
-    color: {
-      pattern: ["#cc1111", "#0080ff", "#99cc33", "#999999"],
-    },
-
-    axis: {
-      x: {
-        type: "category",
-        categories: [...codeGMAO],
-        height: 50,
+      color: {
+        pattern: ["#cc1111", "#0080ff", "#99cc33", "#999999"],
       },
-    },
 
-    size: {
-      width: 1000,
-      height: 400,
-    },
-
-    padding: true,
-
-    // resize: {
-    //   auto: true,
-    //   timer: 100
-    // },
-
-    zoom: {
-      enabled: true,
-      type: "drag",
-    },
-
-    legend: {
-      position: "bottom",
-    },
-
-    bar: {
-      width: {
-        ratio: 0.5,
+      axis: {
+        x: {
+          type: "category",
+          categories: [...codeGMAO],
+          height: 50,
+        },
       },
-    },
-  });
-})();
+
+      size: {
+        width: 1000,
+        height: 400,
+      },
+
+      padding: true,
+
+      zoom: {
+        enabled: true,
+        type: "drag",
+      },
+
+      legend: {
+        position: "bottom",
+      },
+
+      bar: {
+        width: {
+          ratio: 0.5,
+        },
+      },
+    });
+  },
+  function () {
+    let plot = document.getElementById("myPlot");
+    plot.textContent = "DB not found";
+  }
+);
