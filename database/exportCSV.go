@@ -66,7 +66,7 @@ SELECT i.id AS "Info ID",
 `
 
 	// path := "./csvFiles/test_export.csv"
-	path := "./csvFiles/test/test_export.csv"
+	path := "./csvFiles/export/test_export.csv"
 	file, err := os.OpenFile(path, os.O_CREATE|os.O_WRONLY, 0o644)
 	if err != nil {
 		data.ErrorLog.Println("Cannot create or open file")
@@ -169,7 +169,7 @@ func (data *Export) decode_from_UTF8(s string) (string, error) {
 		return "", err
 	}
 
-	new_file := "./csvFiles/test/Actions_exportés.csv"
+	new_file := "./csvFiles/export/Actions_exportés.csv"
 	err = os.WriteFile(new_file, tr, 0o666)
 	if err != nil {
 		log.Println("Cannot write to file")

@@ -658,14 +658,14 @@ func (app *application) exportCSVPost(w http.ResponseWriter, r *http.Request) {
 
 	flusher.Flush()
 
-	path := "./csvFiles/test/Actions_exportés.csv"
+	path := "./csvFiles/export/Actions_exportés.csv"
 	err = os.Remove(path)
 	if err != nil {
 		app.errorLog.Printf("Could not remove file: %s", path)
 	}
 	app.infoLog.Printf("File erased: %s", path)
 
-	path = "./csvFiles/test/test_export.csv"
+	path = "./csvFiles/export/test_export.csv"
 	err = os.Remove(path)
 	if err != nil {
 		app.errorLog.Printf("Could not remove file: %s", path)
