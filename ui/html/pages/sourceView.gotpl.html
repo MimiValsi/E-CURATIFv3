@@ -28,8 +28,7 @@
 
     {{ if .Infos }}
     <div>
-      <input class="search-info top-margin" id="search_status" onkeyup="search_status()"
-        placeholder="Chercher des statut...">
+      <input type="text" class="search-info top-margin" id="search_info" placeholder="Chercher des statut...">
     </div>
     {{ if .IsAuthenticated }}
     <div>
@@ -39,9 +38,8 @@
     </div>
     {{ end }}
 
-    <table id="myTable">
+    <table id="info_table">
       <!-- id @ "Home Page section" border-bottom -->
-
 
       <tr>
         <th class="left-text narrow-width"><strong>Ouvrage</strong></th>
@@ -58,10 +56,10 @@
       {{ $enCours := eq .Status "En cours" }}
       {{ $aff := eq .Status "Affecté" }}
 
-      {{ $res := eq .Status "Réalisée" }}
-      {{ $reso := eq .Status "Résolu" }}
+      {{ $realisee := eq .Status "Réalisée" }}
+      {{ $resolu := eq .Status "Résolu" }}
 
-      {{ $arch := eq .Status "Archivé" }}
+      {{ $archive := eq .Status "Archivé" }}
 
       <tr>
         {{ if .Ouvrage }}
@@ -86,13 +84,13 @@
         <td class="right-text statusAffected narrow-width">{{ .Status }}</td>
         {{ end }}
 
-        {{ if $res }}
+        {{ if $realisee }}
         <td class="right-text statusDone narrow-width">{{ .Status }}</td>
-        {{ else if $reso }}
+        {{ else if $resolu }}
         <td class="right-text statusDone narrow-width">{{ .Status }}</td>
         {{ end }}
 
-        {{ if $arch }}
+        {{ if $archive }}
         <td class="right-text statusArchived narrow-width">{{ .Status }}</td>
         {{ end }}
       </tr>
@@ -108,6 +106,9 @@
       {{ end }}
       {{ end }}
     </table>
+    <span id="noMatch" class="no-match">
+      Rien trouvé...
+    </span>
   </div>
 
 </div>
