@@ -29,7 +29,7 @@
     {{ if .Infos }}
     <div>
       <input class="search-info top-margin" id="search_status" onkeyup="search_status()"
-        placeholder="Chercher des status...">
+        placeholder="Chercher des statut...">
     </div>
     {{ if .IsAuthenticated }}
     <div>
@@ -47,7 +47,7 @@
         <th class="left-text narrow-width"><strong>Ouvrage</strong></th>
         <th class="center-text large-width"><strong>Détail</strong></th>
         <th class="center-text narrow-width"><strong>Priorité</strong></th>
-        <th class="right-text narrow-width"><strong>Status</strong></th>
+        <th class="right-text narrow-width"><strong>Statut</strong></th>
       </tr>
       <!-- Infos table -->
       {{ range .Infos }}
