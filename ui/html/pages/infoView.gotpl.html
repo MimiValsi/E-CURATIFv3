@@ -16,7 +16,7 @@
   </div>
   <form action="/source/{{ .Info.SourceID }}/info/delete/{{ .Info.ID }}" method="POST">
     <input type="hidden" name="csrf_token" value="{{ .CSRFToken }}">
-    <button onclick='return confirm("Êtes-vous sûr de supprimer?");' type="submit" class="delete-btn">
+    <button id="check-delete" type="submit" class="delete-btn">
       <img class="delete-img" src="/static/img/icone_corbeille.png">
   </form>
   {{ else }}
@@ -52,37 +52,37 @@
       <!-- Status Colors -->
       {{ if $aRealiser }}
       <th id="statusWait" class="statusWait">
-        <strong>Status: </strong>{{ .Status }}
+        <strong>Statut: </strong>{{ .Status }}
       </th>
       {{ else if $enAttente}}
       <th id="statusWait" class="statusWait">
-        <strong>Status: </strong>{{ .Status }}
+        <strong>Statut: </strong>{{ .Status }}
       </th>
       {{ end }}
 
       {{ if $enCours }}
       <th id="statusAffected" class="statusAffected">
-        <strong>Status: </strong>{{ .Status }}
+        <strong>Statut: </strong>{{ .Status }}
       </th>
       {{ else if $aff }}
       <th id="statusAffected" class="statusAffected">
-        <strong>Status: </strong>{{ .Status }}
+        <strong>Statut: </strong>{{ .Status }}
       </th>
       {{ end }}
 
       {{ if $rese }}
       <th id="statusDone" class="statusDone">
-        <strong>Status: </strong>{{ .Status }}
+        <strong>Statut: </strong>{{ .Status }}
       </th>
       {{ else if $reso }}
       <th id="statusDone" class="statusDone">
-        <strong>Status: </strong>{{ .Status }}
+        <strong>Statut: </strong>{{ .Status }}
       </th>
       {{ end }}
 
       {{ if $arche }}
       <th id="statusArchived" class="statusArchived">
-        <strong>Status: </strong>{{ .Status }}
+        <strong>Statut: </strong>{{ .Status }}
       </th>
       {{ end }}
       <!-- End Status Colors -->
