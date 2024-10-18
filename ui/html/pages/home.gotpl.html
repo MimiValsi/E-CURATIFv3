@@ -10,15 +10,13 @@
   <div>
     <a href="/source/create"><img class="iconeWidth" src="/static/img/icone_ps.png" /></a>
 
-    <form enctype="multipart/form-data" action="//localhost:8080/importCSV" method="POST">
+    <form id="getFile" enctype="multipart/form-data" action="//localhost:8080/importCSV" method="POST">
       <input type="hidden" name="csrf_token" value="{{ .CSRFToken }}">
       <label class="custom-file-button">
-	<input id="importCSV" type="file" accept=".csv" name="inpt"
-	  onchange="form.submit(); alert('Fichier en cours de transfert...');">
+	<input id="importCSV" type="file" accept=".csv" name="inpt">
 	<img class="iconeWidth" src="/static/img/icone_import2.png">
       </label>
     </form>
-
     <a href="//localhost:8080/exportCSV">
       <img class="iconeWidth" src="/static/img/icone_export2.png" />
     </a>
