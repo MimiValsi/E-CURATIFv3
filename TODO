@@ -2,22 +2,21 @@ LIST DES CURATIFS:
 
 Create NNI validator
 
- Rajouter rougle alerte en cas de trop de diff entre a realiser et total
- petit rouge a la place
+Rajouter rougle alerte en cas de trop de diff entre a realiser et total
+petit rouge a la place
 
- Ajouter update dans DB
+Ajouter update dans DB
 
- Create users session. Create own or ask for Gardian? ( BOTH )
+Create users session. Create own or ask for Gardian? ( BOTH )
 
- Rajouter emplacement pour images
- Rajouter DI depuis Maximo et éventuellement fiche avarie
+Rajouter emplacement pour images
+Rajouter DI depuis Maximo et éventuellement fiche avarie
 
- Create docker and dockerfile config
-
- Add SIGTERM behavior
+Create docker and dockerfile config
 
 Autho OKTA OPENIDconnect
 Gardien
+
  ---- export query ----
 
 \copy (SELECT
