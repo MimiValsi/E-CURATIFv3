@@ -9,14 +9,14 @@
     {{ with .Form.FieldErrors.nni }}
     <label class="error">{{ . }}</label>
     {{ end }}
-    <input type="text" name="nni" value="{{ .Form.NNI }}" autofocus required />
+    <input class="login" type="text" name="nni" value="{{ .Form.NNI }}" autofocus required />
   </div>
   <div class="center-text">
     <label>Password:</label><br />
     {{ with .Form.FieldErrors.password }}
     <label class="error">{{ . }}</label>
     {{ end }}
-    <input type="password" name="password" required />
+    <input class="login" type="password" name="password" required />
   </div>
   <br />
   <div class="center-text">

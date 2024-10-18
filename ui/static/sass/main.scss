@@ -403,19 +403,17 @@ top-margin {
   margin-bottom: 1rem;
 }
 
-form input[type="text"],
-form input[type="nni"],
-form input[type="password"],
-form input[type="email"] {
+.login {
   padding: 0.75rem 1rem;
   width: 15%;
   font-size: 1rem;
+  text-align: center;
+  color: #6A6C6F;
+  background: #FFFFFF;
+  border: 1px solid #E4E5E7;
+  border-radius: 3px;
 }
 
-form input[type=text],
-form input[type="nni"],
-form input[type="password"],
-form input[type="email"],
 textarea {
   color: #6A6C6F;
   background: #FFFFFF;
@@ -431,7 +429,6 @@ input[type="submit"] {
   // padding: 18px 27px;
   border: none;
   display: inline-block;
-  margin-top: 18px;
   font-weight: 700;
   font-size: 1rem;
 }

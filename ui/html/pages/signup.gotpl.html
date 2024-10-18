@@ -1,4 +1,5 @@
-{{define "title"}}Signup{{end}} {{ define "nav" }} {{ end }} {{define "main"}}
+{{ define "title" }} Signup {{ end }} {{ define "nav" }} {{ end }} {{ define
+"main" }}
 <form action="/user/signup" method="POST" novalidate>
   <input type="hidden" name="csrf_token" value="{{ .CSRFToken }}" />
   <div class="sign">
@@ -6,21 +7,40 @@
     {{ with .Form.FieldErrors.nni }}
     <label class="error">{{ . }}</label>
     {{ end }}
-    <input type="text" name="nni" value="{{ .Form.NNI }}" autofocus required />
+    <input
+      class="login"
+      type="text"
+      name="nni"
+      value="{{ .Form.NNI }}"
+      autofocus
+      required
+    />
   </div>
   <div class="sign">
     <label>Email:</label><br />
     {{ with .Form.FieldErrors.email }}
     <label class="error">{{ . }}</label>
     {{ end }}
-    <input type="email" name="email" value="{{ .Form.Email }}" required />
+    <input
+      class="login"
+      type="email"
+      name="email"
+      value="{{ .Form.Email }}"
+      required
+    />
   </div>
   <div class="sign">
     <label>Password:</label><br />
     {{ with .Form.FieldErrors.password }}
     <label class="error">{{ . }}</label>
     {{ end }}
-    <input type="password" name="password" id="password" required />
+    <input
+      class="login"
+      type="password"
+      name="password"
+      id="password"
+      required
+    />
   </div>
   <div class="sign">
     <input type="submit" value="Créer" />
