@@ -1,3 +1,6 @@
 [submodule "ui/static/sass/bulma"]
 	path = ui/static/sass/bulma
 	url = git@github.com:MimiValsi/bulma.git
+[submodule "ui/static/js/billboard.js"]
+	path = ui/static/js/billboard.js
+	url = git@github.com:MimiValsi/billboard.js.git
