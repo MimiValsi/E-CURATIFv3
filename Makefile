@@ -9,7 +9,7 @@ sass:
 	@echo "Compiling css file"
 	@sassc ui/static/sass/main.scss ui/static/sass/main.css
 
-# Compile seulement golang
+# Compile seulement côté golang
 build:
 	@echo "Compiling program"
 	@go build -o $(NAME) ./cmd/
