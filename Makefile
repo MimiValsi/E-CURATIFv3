@@ -25,9 +25,8 @@ install:
 	@echo "building docker..."
 	@docker buildx build -t ecuratif_db ./database/
 	@docker run -d --name ecuratif_psql_container -p 5432:5432 ecuratif_db:latest
-	@sleep 10
-	@mkdir tls
-	@go run /usr/local/go/src/crypto/tls/generate_cert.go --rsa-bits=2048 --host=localhost
+	@npm install --prefix=./ui/static/js/ billboard.js
+	@mkdir tls && cd tls/ && go run /usr/local/go/src/crypto/tls/generate_cert.go --rsa-bits=2048 --host=localhost
 	@echo "Compiling css files..."
 	@sassc ui/static/sass/main.scss ui/static/sass/main.css
 	@echo "Compiling program..."
