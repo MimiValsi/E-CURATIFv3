@@ -2,8 +2,13 @@
 <!doctype html>
 <html lang="en">
   <head>
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
     <meta charset="utf-8" />
     <link rel="stylesheet" href="/static/sass/main.css" />
+    <link
+      rel="stylesheet"
+      href="/static/js/node_modules/billboard.js/dist/billboard.css"
+    />
     <link
       rel="shortcut icon"
       type="image/x-icon"
@@ -24,10 +29,9 @@
       <div class="flash">{{ . }}</div>
       {{ end }} {{ template "main" . }}
     </main>
-    <script
-      src="/static/js/node_modules/billboard.js/dist/billboard.pkgd.js"
-      type="text/javascript"
-    ></script>
+    <!--src="/static/js/billboard.js/dist/billboard.pkgd.js"-->
+    <script src="/static/js/node_modules/billboard.js/dist/billboard.pkgd.min.js"></script>
+    <!--<script src="/static/js/billboard.js"></script>-->
     <script src="/static/js/main.js" type="text/javascript"></script>
   </body>
 </html>
