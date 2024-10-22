@@ -1,13 +1,10 @@
 @charset "utf-8";
-// @import "./@mdi/font/css/materialdesignicons.min.css";
-@import "./bulma/bulma.scss";
+// @import "./node_modules/bulma/css/bulma.min.css";
 @import "../js/node_modules/billboard.js/dist/billboard.css";
 
 /*******************
  * BULMA VARIABLES *
  *******************/
-$file-border-color: none;
-$file-cta-background-color: none;
 
 /***********************
  * BULMA VARIABLES END *
@@ -16,6 +13,10 @@ $file-cta-background-color: none;
 /****************
  * MY VARIABLES *
  ****************/
+
+button:hover {
+  cursor: pointer;
+}
 
 /********************
  * MY VARIABLES END *
@@ -120,6 +121,13 @@ nav .custom-file-button {
 /********
  * HOME *
  ********/
+.button-large {
+  padding: 1rem;
+  font-size: 1rem;
+  color: black;
+  border: gray 1px solid;
+  border-radius: 0.3rem;
+}
 
 /************
  * HOME END *
@@ -151,14 +159,11 @@ nav .custom-file-button {
 }
 
 #header {
-  background-image: -webkit-linear-gradient(left, #96cd32 15%, #1423cd 30%, #1423cd 100%);
+  background-image: -webkit-linear-gradient(left, #96cd32 15%, #1423cd 30%);
   background-size: 100% 0.6rem;
   background-repeat: no-repeat;
   padding-top: 1rem;
   text-align: center;
-
-  /* Temporaire, délimitation des divs*/
-  // border-bottom: 0.063rem solid;
 }
 
 #myPlot {
@@ -175,14 +180,33 @@ nav .custom-file-button {
 
 .ps-title {
   font-size: 3rem;
-  font-style: bold;
+  font-weight: 700;
   text-align: center;
 }
 
 .inpt {
   height: 3rem;
-  font-size: 1.2rem;
-  border-radius: 0.25rem;
+  font-size: 1rem;
+  border-radius: 3px;
+  border: 1px solid #E4E5E7;
+  width: 100%;
+}
+
+.inpt-create {
+  height: 3rem;
+  font-size: 1rem;
+  border-radius: 3px;
+  border: 1px solid #E4E5E7;
+}
+
+textarea {
+  // color: #6A6C6F;
+  height: 3rem;
+  font-size: 1rem;
+  border-radius: 3px;
+  // background: #FFFFFF;
+  border: 1px solid #E4E5E7;
+  width: 100%;
 }
 
 .inptAlert {
@@ -217,7 +241,11 @@ table {
   width: calc(100% / 2);
   border-collapse: collapse;
   table-layout: fixed;
-  margin: 1rem auto;
+}
+
+.list {
+  display: grid;
+  grid-template-columns: repeat(2, 25%);
 }
 
 th,
@@ -302,11 +330,12 @@ top-margin {
  ***********/
 .green-btn {
   background-color: #99cc33 !important;
-  color: white;
+  color: black;
 }
 
 .turquoise-btn {
   background-color: #33cccc !important;
+  color: black;
 }
 
 .blue-btn {
@@ -316,11 +345,12 @@ top-margin {
 
 .yellow-btn {
   background-color: #fff000 !important;
+  color: black;
 }
 
 .orange-btn {
   background-color: #ff7f00 !important;
-  color: white;
+  color: black;
 }
 
 .red-btn {
@@ -359,6 +389,51 @@ top-margin {
   background: none;
   cursor: pointer;
   padding: 0;
+}
+
+.button-submit {
+  background-color: #4EB722;
+  color: #FFFFFF;
+  cursor: pointer;
+  border: none;
+  text-decoration: none;
+  padding: 1rem;
+  display: inline-block;
+  font-size: 1rem;
+  border-radius: 3px;
+  font-weight: 700;
+}
+
+.button-submit:hover {
+  background-color: #62CB31;
+  border-radius: 3px;
+  color: #FFFFFF;
+  border: none;
+  display: inline-block;
+  font-weight: 700;
+  font-size: 1rem;
+}
+
+.btn-create {
+  background-color: #3162CB;
+  border-radius: 3px;
+  color: #FFFFFF;
+  border: none;
+  display: inline-block;
+  font-weight: 700;
+  font-size: 1rem;
+  padding: 1rem;
+}
+
+.btn-create:hover {
+  background-color: #3072AB;
+  border-radius: 3px;
+  color: #FFFFFF;
+  border: none;
+  display: inline-block;
+  font-weight: 700;
+  font-size: 1rem;
+  padding: 1rem;
 }
 
 /***************
@@ -414,31 +489,7 @@ top-margin {
   border-radius: 3px;
 }
 
-textarea {
-  color: #6A6C6F;
-  background: #FFFFFF;
-  border: 1px solid #E4E5E7;
-  border-radius: 3px;
-}
 
-a.button,
-input[type="submit"] {
-  background-color: #62CB31;
-  border-radius: 3px;
-  color: #FFFFFF;
-  border: none;
-  display: inline-block;
-  font-weight: 700;
-  font-size: 1rem;
-}
-
-a.button:hover,
-input[type="submit"]:hover {
-  background-color: #4EB722;
-  color: #FFFFFF;
-  cursor: pointer;
-  text-decoration: none;
-}
 
 /************
  * USER END *
