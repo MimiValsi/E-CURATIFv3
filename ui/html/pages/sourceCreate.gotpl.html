@@ -9,7 +9,7 @@
 {{ end }} {{ define "main" }}
 <form name="srcInpt" action="/source/create" method="POST">
   <input type="hidden" name="csrf_token" value="{{ .CSRFToken }}" />
-  <label class="title blockMargin">Nom du Poste Source:<br /></label>
+  <label class="title blockMargin">Poste Source:<br /></label>
   <input
     placeholder="Ex.: Billancourt"
     id="name"
@@ -19,7 +19,7 @@
     required
     autofocus
   /><br />
-  <label class="title blockMargin">Code GMAO<br /></label>
+  <label class="title blockMargin">Code GMAO:<br /></label>
   <input
     placeholder="Ex.: BILLA"
     id="name"
@@ -28,10 +28,6 @@
     class="inpt blockMargin"
     required
   /><br />
-  <input
-    type="submit"
-    value="Créer"
-    class="button is-primary is-light is-medium blockMargin"
-  />
+  <input type="submit" value="Créer" class="button-submit blockMargin" />
 </form>
 {{ end }}

@@ -60,7 +60,7 @@
 	     le: Lesser Equal  -->
 	{{ if and (ge .Average 0) (le .Average 19) }}
 	<!-- if curatif -->
-	<button name="{{ .Curatifs }}" class="button is-large red-btn">
+	<button name="{{ .Curatifs }}" class="button-large red-btn">
 	  <span class="is-size-5">
 	    {{ .Name }}
 	    <!-- {{ .Diff }} -->
@@ -68,7 +68,7 @@
 	</button>
 
 	{{ else if and (ge .Average 20) (le .Average 39) }}
-	<button name="{{ .Curatifs }}" class="button is-large orange-btn">
+	<button name="{{ .Curatifs }}" class="button-large orange-btn">
 	  <span class="is-size-5">
 	    {{ .Name }}
 	    <!-- {{ .Diff }} -->
@@ -76,7 +76,7 @@
 	</button>
 
 	{{ else if and (ge .Average 40) (le .Average 59) }}
-	<button name="{{ .Curatifs }}" class="button is-large yellow-btn">
+	<button name="{{ .Curatifs }}" class="button-large yellow-btn">
 	  <span class="is-size-5">
 	    {{ .Name }}
 	    <!-- {{ .Diff }} -->
@@ -84,7 +84,7 @@
 	</button>
 
 	{{ else if and (ge .Average 60) (le .Average 79) }}
-	<button name="{{ .Curatifs }}" class="button is-large blue-btn">
+	<button name="{{ .Curatifs }}" class="button-large blue-btn">
 	  <span class="is-size-5">
 	    {{ .Name }}
 	    <!-- {{ .Diff }} -->
@@ -92,7 +92,7 @@
 	</button>
 
 	{{ else if and (ge .Average 80) (le .Average 99) }}
-	<button name="{{ .Curatifs }}" class="button is-large turquoise-btn">
+	<button name="{{ .Curatifs }}" class="button-large turquoise-btn">
 	  <span class="is-size-5">
 	    {{ .Name }}
 	    <!-- {{ .Diff }} -->
@@ -100,7 +100,7 @@
 	</button>
 
 	{{ else if (eq .Average 100) }}
-	<button name="{{ .Curatifs }}" class="button is-large green-btn">
+	<button name="{{ .Curatifs }}" class="button-large green-btn">
 	  <span class="is-size-5">
 	    {{ .Name }}
 	    <!-- {{ .Diff }} -->

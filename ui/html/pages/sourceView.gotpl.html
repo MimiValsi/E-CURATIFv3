@@ -22,21 +22,18 @@
 {{ with .Source }}
 <div class="margin">
   <h2 class="ps-title">{{ .Name }}</h2>
-  <br>
   {{ end }}
-  <div>
+  <div class="list">
 
     {{ if .Infos }}
     <div>
       <input type="text" class="search-info top-margin" id="search_info" placeholder="Chercher des statut...">
-    </div>
-    {{ if .IsAuthenticated }}
-    <div>
+      {{ if .IsAuthenticated }}
       <form action="/source/{{ .Source.ID }}/info/create">
-        <button name="createInfo" class="button is-info is-light">Créer Curatif</button>
+        <button name="createInfo" class="btn-create">Créer Curatif</button>
       </form>
+      {{ end }}
     </div>
-    {{ end }}
 
     <table id="info_table">
       <!-- id @ "Home Page section" border-bottom -->
@@ -99,11 +96,6 @@
       {{ else }}
       <p>Poste Source Prope...</p>
 
-      {{ if .IsAuthenticated }}
-      <form action="/source/{{ .Source.ID }}/info/create">
-        <button name="createInfo" class="button is-info is-light">Créer Curatif</button>
-      </form>
-      {{ end }}
       {{ end }}
     </table>
     <span id="noMatch" class="no-match">

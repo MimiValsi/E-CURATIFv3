@@ -22,16 +22,15 @@
     <input type="hidden" name="csrf_token" value="{{ .CSRFToken }}">
     <table>
       <tr>
-        <th class="center-text">Ouvrage</th>
-        <th></th>
+        <th colspan="2" class="center-text">Ouvrage</th>
         <th class="center-text">Date de création</th>
       </tr>
       <tr>
         <td colspan="2">
-            <input placeholder="..." class="input" type="text" name="ouvrage" id="ouvrage" autofocus>
+            <input placeholder="..." class="inpt" type="text" name="ouvrage" id="ouvrage" autofocus>
         </td>
         <td>
-          <input placeholder="..." class="input" type="text" name="created" id="created">
+          <input placeholder="..." class="inpt" type="text" name="created" id="created">
         </td>
       </tr>
       <tr>
@@ -53,15 +52,15 @@
       </tr>
       <tr>
         <td>
-          <input placeholder="..." class="input" type="text"
+          <input placeholder="..." class="inpt" type="text"
                  name="entite" id="entite" >
         </td>
         <td>
-          <input placeholder="..." class="input" type="text"
+          <input placeholder="..." class="inpt" type="text"
                  name="priorite" id="priorite" >
         </td>
         <td>
-          <input placeholder="..." class="input" type="text" name="echeance" id="echeance">
+          <input placeholder="..." class="inpt" type="text" name="echeance" id="echeance">
         </td>
       </tr>
       <tr>
@@ -92,13 +91,13 @@
           </label>
           <label class="radio">
             <input type="radio" name="status"
-              value="Réalisée">
-            Réalisée
+              value="Réalisé">
+            Réalisé
           </label>
           <label class="radio">
             <input type="radio" name="status"
-                   value="archivée">
-            archivée
+                   value="archivé">
+            archivé
           </label>
         </td>
       </tr>
