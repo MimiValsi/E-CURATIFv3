@@ -26,7 +26,7 @@
   <div class="user_div">
     <form class="user" action="/user/logout" method="POST">
       <input type="hidden" name="csrf_token" value="{{ .CSRFToken }}">
-      <button type="submit" class="logout">
+      <button id="logout" type="submit" class="logout">
 	Déconnexion
     </form>
   </div>
