@@ -3,46 +3,47 @@ SELECT 'CREATE DATABASE ecuratif' WHERE NOT EXISTS (SELECT FROM pg_database WHER
 \c ecuratif
 
 CREATE TABLE IF NOT EXISTS source (
-	id SERIAL PRIMARY KEY NOT NULL,
-	name VARCHAR,
-	code_gmao VARCHAR
+  id SERIAL PRIMARY KEY NOT NULL,
+  name VARCHAR,
+  code_gmao VARCHAR
 );
 
 CREATE TABLE IF NOT EXISTS info (
-	id SERIAL NOT NULL,
-	agent VARCHAR,
-	ouvrage VARCHAR,
-	priorite INTEGER,
-	detail TEXT,
-	source_id INTEGER,
-	created DATE,
-	updated DATE,
-	status VARCHAR,
-	evenement VARCHAR,
-	commentaire VARCHAR,
-	echeance VARCHAR,
-	entite VARCHAR,
-	CONSTRAINT fk_source
-	  FOREIGN KEY(source_id) REFERENCES source(id)
+  id SERIAL NOT NULL,
+  agent VARCHAR,
+  ouvrage VARCHAR,
+  priorite INTEGER,
+  detail TEXT,
+  source_id INTEGER,
+  created DATE,
+  updated DATE,
+  status VARCHAR,
+  evenement VARCHAR,
+  commentaire VARCHAR,
+  echeance VARCHAR,
+  entite VARCHAR,
+  CONSTRAINT fk_source
+    FOREIGN KEY(source_id) REFERENCES source(id)
 );
 
 CREATE TABLE IF NOT EXISTS sessions (
-	token VARCHAR(43) PRIMARY KEY,
-	data BYTEA NOT NULL,
-	expiry TIMESTAMP(6) NOT NULL
+  token VARCHAR(43) PRIMARY KEY,
+  data BYTEA NOT NULL,
+  expiry TIMESTAMP(6) NOT NULL
 );
 
 CREATE INDEX sessions_expiry_idx ON sessions (expiry);
 
 CREATE TABLE IF NOT EXISTS users (
-  id SERIAL PRIMARY KEY NOT NULL,
+  id BIGSERIAL PRIMARY KEY NOT NULL,
   nni VARCHAR NOT NULL,
-  email VARCHAR NOT NULL,
-  hashed_password VARCHAR(60) NOT NULL,
-  created DATE NOT NULL
+  email TEXT NOT NULL,
+  hashed_password BYTEA NOT NULL,
+  created DATE
 );
 
 ALTER TABLE users ADD CONSTRAINT users_uc_email UNIQUE (email);
+ALTER TABLE users ADD CONSTRAINT users_uc_nni UNIQUE (nni);
 
 INSERT INTO source (name, code_gmao)
 VALUES ('ALSACE', 'ALSAC');
