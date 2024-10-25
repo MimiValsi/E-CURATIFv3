@@ -50,7 +50,9 @@ func MaxChars(value string, n int) bool {
 
 var EmailRX = regexp.MustCompile("^[a-zA-Z0-9.!#$%&'*+/=?^_`{|}~-]+@[a-zA-Z0-9](?:[a-zA-Z0-9-]{0,61}[a-zA-Z0-9])?(?:\\.[a-zA-Z0-9](?:[a-zA-Z0-9-]{0,61}[a-zA-Z0-9])?)*$")
 
-var NniRx = regexp.MustCompile("^[a-zA-Z]{1}[0-9]{5}$")
+var NniRx = regexp.MustCompile(`^[a-zA-Z]{1}[0-9]{5}$`)
+
+var passRx = regexp.MustCompile(`^[a-zA-Z0-9.!@#$%^&*()_+-={}[]"';:.,?></]{8,}$`)
 
 func MinChars(value string, n int) bool {
 	return utf8.RuneCountInString(value) >= n
