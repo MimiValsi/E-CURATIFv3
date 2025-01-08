@@ -2,6 +2,8 @@ LIST DES CURATIFS:
 
 Create NNI validator
 
+Add docker volume
+
 Rajouter rougle alerte en cas de trop de diff entre a realiser et total
 petit rouge a la place
 
