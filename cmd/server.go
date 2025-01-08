@@ -14,6 +14,7 @@ import (
 func (app *application) serve() error {
 
 	tlsConfig := &tls.Config{
+		MinVersion:       tls.VersionTLS13,
 		CurvePreferences: []tls.CurveID{tls.X25519, tls.CurveP256},
 	}
 
