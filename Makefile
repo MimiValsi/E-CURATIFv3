@@ -24,7 +24,7 @@ build:
 install:
 	@echo "building docker..."
 	@docker buildx build -t ecuratif_db ./database/
-	@docker run -d --name ecuratif_psql_container -p 5432:5432 ecuratif_db:latest
+	@docker run -d --name ecuratif_psql_container -p 5432:5432 -v ecuratif_vol:/var/lib/ecuratif_vol ecuratif_db:latest
 	@echo "installing billboard.js via npm..."
 	@npm install --prefix=./ui/static/js/ billboard.js
 	@echo "generating tls certification(localhost only)..."
